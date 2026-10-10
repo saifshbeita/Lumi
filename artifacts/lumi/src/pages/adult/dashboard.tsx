@@ -15,6 +15,7 @@ function AddStudent({ parent, noun, onClose }: { parent: boolean; noun: string; 
   const [f, setF] = useState({ name: '', username: '', pin: '' });
   const [mode, setMode] = useState<Mode>('dyslexia');
   const [interests, setInterests] = useState<string[]>([]);
+  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
   const [assessed, setAssessed] = useState(false);
   const [error, setError] = useState('');
   const submit = (e: FormEvent) => {
@@ -23,7 +24,7 @@ function AddStudent({ parent, noun, onClose }: { parent: boolean; noun: string; 
     if (!/^[a-zA-Z0-9_]{3,40}$/.test(f.username)) return setError('Username: 3 to 40 letters, numbers or underscores.');
     if (!/^[0-9]{4}$/.test(f.pin)) return setError('The PIN must be exactly 4 digits.');
     if (parent && !assessed) return setError('Please confirm the assessment checkbox. Without it we cannot create the account.');
-    create.mutate({ data: { name: f.name.trim(), username: f.username, pin: f.pin, mode, ...(interests.length ? { interests } : {}), ...(parent ? { assessmentConfirmed: true } : {}) } }, {
+    create.mutate({ data: { name: f.name.trim(), username: f.username, pin: f.pin, mode, language, ...(interests.length ? { interests } : {}), ...(parent ? { assessmentConfirmed: true } : {}) } }, {
       onSuccess: () => { qc.invalidateQueries({ queryKey: getListStudentsQueryKey() }); onClose(); },
       onError: (er) => setError(errMsg(er, 'We could not add this account. The username may already be taken.')),
     });
@@ -49,6 +50,17 @@ function AddStudent({ parent, noun, onClose }: { parent: boolean; noun: string; 
             ))}
           </div>
           <p className="mt-2 text-base">This decides how the child's Lumi looks and feels. You can change it later.</p>
+        </fieldset>
+        <fieldset>
+          <legend className="mb-2">Language</legend>
+          <div className="flex flex-wrap gap-3" role="radiogroup">
+            {(['ar', 'en'] as const).map((l) => (
+              <label key={l} className={cx('inline-flex items-center min-h-14 px-6 rounded-full border border-navy cursor-pointer has-[:focus-visible]:outline-4 has-[:focus-visible]:outline-navy has-[:focus-visible]:outline-offset-2', language === l ? 'bg-navy text-white' : 'bg-card')}>
+                <input type="radio" name="language" value={l} checked={language === l} onChange={() => setLanguage(l)} className="sr-only" data-testid={`radio-language-${l}`} />
+                {l === 'ar' ? 'Arabic' : 'English'}
+              </label>
+            ))}
+          </div>
         </fieldset>
         {parent && (
           <label className="flex items-start gap-4 bg-card border border-navy rounded-2xl p-5 cursor-pointer">

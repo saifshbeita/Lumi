@@ -93,6 +93,14 @@ export interface AdultSignup {
   school?: string;
 }
 
+export type StudentLanguage = typeof StudentLanguage[keyof typeof StudentLanguage];
+
+
+export const StudentLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 /**
  * @maxItems 5
  * @items.minLength 1
@@ -102,6 +110,7 @@ export interface AdultSignup {
 export type Interests = string[];
 
 export interface Student {
+  language: StudentLanguage;
   interests: Interests;
   id: number;
   name: string;
@@ -110,7 +119,16 @@ export interface Student {
   assessmentConfirmed: boolean;
 }
 
+export type StudentInputLanguage = typeof StudentInputLanguage[keyof typeof StudentInputLanguage];
+
+
+export const StudentInputLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 export interface StudentInput {
+  language?: StudentInputLanguage;
   interests?: Interests;
   /**
      * @minLength 1
@@ -129,7 +147,16 @@ export interface StudentInput {
   assessmentConfirmed?: boolean;
 }
 
+export type StudentUpdateLanguage = typeof StudentUpdateLanguage[keyof typeof StudentUpdateLanguage];
+
+
+export const StudentUpdateLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 export interface StudentUpdate {
+  language?: StudentUpdateLanguage;
   mode?: Mode;
   interests?: Interests;
 }
@@ -166,7 +193,16 @@ export interface DemoModeResult {
   error?: string;
 }
 
+export type StudentLoginLanguage = typeof StudentLoginLanguage[keyof typeof StudentLoginLanguage];
+
+
+export const StudentLoginLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 export interface StudentLogin {
+  language?: StudentLoginLanguage;
   /**
      * @minLength 1
      * @maxLength 40

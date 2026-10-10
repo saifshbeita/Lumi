@@ -28,6 +28,9 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
   const [mode, setMode] = useState<Mode | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   useEffect(() => { if (current) setMode(current); }, [current]);
+  const currentLang = data?.student.language ?? 'ar';
+  const [language, setLanguage] = useState<'ar' | 'en'>('ar');
+  useEffect(() => { setLanguage(currentLang); }, [currentLang]);
   // Interests: init once per student; polling never overwrites local edits.
   const [interests, setInterests] = useState<string[]>([]);
   const [savedInterests, setSavedInterests] = useState<string[]>([]);
@@ -66,11 +69,11 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
   const save = () => {
     if (!mode) return;
     setMsg(null);
-    update.mutate({ id, data: { mode } }, {
+    update.mutate({ id, data: { mode, language } }, {
       onSuccess: () => {
         qc.invalidateQueries({ queryKey: getGetStudentQueryKey(id) });
         qc.invalidateQueries({ queryKey: getListStudentsQueryKey() });
-        setMsg({ ok: true, text: `Saved. ${student.name}'s Lumi now uses ${modeLabel[mode]} mode.` });
+        setMsg({ ok: true, text: `Saved. ${student.name}'s Lumi now uses ${modeLabel[mode]} mode in ${language === 'ar' ? 'Arabic' : 'English'}.` });
       },
       onError: (e) => setMsg({ ok: false, text: errMsg(e) }),
     });
@@ -102,8 +105,21 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
               </label>
             ))}
           </div>
+          <div className="mt-5">
+            <fieldset>
+              <legend className="mb-2">Language</legend>
+              <div className="flex flex-wrap gap-3" role="radiogroup">
+                {(['ar', 'en'] as const).map((l) => (
+                  <label key={l} className={cx('inline-flex items-center min-h-14 px-6 rounded-full border border-navy cursor-pointer has-[:focus-visible]:outline-4 has-[:focus-visible]:outline-navy has-[:focus-visible]:outline-offset-2', language === l ? 'bg-navy text-white' : 'bg-card')}>
+                    <input type="radio" name="edit-language" value={l} checked={language === l} onChange={() => setLanguage(l)} className="sr-only" data-testid={`radio-edit-language-${l}`} />
+                    {l === 'ar' ? 'Arabic' : 'English'}
+                  </label>
+                ))}
+              </div>
+            </fieldset>
+          </div>
           <div className="mt-5 flex items-center gap-4 flex-wrap">
-            <Button onClick={save} disabled={update.isPending || !mode || mode === current} data-testid="button-save-mode">{update.isPending ? 'Saving...' : 'Save mode'}</Button>
+            <Button onClick={save} disabled={update.isPending || !mode || (mode === current && language === currentLang)} data-testid="button-save-mode">{update.isPending ? 'Saving...' : 'Save mode & language'}</Button>
             {msg && (msg.ok ? <p role="status" className="bg-sage rounded-2xl px-5 py-3 border border-navy" data-testid="text-saved">{msg.text}</p> : <ErrorBox>{msg.text}</ErrorBox>)}
           </div>
         </fieldset>

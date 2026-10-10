@@ -28,7 +28,7 @@ router.get("/", async (_req, res): Promise<void> => {
 });
 router.post("/", limiter, async (_req, res): Promise<void> => {
   const student = res.locals.student as StudentRow;
-  const [chat] = await db.insert(chats).values({ studentId: student.id, title: "محادثة جديدة", icon: null }).returning();
+  const [chat] = await db.insert(chats).values({ studentId: student.id, title: student.language === "en" ? "New chat" : "محادثة جديدة", icon: null }).returning();
   res.status(201).json(CreateStudentChatResponse.parse(publicChat(chat!)));
 });
 router.get("/:id/messages", async (req, res): Promise<void> => {
@@ -89,17 +89,19 @@ router.post("/:id/messages", limiter, async (req, res): Promise<void> => {
     if (!studentMessage) throw new Error("Student message was not saved");
     savedId = studentMessage.id;
     const contextRows = await lockedDb.select({ role: messages.role, content: messages.content }).from(messages).where(eq(messages.chatId, chatId)).orderBy(desc(messages.id)).limit(20);
-    const answer = await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests);
+    const answer = await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests, undefined, current.language);
     // A mode reassignment during generation must not return the old mode's reply.
     const [fresh] = await lockedDb.select().from(students).where(eq(students.id, student.id));
     if (!fresh || fresh.conditions[0] !== mode) { res.status(409).json({ error: "تم تحديث مساحة التعلم. افتحها من جديد ثم أعد المحاولة.", studentMessageId: savedId }); return; }
     const [reply] = await lockedDb.insert(messages).values({ chatId, role: "ai", content: answer }).returning();
+    // A descriptive title must never hold back the visible answer or speech.
     let labeledChat = chat;
     if (!chat.icon) {
-      let label = { title: "نتعلم مع لومي", icon: "💬" };
-      try { label = await generateChatLabel(content, answer); }
-      catch { req.log.warn({ chatId }, "Chat labeling unavailable; used safe Arabic label"); }
-      [labeledChat] = await lockedDb.update(chats).set(label).where(and(eq(chats.id, chatId), eq(chats.studentId, student.id))).returning() as [typeof chats.$inferSelect];
+      const label = { title: current.language === "en" ? "Learning with Lumi" : "نتعلم مع لومي", icon: "💬" };
+      [labeledChat] = await lockedDb.update(chats).set(label).where(eq(chats.id, chatId)).returning() as [typeof chats.$inferSelect];
+      void generateChatLabel(content, answer, current.language).then(async title => {
+        await db.update(chats).set(title).where(and(eq(chats.id, chatId), eq(chats.studentId, student.id)));
+      }).catch(() => req.log.warn({ chatId }, "Background chat labeling unavailable"));
     }
     res.json(SendStudentMessageResponse.parse({ chat: publicChat(labeledChat), studentMessage: publicMessage(studentMessage), reply: publicMessage(reply!) }));
     scheduleInsights(student.id, chatId);

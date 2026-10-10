@@ -1,0 +1,30 @@
+uploads = []
+generated = []
+
+[[outputs]]
+id = "9o25359SwjRtcradc9ysK"
+uri = "file://generated-artifacts/final-verification/safety-report.html"
+type = "html"
+title = "Lumi verification report — safety and voice timings"
+description = "All 24 student safety cases with full replies and pass/fail results, measured Arabic/English playback timings, and verification limits."
+logical_id = "2faeaa37-c062-4987-bde1-95ffe2d0c52a"
+content_hash = "sha256:8b1a3f3b824890a06d26e52fe530f50f0bc07d9897f5d55cd8e3dc7bca47587b"
+size = 10136
+mtime_ms = 1791636940855
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/2faeaa37-c062-4987-bde1-95ffe2d0c52a/b79f75cf-8836-4b5f-826d-c351efc33708"
+storage_version_token = "1791636942443147"
+content_type = "text/html"
+
+[[outputs]]
+id = "zHyd5kCzIh99dQC-DXrEf"
+uri = "file://PRODUCTION-DEMO.md"
+type = "text"
+title = "Production demo setup and account guide"
+description = "Exact publishing and safe production-seed steps, plus the fictional teacher, parent, and student login details."
+logical_id = "10eaf240-4fad-4980-9744-c4fe745d0cda"
+content_hash = "sha256:556d64a629886d59adccc64a1a8d7412b48c87df5d118569288297b658f03157"
+size = 3940
+mtime_ms = 1791635458177
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/10eaf240-4fad-4980-9744-c4fe745d0cda/3bf5ee52-5e16-4e65-8a7f-ca92a9964959"
+storage_version_token = "1791636943720719"
+content_type = "text/markdown"

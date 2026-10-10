@@ -6,8 +6,10 @@
  */
 import type { Interests } from './interests';
 import type { Mode } from './mode';
+import type { StudentLanguage } from './studentLanguage';
 
 export interface Student {
+  language: StudentLanguage;
   interests: Interests;
   id: number;
   name: string;

@@ -42,7 +42,7 @@ router.post("/voice/transcribe", authorizeTranscription, limit, (req, res) => {
     try {
       const audio = await validatedWav(req.file.buffer, req.file.mimetype.split(";")[0]!);
       const result = await voiceOpenAI.audio.transcriptions.create({
-        model: "gpt-4o-mini-transcribe", language: "ar", response_format: "json",
+        model: "gpt-4o-mini-transcribe", language: res.locals.adultDemo ? "ar" : (await currentStudent(req.session.studentId))?.language ?? "ar", response_format: "json",
         file: await toFile(audio, "question.wav", { type: "audio/wav" }),
       });
       if (!res.locals.adultDemo) {
@@ -100,9 +100,26 @@ export async function serveMessageAudio(req: Request, res: Response, id: number,
       const speech = await voiceOpenAI.audio.speech.create({
         model: "gpt-4o-mini-tts", voice: "sage", speed: 0.9, response_format: "mp3",
         input: message.content,
-        instructions: "Read the supplied Arabic text exactly. Use a warm, calm, clear voice for a child, with gentle pauses. Do not add or change any words.",
+        instructions: "Read the supplied text exactly, in its own language (Arabic or English). Use a warm, calm, clear voice for a child. Do not add or change words.",
       });
-      await file.save(Buffer.from(await speech.arrayBuffer()), { resumable: false, contentType: "audio/mpeg", metadata: { cacheControl: "private, no-store" } });
+      if (!await verifyAccess()) { res.status(403).json({ error: "Audio access changed." }); return; }
+      if (!speech.body) throw new Error("Empty speech stream");
+      res.set({ "Content-Type": "audio/mpeg", "Cache-Control": "private, no-store", "X-Lumi-Audio-Cache": cache, "X-Accel-Buffering": "no" });
+      res.flushHeaders();
+      const chunks: Buffer[] = [];
+      // Chrome progressively decodes MP3. Keep generating/cache even if the
+      // listener pauses or disconnects, so replay never duplicates generation.
+      for await (const chunk of speech.body) {
+        const bytes = Buffer.from(chunk);
+        chunks.push(bytes);
+        if (!res.destroyed) res.write(bytes);
+      }
+      const audio = Buffer.concat(chunks);
+      if (!audio.length) throw new Error("Empty speech");
+      await file.save(audio, { resumable: false, contentType: "audio/mpeg", metadata: { cacheControl: "private, no-store" } });
+      await db.update(messages).set({ audioUrl: expectedPath }).where(and(eq(messages.id, id), eq(messages.chatId, message.chatId)));
+      if (!res.destroyed) res.end();
+      return;
     }
     if (!message.audioUrl) await db.update(messages).set({ audioUrl: expectedPath }).where(and(eq(messages.id, id), eq(messages.chatId, message.chatId)));
     if (!await verifyAccess()) { res.status(403).json({ error: "الصوت غير متاح لهذا الحساب." }); return; }
@@ -111,7 +128,8 @@ export async function serveMessageAudio(req: Request, res: Response, id: number,
     res.send(audio);
   } catch (e) {
     req.log.warn({ messageId: id, kind: e instanceof Error ? e.name : "unknown" }, "Voice playback unavailable");
-    res.status(503).json({ error: "تعذر تشغيل الصوت. يمكنك قراءة الرد أو الضغط للاستماع مرة أخرى." });
+    if (res.headersSent) res.destroy();
+    else res.status(503).json({ error: "تعذر تشغيل الصوت. يمكنك قراءة الرد أو الضغط للاستماع مرة أخرى." });
   } finally {
     if (locked) await client.query("SELECT pg_advisory_unlock(71935, $1)", [id]).catch(() => { brokenConnection = true; });
     client.release(brokenConnection);

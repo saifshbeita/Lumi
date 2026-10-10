@@ -6,6 +6,7 @@ import { db, adults } from "@workspace/db";
 import { SignupAdultBody, LoginAdultBody, SignupAdultResponse, LoginAdultResponse, GetAdultSessionResponse } from "@workspace/api-zod";
 import { regenerateSession, saveSession, destroySession } from "../lib/session";
 import { publicAdult } from "../lib/profiles";
+import { checkLogin } from "../lib/login-lock";
 
 const router: IRouter = Router();
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 30, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "Too many attempts. Please try again in 15 minutes." } });
@@ -28,7 +29,10 @@ router.post("/login", limiter, async (req, res): Promise<void> => {
   const parsed = LoginAdultBody.safeParse(req.body);
   if (!parsed.success) { res.status(400).json({ error: "Please check your email and password." }); return; }
   const [adult] = await db.select().from(adults).where(eq(adults.email, parsed.data.email.trim().toLowerCase()));
-  if (!adult || adult.role !== parsed.data.role || !(await bcrypt.compare(parsed.data.password, adult.passwordHash))) { res.status(401).json({ error: "Email or password doesn't match this account type. Please try again." }); return; }
+  // Legacy development credentials are never valid on the public deployment.
+  if (process.env.NODE_ENV === "production" && ["teacher@lumi.demo", "parent@lumi.demo"].includes(parsed.data.email.trim().toLowerCase())) { res.status(401).json({ error: "Use the production pitch demo account." }); return; }
+  const result = await checkLogin(`adult:${parsed.data.email.trim().toLowerCase()}`, 10, async () => !!adult && adult.role === parsed.data.role && await bcrypt.compare(parsed.data.password, adult.passwordHash));
+  if (result !== "ok" || !adult) { res.status(result === "locked" ? 429 : 401).json({ error: result === "locked" ? "For your safety, this account is paused. Please try again in 15 minutes." : "Email or password doesn't match this account type. Please try again." }); return; }
   await regenerateSession(req); req.session.adultId = adult.id; await saveSession(req);
   res.json(LoginAdultResponse.parse(publicAdult(adult)));
 });

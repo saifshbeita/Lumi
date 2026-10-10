@@ -4,8 +4,10 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { StudentLoginLanguage } from './studentLoginLanguage';
 
 export interface StudentLogin {
+  language?: StudentLoginLanguage;
   /**
      * @minLength 1
      * @maxLength 40

@@ -59,6 +59,7 @@ export const RefreshStudentInsightsResponse = zod.object({
   "lastActive": zod.string().nullable()
 }),
   "student": zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(refreshStudentInsightsResponseStudentInterestsItemMax).regex(refreshStudentInsightsResponseStudentInterestsItemRegExp)).max(refreshStudentInsightsResponseStudentInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -198,6 +199,7 @@ export const listStudentsResponseInterestsMax = 5;
 
 
 export const ListStudentsResponseItem = zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(listStudentsResponseInterestsItemMax).regex(listStudentsResponseInterestsItemRegExp)).max(listStudentsResponseInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -225,6 +227,7 @@ export const createStudentBodyPinRegExp = new RegExp('^[0-9]{4}$');
 
 
 export const CreateStudentBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "interests": zod.array(zod.string().min(1).max(createStudentBodyInterestsItemMax).regex(createStudentBodyInterestsItemRegExp)).max(createStudentBodyInterestsMax).optional(),
   "name": zod.string().min(1).max(createStudentBodyNameMax),
   "username": zod.string().min(createStudentBodyUsernameMin).max(createStudentBodyUsernameMax).regex(createStudentBodyUsernameRegExp),
@@ -242,6 +245,7 @@ export const createStudentResponseInterestsMax = 5;
 
 
 export const CreateStudentResponse = zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(createStudentResponseInterestsItemMax).regex(createStudentResponseInterestsItemRegExp)).max(createStudentResponseInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -271,6 +275,7 @@ export const GetStudentResponse = zod.object({
   "lastActive": zod.string().nullable()
 }),
   "student": zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(getStudentResponseStudentInterestsItemMax).regex(getStudentResponseStudentInterestsItemRegExp)).max(getStudentResponseStudentInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -308,6 +313,7 @@ export const updateStudentBodyInterestsMax = 5;
 
 
 export const UpdateStudentBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "mode": zod.enum(['dyslexia', 'learning', 'autism']).optional(),
   "interests": zod.array(zod.string().min(1).max(updateStudentBodyInterestsItemMax).regex(updateStudentBodyInterestsItemRegExp)).max(updateStudentBodyInterestsMax).optional()
 })
@@ -321,6 +327,7 @@ export const updateStudentResponseInterestsMax = 5;
 
 
 export const UpdateStudentResponse = zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(updateStudentResponseInterestsItemMax).regex(updateStudentResponseInterestsItemRegExp)).max(updateStudentResponseInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -336,6 +343,7 @@ export const loginStudentBodyPinRegExp = new RegExp('^[0-9]{4}$');
 
 
 export const LoginStudentBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "username": zod.string().min(1).max(loginStudentBodyUsernameMax),
   "pin": zod.string().regex(loginStudentBodyPinRegExp)
 })
@@ -349,6 +357,7 @@ export const loginStudentResponseInterestsMax = 5;
 
 
 export const LoginStudentResponse = zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(loginStudentResponseInterestsItemMax).regex(loginStudentResponseInterestsItemRegExp)).max(loginStudentResponseInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -368,6 +377,7 @@ export const getStudentSessionResponseStudentOneInterestsMax = 5;
 
 export const GetStudentSessionResponse = zod.object({
   "student": zod.union([zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(getStudentSessionResponseStudentOneInterestsItemMax).regex(getStudentSessionResponseStudentOneInterestsItemRegExp)).max(getStudentSessionResponseStudentOneInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),
@@ -403,6 +413,7 @@ export const GetStudentModeResponse = zod.object({
   "lastActive": zod.string().nullable()
 }),
   "student": zod.object({
+  "language": zod.enum(['ar', 'en']),
   "interests": zod.array(zod.string().min(1).max(getStudentModeResponseStudentInterestsItemMax).regex(getStudentModeResponseStudentInterestsItemRegExp)).max(getStudentModeResponseStudentInterestsMax),
   "id": zod.number().int(),
   "name": zod.string(),

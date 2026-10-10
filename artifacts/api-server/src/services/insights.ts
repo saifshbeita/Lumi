@@ -64,7 +64,7 @@ async function generate(studentId: number) {
       const response = await openai.chat.completions.create({
         model: "gpt-5.4-mini", reasoning_effort: "low", max_completion_tokens: 3500,
         response_format: { type: "json_object" },
-        messages: [{ role: "system", content: prompt }, { role: "user", content: JSON.stringify({ mode: student.conditions[0], chats: history, currentInsights: current }) }],
+        messages: [{ role: "system", content: prompt + (student.language === "ar" ? "\nLANGUAGE OVERRIDE: Write insight text and evidence explanations in Arabic, preserving the exact verbatim student quotations and JSON keys." : "") }, { role: "user", content: JSON.stringify({ mode: student.conditions[0], chats: history, currentInsights: current }) }],
       }, { timeout: 45000, maxRetries: 0 });
       parsed = output.parse(JSON.parse(response.choices[0]?.message?.content ?? ""));
     }

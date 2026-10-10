@@ -366,8 +366,9 @@ components:
         school: { type: string, maxLength: 200 }
     Student:
       type: object
-      required: [id, name, username, conditions, assessmentConfirmed, interests]
+      required: [id, name, username, conditions, assessmentConfirmed, interests, language]
       properties:
+        language: { type: string, enum: [ar, en] }
         interests: { $ref: "#/components/schemas/Interests" }
         id: { type: integer }
         name: { type: string }
@@ -380,6 +381,7 @@ components:
       type: object
       required: [name, username, pin, mode]
       properties:
+        language: { type: string, enum: [ar, en] }
         interests: { $ref: "#/components/schemas/Interests" }
         name: { type: string, minLength: 1, maxLength: 100 }
         username: { type: string, minLength: 3, maxLength: 40, pattern: "^[a-zA-Z0-9_]+$" }
@@ -390,6 +392,7 @@ components:
       type: object
       minProperties: 1
       properties:
+        language: { type: string, enum: [ar, en] }
         mode: { $ref: "#/components/schemas/Mode" }
         interests: { $ref: "#/components/schemas/Interests" }
     Interests:
@@ -420,6 +423,7 @@ components:
       type: object
       required: [username, pin]
       properties:
+        language: { type: string, enum: [ar, en] }
         username: { type: string, minLength: 1, maxLength: 40 }
         pin: { type: string, pattern: "^[0-9]{4}$" }
     StudentSession:

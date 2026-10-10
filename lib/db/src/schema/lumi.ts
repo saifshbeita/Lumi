@@ -19,6 +19,7 @@ export const students = pgTable("students", {
   pinHash: text("pin_hash").notNull(),
   conditions: text("conditions").array().notNull(),
   interests: text("interests").array().notNull().default(sql`ARRAY[]::text[]`),
+  language: text("language", { enum: ["ar", "en"] }).notNull().default("ar"),
   assessmentConfirmed: boolean("assessment_confirmed").notNull().default(false),
   insightsUpdatedAt: timestamp("insights_updated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
@@ -52,6 +53,12 @@ export const sessions = pgTable("sessions", {
   sess: json("sess").notNull(),
   expire: timestamp("expire", { precision: 6 }).notNull(),
 }, table => [index("sessions_expire_idx").on(table.expire)]);
+export const loginAttempts = pgTable("login_attempts", {
+  key: text("key").primaryKey(),
+  failures: integer("failures").notNull().default(0),
+  windowStartedAt: timestamp("window_started_at", { withTimezone: true }).notNull().defaultNow(),
+  lockedUntil: timestamp("locked_until", { withTimezone: true }),
+});
 export const insertAdultSchema = createInsertSchema(adults).omit({ id: true, createdAt: true });
 export const insertStudentSchema = createInsertSchema(students).omit({ id: true, createdAt: true });
 export const insertChatSchema = createInsertSchema(chats).omit({ id: true, createdAt: true });

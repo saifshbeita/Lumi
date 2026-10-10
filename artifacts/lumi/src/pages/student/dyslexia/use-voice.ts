@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { t, type Lang } from '@/lib/student-i18n';
 
 type Phase = 'idle' | 'listening' | 'thinking';
 const api = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/student${path}`;
@@ -16,7 +17,9 @@ function silence() {
   return URL.createObjectURL(new Blob([data], { type: 'audio/wav' }));
 }
 
-export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) => void, focusFallback: () => void) {
+export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) => void, focusFallback: () => void, language: Lang = 'ar') {
+  const S = useRef(t(language));
+  S.current = t(language);
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
   const [audioState, setAudioState] = useState<{ id: number; state: 'loading' | 'playing' | 'error' } | null>(null);
@@ -47,8 +50,13 @@ export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) 
   const stopPlayback = () => {
     operation.current++;
     controller.current?.abort();
-    element.current?.pause();
-    if (element.current) { element.current.onplaying = null; element.current.onended = null; }
+    const el = element.current;
+    if (el) {
+      el.onplaying = null; el.onended = null; el.onerror = null;
+      el.pause();
+      // Drop a streaming source so the network request is released.
+      if (el.src && !el.src.startsWith('blob:')) { el.removeAttribute('src'); el.load(); }
+    }
     source.current?.stop(); source.current = null;
     if (mounted.current) setAudioState(null);
   };
@@ -87,34 +95,39 @@ export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) 
     stopPlayback();
     if (!automatic) unlock();
     const token = operation.current;
-    const abort = new AbortController(); controller.current = abort;
+    const live = () => mounted.current && token === operation.current;
     setAudioState({ id, state: 'loading' });
-    try {
-      const response = await fetch(api(`/messages/${id}/audio`), { credentials: 'include', signal: abort.signal });
-      if (!response.ok) throw new Error(await friendlyError(response, 'تعذر تشغيل الصوت. اضغط للاستماع مرة أخرى.'));
-      const blob = await response.blob();
-      if (!mounted.current || token !== operation.current) return;
-      if (!element.current) element.current = new Audio();
-      const audio = element.current;
-      const url = URL.createObjectURL(blob); urls.current.push(url);
-      audio.src = url;
-      const started = () => { if (mounted.current && token === operation.current) { setAudioState({ id, state: 'playing' }); notePlaying(); } };
-      const ended = () => { if (mounted.current && token === operation.current) setAudioState(null); };
-      audio.onplaying = started; audio.onended = ended;
-      audio.onerror = () => { if (mounted.current && token === operation.current) setAudioState({ id, state: 'error' }); };
-      try { await audio.play(); }
-      catch {
-        // Safari can reapply element autoplay restrictions after getUserMedia.
-        // The context resumed by the original tap provides a user-unlocked fallback.
-        const ctx = context.current;
-        if (!ctx || ctx.state !== 'running') throw new Error('اضغط الاستماع لتشغيل الرد.');
-        const decoded = await ctx.decodeAudioData(await blob.arrayBuffer());
-        if (!mounted.current || token !== operation.current) return;
+    if (!element.current) { element.current = new Audio(); element.current.setAttribute('playsinline', ''); }
+    const audio = element.current;
+    const url = api(`/messages/${id}/audio`);
+    const started = () => { if (live()) { setAudioState({ id, state: 'playing' }); notePlaying(); } };
+    const ended = () => { if (live()) setAudioState(null); };
+    const failed = () => { if (live()) setAudioState({ id, state: 'error' }); };
+    audio.onplaying = started; audio.onended = ended; audio.onerror = failed;
+    // Same-origin endpoint: cookies are sent automatically, and the browser starts
+    // progressive MP3 playback from the first streamed bytes (no client-side buffering).
+    audio.preload = 'auto';
+    audio.src = url;
+    try { await audio.play(); }
+    catch (e) {
+      if (!live()) return;
+      if (e instanceof DOMException && e.name === 'AbortError') return;
+      if (audio.error) { failed(); return; }
+      // Safari can reapply element autoplay restrictions after getUserMedia.
+      // Fallback only then: fetch and decode through the context resumed by the original tap.
+      const ctx = context.current;
+      if (!ctx || ctx.state !== 'running') { failed(); return; }
+      audio.onplaying = null; audio.onended = null; audio.onerror = null;
+      audio.removeAttribute('src'); audio.load();
+      const abort = new AbortController(); controller.current = abort;
+      try {
+        const response = await fetch(url, { credentials: 'include', signal: abort.signal });
+        if (!response.ok) throw new Error(await friendlyError(response, S.current.audioFail));
+        const decoded = await ctx.decodeAudioData(await response.arrayBuffer());
+        if (!live()) return;
         const node = ctx.createBufferSource(); source.current = node;
         node.buffer = decoded; node.connect(ctx.destination); node.onended = ended; node.start(); started();
-      }
-    } catch {
-      if (mounted.current && token === operation.current) setAudioState({ id, state: 'error' });
+      } catch { failed(); }
     }
   };
   const transcribe = async (blob: Blob) => {
@@ -124,16 +137,16 @@ export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) 
       const form = new FormData();
       form.append('audio', blob, blob.type.startsWith('audio/mp4') ? 'question.mp4' : 'question.webm');
       const response = await fetch(api('/voice/transcribe'), { method: 'POST', credentials: 'include', body: form, signal: abort.signal });
-      if (!response.ok) throw new Error(await friendlyError(response, 'تعذر سماع التسجيل. حاول مرة أخرى أو اكتب سؤالك.'));
+      if (!response.ok) throw new Error(await friendlyError(response, S.current.recFail));
       const body = await response.json();
-      if (typeof body.text !== 'string' || !body.text.trim()) throw new Error('لم أسمع سؤالك بوضوح. حاول مرة أخرى.');
+      if (typeof body.text !== 'string' || !body.text.trim()) throw new Error(S.current.notClear);
       if (!mounted.current) return;
       lastBlob.current = null;
       setPhase('idle');
       callbacks.current.onTranscript(body.text);
     } catch (e) {
       if (!mounted.current || abort.signal.aborted) return;
-      setPhase('idle'); setError(e instanceof Error ? e.message : 'حاول مرة أخرى أو اكتب سؤالك.');
+      setPhase('idle'); setError(e instanceof Error ? e.message : S.current.retryOrType);
       setTimeout(() => callbacks.current.focusFallback(), 0);
     }
   };
@@ -146,11 +159,11 @@ export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) 
     }
     stopPlayback(); unlock(); setError(''); lastBlob.current = null;
     if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) {
-      setError('الميكروفون غير متاح في هذا المتصفح. يمكنك كتابة سؤالك هنا.');
+      setError(S.current.noMic);
       setTimeout(() => callbacks.current.focusFallback(), 0); return;
     }
     const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find(t => MediaRecorder.isTypeSupported(t));
-    if (!mime) { setError('هذا المتصفح لا يدعم التسجيل. يمكنك كتابة سؤالك هنا.'); setTimeout(() => callbacks.current.focusFallback(), 0); return; }
+    if (!mime) { setError(S.current.noRecord); setTimeout(() => callbacks.current.focusFallback(), 0); return; }
     const token = ++recordingOperation.current;
     setPhase('listening');
     try {
@@ -164,11 +177,11 @@ export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) 
         if (event.data.size) { chunks.push(event.data); bytes += event.data.size; }
         if (bytes > 5 * 1024 * 1024) { invalid = true; if (rec.state === 'recording') rec.stop(); }
       };
-      rec.onerror = () => { invalid = true; releaseMic(); if (mounted.current) { setPhase('idle'); setError('توقف التسجيل. حاول مرة أخرى أو اكتب سؤالك.'); callbacks.current.focusFallback(); } };
+      rec.onerror = () => { invalid = true; releaseMic(); if (mounted.current) { setPhase('idle'); setError(S.current.recStopped); callbacks.current.focusFallback(); } };
       rec.onstop = () => {
         releaseMic(); recorder.current = null;
         if (!mounted.current || token !== recordingOperation.current) return;
-        if (invalid || !bytes) { setPhase('idle'); setError('التسجيل غير صالح أو كبير. حاول بسؤال أقصر.'); return; }
+        if (invalid || !bytes) { setPhase('idle'); setError(S.current.recInvalid); return; }
         stoppedAt.current ??= performance.now();
         void transcribe(new Blob(chunks, { type: mime.split(';')[0] }));
       };
@@ -178,7 +191,7 @@ export function useDyslexiaVoice(enabled: boolean, onTranscript: (text: string) 
     } catch {
       releaseMic();
       if (mounted.current && token === recordingOperation.current) {
-        setPhase('idle'); setError('لم نتمكن من فتح الميكروفون. اسمح باستخدامه أو اكتب سؤالك هنا.');
+        setPhase('idle'); setError(S.current.micDenied);
         setTimeout(() => callbacks.current.focusFallback(), 0);
       }
     }
