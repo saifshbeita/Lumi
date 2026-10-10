@@ -23,6 +23,8 @@ export * from './chatHistory';
 export * from './chatMessage';
 export * from './chatMessagePresentation';
 export * from './chatMessageRole';
+export * from './chatSubject';
+export * from './chatSubjectInput';
 export * from './demoModeResult';
 export * from './demoModeResultStatus';
 export * from './demoQuestion';

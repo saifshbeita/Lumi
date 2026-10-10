@@ -3,6 +3,12 @@ name: Bilingual ownership and evidence
 description: User-defined language control, transcript preservation, and bilingual evidence-generation lessons.
 ---
 
+Subject selection is topical focus, not a child-controlled language switch or a new assessment setting.
+
+**Why:** The requested subject picker is a minimal chat addition; adult language ownership, warm-ups, scoring, and difficulty behavior must remain separate.
+
+**How to apply:** Preserve assigned-language and mode-specific support rules when expanding subject choices.
+
 Public pages offer Arabic/English with a remembered public choice, default Arabic. Adults have a saved account preference. Students have no language toggle after login: the adult assigns the child's language in the add/edit form. The adult-only comparison demo has its own toggle, independent of the adult's saved preference.
 
 **Why:** The user explicitly specified who controls language throughout the website.

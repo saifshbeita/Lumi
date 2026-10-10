@@ -2,13 +2,17 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { useDyslexiaVoice } from './dyslexia/use-voice';
 import { useQueryClient } from '@tanstack/react-query';
-import { useListStudentMessages, useSendStudentMessage, getListStudentMessagesQueryKey, getListStudentChatsQueryKey, getGetWarmupQueryKey,getGetStudentSessionQueryKey,type ChatMessage } from '@workspace/api-client-react';
+import { useListStudentMessages, useSendStudentMessage, useUpdateChatSubject, getListStudentMessagesQueryKey, getListStudentChatsQueryKey, getGetWarmupQueryKey,getGetStudentSessionQueryKey,type ChatMessage, type ChatSubject } from '@workspace/api-client-react';
 import { Button, ErrorBox, Loading, cx } from '@/components/lumi';
 import { parseSteps, DYSLEXIA_TEXT_STYLE, ModeReply, SpeakerButton, LearningSteps, AutismSchedule, MicButton } from './mode-parts';
 import type { Mode } from '@/lib/tokens';
 import { langAttrs, t, type Lang } from '@/lib/student-i18n';
 
 type Msg = ChatMessage;
+const subjects: {value:ChatSubject;label:string}[] = [
+  {value:'math',label:'🔢 رياضيات'}, {value:'science',label:'🔬 علوم'},
+  {value:'arabic',label:'📖 عربي'}, {value:'english',label:'🔤 English'}, {value:'general',label:'💬 عام'},
+];
 type Presentation = { choices?: {id:string;label:string}[]; question?:string; showQuestion?:boolean; textSize?:number; audio?:boolean; pair?:string[]; plan?:boolean; announcement?:string;awaitNext?:boolean;placementId?:number };
 
 export function StudentChat({ mode, chatId, lang = 'ar', preferences = {} }: { mode: Mode; chatId: number; lang?: Lang; preferences?:Record<string,unknown> }) {
@@ -18,6 +22,15 @@ export function StudentChat({ mode, chatId, lang = 'ar', preferences = {} }: { m
   const key = getListStudentMessagesQueryKey(chatId);
   const hist = useListStudentMessages(chatId, { query: { queryKey: key, retry: false } });
   const send = useSendStudentMessage();
+  const changeSubject = useUpdateChatSubject();
+  const subject = hist.data?.chat.subject ?? 'general';
+  const selectSubject = (value:ChatSubject) => {
+    if (value===subject || changeSubject.isPending) return;
+    changeSubject.mutate({id:chatId,data:{subject:value}}, {onSuccess:chat=>{
+      qc.setQueryData(key,(previous:typeof hist.data)=>previous?{...previous,chat}:previous);
+      qc.invalidateQueries({queryKey:getListStudentChatsQueryKey()});
+    }});
+  };
   const [draft, setDraft] = useState('');
   const [failed, setFailed] = useState(false);
   const [progress, setProgress] = useState<Record<number, number>>({});
@@ -36,7 +49,7 @@ export function StudentChat({ mode, chatId, lang = 'ar', preferences = {} }: { m
   const currentPresentation=lastAi?.presentation as Presentation|null;
   const placementCurrent=currentPresentation?.placementId===preferences.placementId;
   const locked = !!lastAiSteps && (lastAiProg < lastAiSteps.length - 1 || placementCurrent&&currentPresentation?.awaitNext===true);
-  const busy = send.isPending;
+  const busy = send.isPending || changeSubject.isPending;
   const count = messages.length;
 
   useEffect(() => {
@@ -158,7 +171,19 @@ export function StudentChat({ mode, chatId, lang = 'ar', preferences = {} }: { m
         {messages.map(bubble)}
         {dys && voiceQuestion && <div dir="auto" className="self-start max-w-[85%] bg-mist rounded-3xl px-5 py-3" style={textStyle} data-testid="voice-transcript">{voiceQuestion}</div>}
       </div>
-      <div className="shrink-0 px-4 pb-4 pt-2 flex flex-col gap-2">{status}{composer}</div>
+      <div className="shrink-0 px-4 pb-4 pt-2 flex flex-col gap-2">
+        {status}
+        <div dir="rtl" role="group" aria-label="المادة" className="flex gap-2 overflow-x-auto py-1" data-testid="subject-picker">
+          {subjects.map(item=><button key={item.value} type="button" aria-pressed={subject===item.value}
+            disabled={busy||voice.phase!=='idle'} onClick={()=>selectSubject(item.value)} data-testid={`subject-${item.value}`}
+            className="shrink-0 rounded-full px-4 text-base focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-navy disabled:cursor-wait"
+            style={{minHeight:56,background:subject===item.value?'#2D4059':'#FFFFFF',color:subject===item.value?'#FFFFFF':'#2D4059',border:`1px solid ${subject===item.value?'#2D4059':'#E5EEF5'}`,animation:'none',transition:'none'}}>
+            {item.label}
+          </button>)}
+        </div>
+        {changeSubject.isError&&<p role="alert">{lang==='ar'?'تعذّر حفظ المادة. اخترها مرة أخرى.':'Could not save the subject. Please select it again.'}</p>}
+        {composer}
+      </div>
     </div>
   );
 }

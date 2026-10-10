@@ -4,8 +4,10 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { ChatSubject } from './chatSubject';
 
 export interface StudentChat {
+  subject: ChatSubject;
   id: number;
   title: string;
   /** @nullable */

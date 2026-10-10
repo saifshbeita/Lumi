@@ -321,6 +321,25 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/StudentChat" }
+  /student/chats/{id}/subject:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer, minimum: 1 }
+    patch:
+      operationId: updateChatSubject
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ChatSubjectInput" }
+      responses:
+        "200":
+          description: Updated owned chat
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StudentChat" }
   /student/chats/{id}/messages:
     parameters:
       - name: id
@@ -646,8 +665,9 @@ components:
         messageCount: { type: integer }
     StudentChat:
       type: object
-      required: [id, title, icon, createdAt]
+      required: [id, title, icon, createdAt, subject]
       properties:
+        subject: { $ref: "#/components/schemas/ChatSubject" }
         id: { type: integer }
         title: { type: string }
         icon: { type: [string, "null"] }
@@ -664,6 +684,14 @@ components:
         content: { type: string }
         audioUrl: { type: [string, "null"] }
         createdAt: { type: string }
+    ChatSubject:
+      type: string
+      enum: [math, science, arabic, english, general]
+    ChatSubjectInput:
+      type: object
+      required: [subject]
+      properties:
+        subject: { $ref: "#/components/schemas/ChatSubject" }
     MessageInput:
       type: object
       required: [content]

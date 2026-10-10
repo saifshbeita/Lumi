@@ -33,6 +33,7 @@ export const chats = pgTable("chats", {
   title: text("title").notNull(),
   icon: text("icon"),
   learnerState: jsonb("learner_state").$type<Record<string, unknown>>().notNull().default({}),
+  subject: text("subject", { enum: ["math", "science", "arabic", "english", "general"] }).notNull().default("general"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 export const messages = pgTable("messages", {

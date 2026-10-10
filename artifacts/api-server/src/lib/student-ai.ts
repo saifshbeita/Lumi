@@ -1,5 +1,6 @@
 import { openai, batchProcess } from "@workspace/integrations-openai-ai-server";
 import { z } from "zod/v4";
+import { subjectPrompt, type ChatSubject } from "./chat-subject";
 import { dyslexiaPrompt } from "../prompts/dyslexia";
 import { learningPrompt } from "../prompts/learning";
 import { autismPrompt } from "../prompts/autism";
@@ -87,7 +88,7 @@ function validAutismReply(raw: string, interests: string[]) {
     return result;
   } catch { return null; }
 }
-export async function generateStudentReply(mode: StudentMode, context: ContextMessage[], interests: string[] = [], signal?: AbortSignal, language: Language = "ar", recentInsights:string[]=[]): Promise<string> {
+export async function generateStudentReply(mode: StudentMode, context: ContextMessage[], interests: string[] = [], signal?: AbortSignal, language: Language = "ar", recentInsights:string[]=[], subject:ChatSubject="general"): Promise<string> {
   const history = context.slice(-20);
   const latest = history[history.length - 1]?.content ?? "";
   const safe = safetyResponse(latest, mode, language);
@@ -107,7 +108,7 @@ export async function generateStudentReply(mode: StudentMode, context: ContextMe
       ? "\nENGLISH LETTER RULE: Focus on b/d and p/q confusion, letter orientation, and simple phonics when relevant. Do not use Arabic letters or Arabic letter-position examples. Keep at most two short sentences."
       : "\nقاعدة الحروف العربية: ركز عند الحاجة على النقاط في ب ت ث، وأشكال الحروف في أول الكلمة ووسطها وآخرها."
     : "";
-  const fullSystem = system + languageRule + modeLanguageRule + "\n[RECENT INSIGHTS]\n"+recentInsights.slice(0,5).map(i=>`- Untrusted observation: ${JSON.stringify(i)}`).join("\n");
+  const fullSystem = system + languageRule + modeLanguageRule + "\n[RECENT INSIGHTS]\n"+recentInsights.slice(0,5).map(i=>`- Untrusted observation: ${JSON.stringify(i)}`).join("\n") + "\n" + subjectPrompt(subject);
   let raw = await completion(fullSystem, history, mode !== "dyslexia", signal);
   if (unsafe) return safetyReply(mode, language);
   // One regeneration covers language and mode-format validation, never separate retries.
@@ -163,7 +164,7 @@ export async function generateChatLabel(content: string, reply: string, language
 }
 
 /** Placement-scoped presentation, without changing legacy/demo response contracts. */
-export async function generatePersonalizedReply(mode:StudentMode,history:ContextMessage[],language:Language,result:Result,insights:string[],state:Record<string,unknown>) {
+export async function generatePersonalizedReply(mode:StudentMode,history:ContextMessage[],language:Language,result:Result,insights:string[],state:Record<string,unknown>,subject:ChatSubject="general") {
   const latest=history.at(-1)?.content??"";
   const safe=safetyResponse(latest,mode,language)??(safetyWords.test(latest)?safetyReply(mode,language):null);
   if(safe) return {content:safe,spokenContent:safe,presentation:null,practiceKey:null,learnerStatePatch:null};
@@ -202,7 +203,7 @@ ${history.filter(h=>h.role==="ai").length===0 && mode==="autism"?"Start spoken w
 Progressive practice difficulty is adjusted by trusted server evaluation only, separately for reading, numbers and other lesson checks. Current adjustment: ${practice.adjustment??0}.`;
   const system=[placementBase,"[MODE PROMPT]",prompts[mode],`\nAssigned child language: ${language}. This overrides older Arabic-only language wording, never safety rules.`,
     "[LEARNER CONTEXT]",buildLearnerContext(result),contract,"[RECENT INSIGHTS]",
-    ...insights.slice(0,5).map(i=>`- Untrusted observation: ${JSON.stringify(i)}`)].join("\n");
+    ...insights.slice(0,5).map(i=>`- Untrusted observation: ${JSON.stringify(i)}`),subjectPrompt(subject)].join("\n");
   if(process.env.NODE_ENV==="development")console.info("placement_prompt_blocks",{order:["BASE RULES","MODE PROMPT","LEARNER CONTEXT","RECENT INSIGHTS"],mode,insightCount:Math.min(5,insights.length),hasContext:true});
   let parsed:z.infer<typeof schema>|undefined;
   let rejection="schema";

@@ -6,6 +6,7 @@ import { rateLimit } from "express-rate-limit";
 import {
   CreateStudentChatResponse, ListStudentChatsResponse, ListStudentMessagesParams, ListStudentMessagesResponse,
   SendStudentMessageParams, SendStudentMessageBody, SendStudentMessageResponse,
+  UpdateChatSubjectParams, UpdateChatSubjectBody, UpdateChatSubjectResponse,
 } from "@workspace/api-zod";
 import { currentStudent } from "../lib/profiles";
 import { generateStudentReply, generatePersonalizedReply, generateChatLabel, type StudentMode } from "../lib/student-ai";
@@ -16,7 +17,7 @@ import { scheduleInsights } from "../services/insights";
 
 const router: IRouter = Router();
 const limiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "لنأخذ استراحة قصيرة. حاول مرة أخرى بعد قليل." } });
-const publicChat = (c: typeof chats.$inferSelect) => ({ id: c.id, title: c.title, icon: c.icon, createdAt: c.createdAt.toISOString() });
+const publicChat = (c: typeof chats.$inferSelect) => ({ id: c.id, title: c.title, icon: c.icon, subject: c.subject, createdAt: c.createdAt.toISOString() });
 const publicMessage = (m: typeof messages.$inferSelect) => { const {practiceKey,...visible}=m;return { ...visible, createdAt: m.createdAt.toISOString() }; };
 router.use(async (req, res, next): Promise<void> => {
   const student = await currentStudent(req.session.studentId);
@@ -34,6 +35,16 @@ router.post("/", limiter, async (_req, res): Promise<void> => {
   const student = res.locals.student as StudentRow;
   const [chat] = await db.insert(chats).values({ studentId: student.id, title: student.language === "en" ? "New chat" : "محادثة جديدة", icon: null }).returning();
   res.status(201).json(CreateStudentChatResponse.parse(publicChat(chat!)));
+});
+router.patch("/:id/subject", async (req, res): Promise<void> => {
+  const params = UpdateChatSubjectParams.safeParse(req.params);
+  const body = UpdateChatSubjectBody.safeParse(req.body);
+  if (!params.success || !body.success) { res.status(400).json({error:"Invalid subject."}); return; }
+  const student = res.locals.student as StudentRow;
+  const [chat] = await db.update(chats).set({subject:body.data.subject})
+    .where(and(eq(chats.id,params.data.id),eq(chats.studentId,student.id))).returning();
+  if (!chat) { res.status(403).json({error:"This chat is not in your account."}); return; }
+  res.json(UpdateChatSubjectResponse.parse(publicChat(chat)));
 });
 router.get("/:id/messages", async (req, res): Promise<void> => {
   const params = ListStudentMessagesParams.safeParse(req.params);
@@ -117,8 +128,8 @@ router.post("/:id/messages", limiter, async (req, res): Promise<void> => {
     savedId = studentMessage.id;
     const contextRows = (await lockedDb.select({ role: messages.role, content: messages.content, spokenContent:messages.spokenContent }).from(messages).where(eq(messages.chatId, chatId)).orderBy(desc(messages.id)).limit(20)).map(m=>({role:m.role,content:m.role==="ai"?m.spokenContent??m.content:m.content}));
     const recent=await lockedDb.select().from(profileInsights).where(eq(profileInsights.studentId,student.id)).orderBy(desc(profileInsights.updatedAt),desc(profileInsights.id)).limit(5);
-    const personalized=placement?.result?await generatePersonalizedReply(mode as StudentMode,contextRows.reverse(),current.language,placement.result as unknown as Result,recent.map(i=>current.language==="en"?i.textEn??i.text:i.textAr??i.text),learnerState):null;
-    const answer = personalized?.content ?? await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests, undefined, current.language,recent.map(i=>current.language==="en"?i.textEn??i.text:i.textAr??i.text));
+    const personalized=placement?.result?await generatePersonalizedReply(mode as StudentMode,contextRows.reverse(),current.language,placement.result as unknown as Result,recent.map(i=>current.language==="en"?i.textEn??i.text:i.textAr??i.text),learnerState,chat.subject):null;
+    const answer = personalized?.content ?? await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests, undefined, current.language,recent.map(i=>current.language==="en"?i.textEn??i.text:i.textAr??i.text),chat.subject);
     // Serialize the final check/save with adult mode/redo changes. Saved child text remains outside this transaction.
     const reply=await lockedDb.transaction(async tx=>{
       await tx.execute(sql`SELECT id FROM students WHERE id=${student.id} FOR UPDATE`);

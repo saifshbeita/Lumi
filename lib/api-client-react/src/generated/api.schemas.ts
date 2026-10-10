@@ -457,7 +457,19 @@ export interface Chat {
   messageCount: number;
 }
 
+export type ChatSubject = typeof ChatSubject[keyof typeof ChatSubject];
+
+
+export const ChatSubject = {
+  math: 'math',
+  science: 'science',
+  arabic: 'arabic',
+  english: 'english',
+  general: 'general',
+} as const;
+
 export interface StudentChat {
+  subject: ChatSubject;
   id: number;
   title: string;
   /** @nullable */
@@ -490,6 +502,10 @@ export interface ChatMessage {
   /** @nullable */
   audioUrl: string | null;
   createdAt: string;
+}
+
+export interface ChatSubjectInput {
+  subject: ChatSubject;
 }
 
 export interface MessageInput {

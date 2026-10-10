@@ -282,6 +282,7 @@ export const GetAdultChatParams = zod.object({
 
 export const GetAdultChatResponse = zod.object({
   "chat": zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general']),
   "id": zod.number().int(),
   "title": zod.string(),
   "icon": zod.string().nullable(),
@@ -645,6 +646,7 @@ export const GetStudentModeResponse = zod.object({
 
 
 export const ListStudentChatsResponseItem = zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general']),
   "id": zod.number().int(),
   "title": zod.string(),
   "icon": zod.string().nullable(),
@@ -654,6 +656,27 @@ export const ListStudentChatsResponse = zod.array(ListStudentChatsResponseItem)
 
 
 export const CreateStudentChatResponse = zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general']),
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "icon": zod.string().nullable(),
+  "createdAt": zod.string()
+})
+
+
+
+
+
+export const UpdateChatSubjectParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const UpdateChatSubjectBody = zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general'])
+})
+
+export const UpdateChatSubjectResponse = zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general']),
   "id": zod.number().int(),
   "title": zod.string(),
   "icon": zod.string().nullable(),
@@ -670,6 +693,7 @@ export const ListStudentMessagesParams = zod.object({
 
 export const ListStudentMessagesResponse = zod.object({
   "chat": zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general']),
   "id": zod.number().int(),
   "title": zod.string(),
   "icon": zod.string().nullable(),
@@ -712,6 +736,7 @@ export const SendStudentMessageBody = zod.object({
 
 export const SendStudentMessageResponse = zod.object({
   "chat": zod.object({
+  "subject": zod.enum(['math', 'science', 'arabic', 'english', 'general']),
   "id": zod.number().int(),
   "title": zod.string(),
   "icon": zod.string().nullable(),
