@@ -4,9 +4,11 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { AdultLanguage } from './adultLanguage';
 import type { AdultRole } from './adultRole';
 
 export interface Adult {
+  language: AdultLanguage;
   id: number;
   name: string;
   email: string;

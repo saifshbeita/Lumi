@@ -1,4 +1,5 @@
-import { type ReactNode } from 'react';
+import { useLayoutEffect, type ReactNode } from 'react';
+import { setLanguage } from '@/i18n';
 import { Link } from 'wouter';
 import { Redirect } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
@@ -42,7 +43,7 @@ function Home({ mode, student, out, loggingOut, lang }: { mode: Mode; student: {
           {chats.isSuccess && list.length === 0 && <p className="bg-mist rounded-2xl p-5" data-testid="empty-chats">{s.noChats}</p>}
           <ul className="flex flex-col gap-3 list-none p-0">
             {list.map(c => (
-              <li key={c.id}><Link href={`/student/${mode}/chat/${c.id}`} className={`flex items-center gap-3 border border-border bg-mist rounded-2xl px-5 ${dys ? 'min-h-20' : 'min-h-14'}`} data-testid={`link-chat-${c.id}`}><span aria-hidden>{c.icon ?? '💬'}</span><span>{c.title}</span></Link></li>
+              <li key={c.id}><Link href={`/student/${mode}/chat/${c.id}`} className={`flex items-center gap-3 border border-border bg-mist rounded-2xl px-5 ${dys ? 'min-h-20' : 'min-h-14'}`} data-testid={`link-chat-${c.id}`}><span aria-hidden>{c.icon ?? '💬'}</span><span dir="auto">{c.title}</span></Link></li>
             ))}
           </ul>
         </Card>
@@ -67,6 +68,8 @@ export function StudentGuard({ mode, chatId }: { mode: Mode; chatId?: number }):
   const session = useGetStudentSession({ query: { queryKey: getGetStudentSessionQueryKey(), refetchInterval: 10000, staleTime: 0, retry: false } });
   const s = session.data?.student;
   const L = asLang(s?.language);
+  // Student pages follow the child's assigned language; no toggle here.
+  useLayoutEffect(() => { if (s) setLanguage(L); }, [s, L]);
   if (session.isLoading) return <div {...langAttrs(L)}><Loading label={t(L).loading} /></div>;
   if (session.isError) return <div {...langAttrs(L)} className="p-6 max-w-md mx-auto"><ErrorBox>{t(L).sessionFail}</ErrorBox><Button className="mt-4" onClick={() => session.refetch()}>{t(L).tryAgain}</Button></div>;
   if (!s) return <Redirect to="/student/login" />;

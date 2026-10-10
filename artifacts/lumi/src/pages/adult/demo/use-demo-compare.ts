@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { getCompareDemoModesUrl, type Mode } from '@workspace/api-client-react';
+import i18n, { type Lang } from '@/i18n';
 
 export type ColumnState = { status: 'idle' | 'loading' | 'success' | 'error'; content?: string; error?: string; ms?: number };
 export type Columns = Record<Mode, ColumnState>;
@@ -14,7 +15,8 @@ export function useDemoCompare() {
   const controller = useRef<AbortController | null>(null);
   const token = useRef(0);
 
-  const run = useCallback(async (question: string, interests: string[]) => {
+  const run = useCallback(async (question: string, interests: string[], language: Lang) => {
+    const tr = i18n.getFixedT(language);
     const q = question.trim();
     if (!q) return;
     controller.current?.abort();
@@ -34,15 +36,13 @@ export function useDemoCompare() {
         if (typeof j.mode !== 'string' || !MODES_ORDER.includes(j.mode as Mode)) return;
         const m = j.mode as Mode; const ms = Math.round(performance.now() - start);
         if (j.status === 'success' && typeof j.content === 'string' && j.content.trim()) settle(m, { status: 'success', content: j.content, ms });
-        else settle(m, { status: 'error', error: typeof j.error === 'string' && j.error ? j.error : 'This mode could not answer.', ms });
+        else settle(m, { status: 'error', error: tr('demo.modeFailed'), ms });
       } catch { /* ignore malformed line */ }
     };
     try {
-      const res = await fetch(url(), { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson' }, body: JSON.stringify(interests.length ? { question: q, interests } : { question: q }), signal: abort.signal });
+      const res = await fetch(url(), { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json', Accept: 'application/x-ndjson' }, body: JSON.stringify(interests.length ? { question: q, interests, language } : { question: q, language }), signal: abort.signal });
       if (!res.ok || !res.body) {
-        let msg = 'The comparison could not start.';
-        try { const b = await res.json(); if (typeof b?.error === 'string') msg = b.error; } catch { /* keep default */ }
-        failRest(msg); return;
+        failRest(tr('demo.startFail')); return;
       }
       const reader = res.body.getReader(); const dec = new TextDecoder(); let buf = '';
       for (;;) {
@@ -54,15 +54,17 @@ export function useDemoCompare() {
         while ((i = buf.indexOf('\n')) >= 0) { handle(buf.slice(0, i)); buf = buf.slice(i + 1); }
       }
       buf += dec.decode(); handle(buf);
-      failRest('No reply arrived for this mode.');
+      failRest(tr('demo.noReply'));
     } catch {
-      failRest('The connection dropped. Try again.');
+      failRest(tr('demo.dropped'));
     } finally {
       if (token.current === my) setRunning(false);
     }
   }, []);
 
   const cancel = useCallback(() => { token.current++; controller.current?.abort(); setRunning(false); }, []);
+  /** Abort any in-flight compare and clear all columns so late or old-language results cannot appear. */
+  const reset = useCallback(() => { token.current++; controller.current?.abort(); setRunning(false); setColumns(idle()); setRequestId(0); }, []);
   useEffect(() => () => { token.current++; controller.current?.abort(); }, []);
-  return { columns, requestId, running, run, cancel };
+  return { columns, requestId, running, run, cancel, reset };
 }

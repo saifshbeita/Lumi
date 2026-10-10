@@ -7,6 +7,20 @@
 import * as zod from 'zod';
 
 
+export const UpdateAdultLanguageBody = zod.object({
+  "language": zod.enum(['ar', 'en'])
+})
+
+export const UpdateAdultLanguageResponse = zod.object({
+  "language": zod.enum(['ar', 'en']),
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "email": zod.string(),
+  "role": zod.enum(['teacher', 'parent']),
+  "school": zod.string().nullable()
+})
+
+
 export const compareDemoModesBodyQuestionMax = 2000;
 
 export const compareDemoModesBodyInterestsItemMax = 40;
@@ -18,6 +32,7 @@ export const compareDemoModesBodyInterestsMax = 5;
 
 
 export const CompareDemoModesBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "question": zod.string().min(1).max(compareDemoModesBodyQuestionMax),
   "interests": zod.array(zod.string().min(1).max(compareDemoModesBodyInterestsItemMax).regex(compareDemoModesBodyInterestsItemRegExp)).max(compareDemoModesBodyInterestsMax).optional()
 })
@@ -30,6 +45,7 @@ export const speakDemoReplyBodyTextMax = 800;
 
 
 export const SpeakDemoReplyBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "text": zod.string().min(1).max(speakDemoReplyBodyTextMax)
 })
 
@@ -68,6 +84,10 @@ export const RefreshStudentInsightsResponse = zod.object({
   "assessmentConfirmed": zod.boolean()
 }),
   "insights": zod.array(zod.object({
+  "textAr": zod.string().nullish(),
+  "textEn": zod.string().nullish(),
+  "evidenceAr": zod.string().nullish(),
+  "evidenceEn": zod.string().nullish(),
   "id": zod.number().int(),
   "type": zod.enum(['strength', 'weakness', 'need']),
   "text": zod.string(),
@@ -130,6 +150,7 @@ export const HealthCheckResponse = zod.object({
 
 export const GetAdultSessionResponse = zod.object({
   "adult": zod.union([zod.object({
+  "language": zod.enum(['ar', 'en']),
   "id": zod.number().int(),
   "name": zod.string(),
   "email": zod.string(),
@@ -149,6 +170,7 @@ export const signupAdultBodySchoolMax = 200;
 
 
 export const SignupAdultBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "name": zod.string().min(1).max(signupAdultBodyNameMax),
   "email": zod.string().email(),
   "password": zod.string().min(signupAdultBodyPasswordMin).max(signupAdultBodyPasswordMax),
@@ -157,6 +179,7 @@ export const SignupAdultBody = zod.object({
 })
 
 export const SignupAdultResponse = zod.object({
+  "language": zod.enum(['ar', 'en']),
   "id": zod.number().int(),
   "name": zod.string(),
   "email": zod.string(),
@@ -171,12 +194,14 @@ export const loginAdultBodyPasswordMax = 72;
 
 
 export const LoginAdultBody = zod.object({
+  "language": zod.enum(['ar', 'en']).optional(),
   "email": zod.string().email(),
   "password": zod.string().min(loginAdultBodyPasswordMin).max(loginAdultBodyPasswordMax),
   "role": zod.enum(['teacher', 'parent'])
 })
 
 export const LoginAdultResponse = zod.object({
+  "language": zod.enum(['ar', 'en']),
   "id": zod.number().int(),
   "name": zod.string(),
   "email": zod.string(),
@@ -284,6 +309,10 @@ export const GetStudentResponse = zod.object({
   "assessmentConfirmed": zod.boolean()
 }),
   "insights": zod.array(zod.object({
+  "textAr": zod.string().nullish(),
+  "textEn": zod.string().nullish(),
+  "evidenceAr": zod.string().nullish(),
+  "evidenceEn": zod.string().nullish(),
   "id": zod.number().int(),
   "type": zod.enum(['strength', 'weakness', 'need']),
   "text": zod.string(),
@@ -422,6 +451,10 @@ export const GetStudentModeResponse = zod.object({
   "assessmentConfirmed": zod.boolean()
 }),
   "insights": zod.array(zod.object({
+  "textAr": zod.string().nullish(),
+  "textEn": zod.string().nullish(),
+  "evidenceAr": zod.string().nullish(),
+  "evidenceEn": zod.string().nullish(),
   "id": zod.number().int(),
   "type": zod.enum(['strength', 'weakness', 'need']),
   "text": zod.string(),

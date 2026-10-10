@@ -9,6 +9,7 @@ export const adults = pgTable("adults", {
   passwordHash: text("password_hash").notNull(),
   role: text("role", { enum: ["teacher", "parent"] }).notNull(),
   school: text("school"),
+  language: text("language", { enum: ["ar", "en"] }).notNull().default("ar"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, () => [check("adult_role", sql`role IN ('teacher', 'parent')`)]);
 export const students = pgTable("students", {
@@ -45,6 +46,10 @@ export const profileInsights = pgTable("profile_insights", {
   type: text("type", { enum: ["strength", "weakness", "need"] }).notNull(),
   text: text("text").notNull(),
   evidence: text("evidence"),
+  textAr: text("text_ar"),
+  textEn: text("text_en"),
+  evidenceAr: text("evidence_ar"),
+  evidenceEn: text("evidence_en"),
   sourceChatId: integer("source_chat_id").references(() => chats.id),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, () => [check("insight_type", sql`type IN ('strength','weakness','need')`)]);

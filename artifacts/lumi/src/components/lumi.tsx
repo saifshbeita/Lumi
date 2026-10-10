@@ -1,5 +1,6 @@
 import { type ButtonHTMLAttributes, type InputHTMLAttributes, type ReactNode } from 'react';
 import { Link } from 'wouter';
+import { useTranslation } from 'react-i18next';
 import { brand } from '@/lib/util';
 
 export const btn = {
@@ -20,10 +21,11 @@ export function Card({ className, children, ...p }: { className?: string; childr
   return <div {...p} className={cx('bg-card border border-border rounded-3xl p-6', className)}>{children}</div>;
 }
 export function Logo({ size = 48 }: { size?: number }) {
+  const { t } = useTranslation();
   return (
     <span className="inline-flex items-center gap-3">
       <img src={brand('lumi-logo.png')} alt="" width={size} height={size} style={{ width: size, height: size }} className="object-contain" />
-      <span className="font-heading font-semibold text-2xl text-navy">Lumi</span>
+      <span className="font-heading font-semibold text-2xl text-navy">{t('common.lumi')}</span>
     </span>
   );
 }
@@ -42,9 +44,10 @@ export function ErrorBox({ children }: { children: ReactNode }) {
 export function SkeletonBlock({ className }: { className?: string }) {
   return <div aria-hidden className={cx('bg-mist rounded-3xl', className)} />;
 }
-export function Loading({ label = 'Loading' }: { label?: string }) {
+export function Loading({ label }: { label?: string }) {
+  const { t } = useTranslation();
   return (
-    <div className="min-h-[100dvh] flex items-center justify-center p-6" role="status" aria-label={label}>
+    <div className="min-h-[100dvh] flex items-center justify-center p-6" role="status" aria-label={label ?? t('common.loading')}>
       <div className="w-full max-w-md flex flex-col gap-4"><SkeletonBlock className="h-24" /><SkeletonBlock className="h-40" /></div>
     </div>
   );

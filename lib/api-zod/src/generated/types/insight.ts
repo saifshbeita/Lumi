@@ -7,6 +7,14 @@
 import type { InsightType } from './insightType';
 
 export interface Insight {
+  /** @nullable */
+  textAr?: string | null;
+  /** @nullable */
+  textEn?: string | null;
+  /** @nullable */
+  evidenceAr?: string | null;
+  /** @nullable */
+  evidenceEn?: string | null;
   id: number;
   type: InsightType;
   text: string;

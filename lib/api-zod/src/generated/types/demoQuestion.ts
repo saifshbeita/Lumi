@@ -4,9 +4,11 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { DemoQuestionLanguage } from './demoQuestionLanguage';
 import type { Interests } from './interests';
 
 export interface DemoQuestion {
+  language?: DemoQuestionLanguage;
   /**
      * @minLength 1
      * @maxLength 2000

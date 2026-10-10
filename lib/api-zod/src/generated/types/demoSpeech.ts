@@ -4,8 +4,10 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { DemoSpeechLanguage } from './demoSpeechLanguage';
 
 export interface DemoSpeech {
+  language?: DemoSpeechLanguage;
   /**
      * @minLength 1
      * @maxLength 800

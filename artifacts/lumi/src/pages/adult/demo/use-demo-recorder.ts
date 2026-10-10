@@ -1,11 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import i18n, { type Lang } from '@/i18n';
 
 type Phase = 'idle' | 'listening' | 'thinking';
-const transcribeUrl = () => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/student/voice/transcribe`;
+const transcribeUrl = () => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/student/voice/transcribe?demo=1`;
 const MAX_BYTES = 5 * 1024 * 1024;
 
 /** Demo-only recording adapter. Records a question, transcribes it with the adult cookie + X-Lumi-Demo header. Nothing is stored. */
-export function useDemoRecorder(onTranscript: (text: string) => void, focusFallback: () => void) {
+export function useDemoRecorder(onTranscript: (text: string) => void, focusFallback: () => void, language: Lang) {
+  const langRef = useRef(language); langRef.current = language;
+  const tr = (k: string) => i18n.getFixedT(langRef.current, null, 'student')(k);
   const [phase, setPhase] = useState<Phase>('idle');
   const [error, setError] = useState('');
   const recorder = useRef<MediaRecorder | null>(null);
@@ -28,20 +31,19 @@ export function useDemoRecorder(onTranscript: (text: string) => void, focusFallb
     try {
       const form = new FormData();
       form.append('audio', blob, blob.type.startsWith('audio/mp4') ? 'question.mp4' : 'question.webm');
+      form.append('language', langRef.current);
       const res = await fetch(transcribeUrl(), { method: 'POST', credentials: 'include', headers: { 'X-Lumi-Demo': '1' }, body: form, signal: abort.signal });
       if (!res.ok) {
-        let msg = 'تعذر سماع التسجيل. حاول مرة أخرى أو اكتب سؤالك.';
-        try { const b = await res.json(); if (typeof b?.error === 'string') msg = b.error; } catch { /* default */ }
-        throw new Error(msg);
+        throw new Error(tr('recFail'));
       }
       const body = await res.json() as { text?: unknown };
-      if (typeof body.text !== 'string' || !body.text.trim()) throw new Error('لم أسمع سؤالك بوضوح. حاول مرة أخرى.');
+      if (typeof body.text !== 'string' || !body.text.trim()) throw new Error(tr('notClear'));
       if (!mounted.current) return;
       lastBlob.current = null; setPhase('idle');
       cb.current.onTranscript(body.text.trim());
     } catch (e) {
       if (!mounted.current || abort.signal.aborted) return;
-      fail(e instanceof Error ? e.message : 'حاول مرة أخرى أو اكتب سؤالك.');
+      fail(e instanceof Error ? e.message : tr('retryOrType'));
     }
   };
 
@@ -53,9 +55,9 @@ export function useDemoRecorder(onTranscript: (text: string) => void, focusFallb
       return;
     }
     setError(''); lastBlob.current = null;
-    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return fail('الميكروفون غير متاح في هذا المتصفح. يمكنك كتابة سؤالك هنا.');
+    if (!navigator.mediaDevices?.getUserMedia || !window.MediaRecorder) return fail(tr('noMic'));
     const mime = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/webm'].find((t) => MediaRecorder.isTypeSupported(t));
-    if (!mime) return fail('هذا المتصفح لا يدعم التسجيل. يمكنك كتابة سؤالك هنا.');
+    if (!mime) return fail(tr('noRecord'));
     const my = ++op.current;
     setPhase('listening');
     try {
@@ -69,21 +71,29 @@ export function useDemoRecorder(onTranscript: (text: string) => void, focusFallb
         if (ev.data.size) { chunks.push(ev.data); bytes += ev.data.size; }
         if (bytes > MAX_BYTES) { invalid = true; if (rec.state === 'recording') rec.stop(); }
       };
-      rec.onerror = () => { invalid = true; releaseMic(); fail('توقف التسجيل. حاول مرة أخرى أو اكتب سؤالك.'); };
+      rec.onerror = () => { invalid = true; releaseMic(); fail(tr('recStopped')); };
       rec.onstop = () => {
         releaseMic(); recorder.current = null;
         if (!mounted.current || my !== op.current) return;
-        if (invalid || !bytes) return fail('التسجيل غير صالح أو كبير. حاول بسؤال أقصر.');
+        if (invalid || !bytes) return fail(tr('recInvalid'));
         void transcribe(new Blob(chunks, { type: mime.split(';')[0] }));
       };
       rec.start(250);
       timer.current = setTimeout(() => { if (rec.state === 'recording') { rec.stop(); releaseMic(); } }, 29500);
     } catch {
       releaseMic();
-      if (my === op.current) fail('لم نتمكن من فتح الميكروفون. اسمح باستخدامه أو اكتب سؤالك هنا.');
+      if (my === op.current) fail(tr('micDenied'));
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
+
+  /** Stop recording or transcription without delivering a transcript. */
+  const cancel = useCallback(() => {
+    op.current++; abortRef.current?.abort(); lastBlob.current = null;
+    if (recorder.current?.state === 'recording') recorder.current.stop();
+    releaseMic(); setPhase('idle'); setError('');
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const retry = useCallback(() => { if (lastBlob.current) void transcribe(lastBlob.current); else void tap(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tap]);
@@ -96,5 +106,5 @@ export function useDemoRecorder(onTranscript: (text: string) => void, focusFallb
       releaseMic(); abortRef.current?.abort();
     };
   }, []);
-  return { phase, error, tap, retry };
+  return { phase, error, tap, retry, cancel };
 }

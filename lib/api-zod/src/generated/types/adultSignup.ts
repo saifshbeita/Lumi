@@ -4,9 +4,11 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { AdultSignupLanguage } from './adultSignupLanguage';
 import type { AdultSignupRole } from './adultSignupRole';
 
 export interface AdultSignup {
+  language?: AdultSignupLanguage;
   /**
      * @minLength 1
      * @maxLength 100

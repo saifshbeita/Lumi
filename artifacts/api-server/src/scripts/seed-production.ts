@@ -6,18 +6,21 @@ import { refreshInsights } from "../services/insights";
 import { voiceOpenAI } from "../lib/voice-audio";
 import { objectStorageClient } from "../lib/objectStorage";
 import { demoStudents, topics } from "./demo-content";
+import { pathToFileURL } from "node:url";
 
 // DML only. Schema changes are applied by Publish, never by this seed.
 // Explicit command, advisory lock, exact ownership checks and per-chat
 // transactions make interrupted/repeated runs safe without touching other data.
-export async function seedProductionDemo() {
+export async function seedProductionDemo(options: { forceInsights?: boolean; lockHeld?: boolean } = {}) {
   const password = process.env.DEMO_PASSWORD;
   if (!password || password.length < 8 || password === "LumiDemo2026!") throw new Error("Set DEMO_PASSWORD to a unique password of at least 8 characters, different from the development password.");
   const client = await pool.connect();
   let locked = false;
   try {
-    locked = !!(await client.query("SELECT pg_try_advisory_lock(71940, 1) AS locked")).rows[0]?.locked;
-    if (!locked) throw new Error("Demo seed already running");
+    if (!options.lockHeld) {
+      locked = !!(await client.query("SELECT pg_try_advisory_lock(71940, 1) AS locked")).rows[0]?.locked;
+      if (!locked) throw new Error("Demo seed already running");
+    }
     const owners: Record<string, number> = {};
     for (const role of ["teacher", "parent"] as const) {
       const email = `pitch-${role}@lumi.demo`;
@@ -66,7 +69,8 @@ export async function seedProductionDemo() {
           await db.update(messages).set({ audioUrl: path }).where(eq(messages.id, message.id));
         }
       }
-      if (!(await db.select({ id: profileInsights.id }).from(profileInsights).where(eq(profileInsights.studentId, student.id))).length) {
+      const existingInsights = await db.select().from(profileInsights).where(eq(profileInsights.studentId, student.id));
+      if (options.forceInsights || !existingInsights.length || existingInsights.some(i => !i.textAr || !i.textEn || !i.evidenceAr || !i.evidenceEn)) {
         for (let attempt = 0; attempt < 3; attempt++) {
           try { await refreshInsights(student.id); break; }
           catch (e) { if (attempt === 2) throw e; console.info(`Retrying validated insights for ${spec.username}`); }
@@ -80,4 +84,6 @@ export async function seedProductionDemo() {
     client.release();
   }
 }
-seedProductionDemo().catch(e => { console.error(e instanceof Error ? e.message : "Demo seed failed"); process.exitCode = 1; }).finally(() => pool.end());
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
+  seedProductionDemo().catch(e => { console.error(e instanceof Error ? e.message : "Demo seed failed"); process.exitCode = 1; }).finally(() => pool.end());
+}

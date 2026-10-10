@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { speakDemoReply } from '@workspace/api-client-react';
 import type { SpeakerState } from '@/pages/student/mode-parts';
+import type { Lang } from '@/i18n';
 
 function silentWav() {
   const data = new Uint8Array(44 + 3200); const v = new DataView(data.buffer);
@@ -14,7 +15,7 @@ function silentWav() {
 export function useDemoAudio() {
   const [state, setState] = useState<SpeakerState>(null);
   const el = useRef<HTMLAudioElement | null>(null);
-  const buffered = useRef<{ text: string; url: string } | null>(null);
+  const buffered = useRef<{ text: string; url: string; language: Lang } | null>(null);
   const controller = useRef<AbortController | null>(null);
   const op = useRef(0);
   const mounted = useRef(true);
@@ -46,18 +47,19 @@ export function useDemoAudio() {
     await a.play();
   };
 
-  const speak = useCallback(async (text: string) => {
+  const speak = useCallback(async (text: string, language: Lang) => {
     stop();
     const my = op.current;
     try {
-      if (buffered.current?.text === text) { setState('loading'); await playUrl(buffered.current.url, my); return; }
+      if (buffered.current?.text === text && buffered.current.language === language) { setState('loading'); await playUrl(buffered.current.url, my); return; }
       release();
       const abort = new AbortController(); controller.current = abort;
       setState('loading');
-      const blob = await speakDemoReply({ text: text.slice(0, 800) }, { signal: abort.signal, responseType: 'blob', cache: 'no-store' });
+      const body = { text: text.slice(0, 800), language };
+      const blob = await speakDemoReply(body, { signal: abort.signal, responseType: 'blob', cache: 'no-store' });
       if (!mounted.current || my !== op.current) return;
       const url = URL.createObjectURL(blob);
-      buffered.current = { text, url };
+      buffered.current = { text, url, language };
       await playUrl(url, my);
     } catch {
       if (mounted.current && my === op.current) setState('error');
@@ -65,10 +67,10 @@ export function useDemoAudio() {
   }, [stop]);
 
   /** Speaker button: toggle stop while playing, otherwise replay from buffer or regenerate. */
-  const toggle = useCallback((text: string) => {
+  const toggle = useCallback((text: string, language: Lang) => {
     if (state === 'playing') { stop(); return; }
     unlock();
-    void speak(text);
+    void speak(text, language);
   }, [state, stop, speak, unlock]);
 
   useEffect(() => {

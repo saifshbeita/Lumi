@@ -9,7 +9,8 @@
     "start": "node --enable-source-maps ./dist/index.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit",
     "seed": "tsx src/scripts/seed.ts",
-    "seed:demo": "tsx src/scripts/seed-production.ts"
+    "seed:demo": "tsx src/scripts/seed-production.ts",
+    "demo:bilingual": "tsx src/scripts/update-bilingual.ts"
   },
   "dependencies": {
     "@google-cloud/storage": "^8.4.0",

@@ -1,0 +1,39 @@
+Next step: make the whole website bilingual, Arabic and English. Do NOT add other features or change colors and spacing.
+
+i18n SETUP
+- Use react-i18next with two translation files: client/src/locales/ar.json and en.json. Move every hardcoded UI string into them. No hardcoded text left in components.
+- Set <html lang> and dir="rtl" / dir="ltr" from the active language. Use Tailwind logical properties (ms-, me-, ps-, pe-, start-, end-) so layouts flip correctly. Flip directional icons (arrows, back buttons) in RTL. Numbers and the PIN pad stay readable in both.
+- Fonts: English headings Fraunces 600. Arabic headings Readex Pro 600 (Fraunces has no Arabic). Body Readex Pro in both.
+
+WHO CONTROLS THE LANGUAGE
+- Public pages (entry screen, adult auth, student login): a visible AR | EN toggle in the header. Saved in localStorage (wrapped in try/catch). Default Arabic.
+- Adults: same toggle in the dashboard header. Save to adults.language ('ar' | 'en').
+- Students: NO toggle on student pages after login. The adult sets the child's language in the add/edit student form ("Child's language"). Save to students.language ('ar' | 'en', default 'ar'). The student UI and Lumi's replies follow it.
+- /demo: its own AR | EN toggle that switches all three columns at once.
+
+AI LANGUAGE
+- The chat system prompt gets the student's language. Lumi replies only in that language. If a reply is in the wrong language, regenerate once with a stricter instruction.
+- Mode rules per language: dyslexia in Arabic focuses on similar letters (ب ت ث) and letter shapes; in English it focuses on b/d and p/q confusion and phonics. Other modes stay the same in both.
+- Voice: transcription and TTS use the student's language.
+- Chat titles are generated in the student's language.
+
+INSIGHTS
+- Schema: profile_insights gets text_ar, text_en, evidence_ar, evidence_en (keep existing columns until migrated, then copy existing text into the matching language field).
+- Insight generation returns both languages in one call. The adult profile shows the adult's active language.
+- Evidence quoting the child's own words keeps the original words, only the explanation is translated.
+- Old chat transcripts are never translated. They show in the language they were written in, with the correct direction per message.
+
+DEMO DATA (already seeded on production before this task)
+After the bilingual work is done:
+- Set the demo English student's language to 'en' and regenerate their chats in English if they were seeded in Arabic.
+- Re-run insight generation for all demo students so every insight has text_ar, text_en, evidence_ar and evidence_en filled.
+- Make the demo seed script produce bilingual insights from now on.
+- Give me the exact command to run this update on production, same as before.
+
+DONE WHEN:
+- AR | EN toggle visible on the entry screen, adult auth, student login, adult dashboard, and /demo.
+- Every screen checked in both languages with no leftover untranslated text and no broken RTL/LTR layout.
+- An English-language student gets English replies, English voice, English titles. An Arabic one gets Arabic.
+- Switching the adult toggle switches the insights language without regenerating.
+- /demo toggle switches all three columns.
+- Show me screenshots of the entry screen, adult profile, and dyslexia chat in both languages.

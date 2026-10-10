@@ -81,7 +81,7 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
 
   const showError = failed || (!!pendingRetry && !busy);
   const bubble = (m: Msg) => {
-    if (m.role === 'student') return <div key={m.id} className="self-start max-w-[85%] bg-mist rounded-3xl px-5 py-3" style={textStyle} data-testid={`msg-student-${m.id}`}>{m.content}</div>;
+    if (m.role === 'student') return <div key={m.id} dir="auto" className="self-start max-w-[85%] bg-mist rounded-3xl px-5 py-3" style={textStyle} data-testid={`msg-student-${m.id}`}>{m.content}</div>;
     if (mode === 'learning') {
       const steps = parseSteps(m.content);
       const isLast = lastAi?.id === m.id;
@@ -125,13 +125,13 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
     <div {...la} className={cx('flex flex-col mx-auto max-w-xl w-full', aut ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]')} data-testid={`page-chat-${mode}`} data-voice-latency-ms={dys ? voice.latency : undefined}>
       <header className={cx('shrink-0 px-4 py-3 flex items-center justify-between gap-3', aut && 'h-24')} >
         <Link href={home} className="inline-flex items-center min-h-14 px-6 rounded-full border border-navy bg-card" data-testid="link-back-home">{s.back}</Link>
-        <h1 className="text-xl line-clamp-2">{hist.data?.chat.icon ?? '💬'} {hist.data?.chat.title}</h1>
+        <h1 className="text-xl line-clamp-2" dir="auto">{hist.data?.chat.icon ?? '💬'} {hist.data?.chat.title}</h1>
       </header>
       {aut && <AutismSchedule lang={lang} />}
       <div ref={scroller} className="flex-1 min-h-0 overflow-y-auto px-4 py-3 flex flex-col gap-3" style={aut ? { scrollBehavior: 'auto' } : undefined} data-testid="chat-scroll">
         {messages.length === 0 && <p className="bg-mist rounded-2xl p-5" style={textStyle} data-testid="empty-messages">{s.emptyChat}</p>}
         {messages.map(bubble)}
-        {dys && voiceQuestion && <div className="self-start max-w-[85%] bg-mist rounded-3xl px-5 py-3" style={textStyle} data-testid="voice-transcript">{voiceQuestion}</div>}
+        {dys && voiceQuestion && <div dir="auto" className="self-start max-w-[85%] bg-mist rounded-3xl px-5 py-3" style={textStyle} data-testid="voice-transcript">{voiceQuestion}</div>}
       </div>
       <div className="shrink-0 px-4 pb-4 pt-2 flex flex-col gap-2">{status}{composer}</div>
     </div>

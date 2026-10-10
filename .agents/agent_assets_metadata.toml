@@ -28,3 +28,17 @@ mtime_ms = 1791635458177
 storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/10eaf240-4fad-4980-9744-c4fe745d0cda/3bf5ee52-5e16-4e65-8a7f-ca92a9964959"
 storage_version_token = "1791636943720719"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "UZlDl34sSRoLQ0C-EpX0k"
+uri = "file://BILINGUAL-PRODUCTION.md"
+type = "text"
+title = "Lumi bilingual production update"
+description = "Publishing steps, the exact safe production data-update command, and demo verification details."
+logical_id = "eda1da14-f802-49c9-ab4c-1001143e26c1"
+content_hash = "sha256:3c27a547b9a8bfd25372f3971fba2fcd8f0e1f2150af2a96c6fb4af6c736aed6"
+size = 3630
+mtime_ms = 1791638198013
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/eda1da14-f802-49c9-ab4c-1001143e26c1/5a45e595-0ba6-4111-a8c6-b8fd95ae55aa"
+storage_version_token = "1791641834748754"
+content_type = "text/markdown"

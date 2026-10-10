@@ -42,7 +42,7 @@ router.post("/voice/transcribe", authorizeTranscription, limit, (req, res) => {
     try {
       const audio = await validatedWav(req.file.buffer, req.file.mimetype.split(";")[0]!);
       const result = await voiceOpenAI.audio.transcriptions.create({
-        model: "gpt-4o-mini-transcribe", language: res.locals.adultDemo ? "ar" : (await currentStudent(req.session.studentId))?.language ?? "ar", response_format: "json",
+        model: "gpt-4o-mini-transcribe", language: res.locals.adultDemo ? (req.body.language === "en" ? "en" : "ar") : (await currentStudent(req.session.studentId))?.language ?? "ar", response_format: "json",
         file: await toFile(audio, "question.wav", { type: "audio/wav" }),
       });
       if (!res.locals.adultDemo) {

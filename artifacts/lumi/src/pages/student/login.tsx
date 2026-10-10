@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { Link, Redirect } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
-import { Delete, ArrowRight, ArrowLeft } from 'lucide-react';
+import { Delete, ArrowLeft } from 'lucide-react';
 import { useGetStudentSession, useLoginStudent, getGetStudentSessionQueryKey } from '@workspace/api-client-react';
 import { Button, ErrorBox, Loading, cx } from '@/components/lumi';
-import { brand, errMsg } from '@/lib/util';
-import { asLang, langAttrs, t, type Lang } from '@/lib/student-i18n';
+import { LangToggle } from '@/components/lang-toggle';
+import { asLang as toLang, setLanguage, usePublicLanguage } from '@/i18n';
+import { brand } from '@/lib/util';
+import { langAttrs, t, type Lang } from '@/lib/student-i18n';
 
 const KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9'];
 const keyCls = 'min-h-20 rounded-3xl border border-navy bg-card text-3xl cursor-pointer active:bg-mist';
@@ -17,10 +19,11 @@ export default function StudentLogin() {
   const [username, setUsername] = useState('');
   const [pin, setPin] = useState('');
   const [error, setError] = useState('');
-  const [lang, setLang] = useState<Lang>(() => asLang(typeof localStorage !== 'undefined' ? localStorage.getItem('lumi-student-lang') : null));
+  // Public UI language only; the child's own language comes from the login response.
+  const [lang, setPublicLang] = usePublicLanguage();
   const s = t(lang);
   const la = langAttrs(lang);
-  const pick = (l: Lang) => { setLang(l); setError(''); try { localStorage.setItem('lumi-student-lang', l); } catch { /* ignore */ } };
+  const pick = (l: Lang) => { setPublicLang(l); setError(''); };
 
   const st = session.data?.student;
   if (session.isLoading) return <div {...la}><Loading label={s.loading} /></div>;
@@ -30,9 +33,9 @@ export default function StudentLogin() {
   const submit = () => {
     if (!username.trim()) return setError(s.needUser);
     if (pin.length !== 4) return setError(s.needPin);
-    login.mutate({ data: { username: username.trim(), pin, language: lang } }, {
-      onSuccess: (student) => { qc.clear(); qc.setQueryData(getGetStudentSessionQueryKey(), { student }); },
-      onError: (e) => { setPin(''); setError((e as { status?: number } | null)?.status === 429 ? errMsg(e, s.tooMany) : s.badLogin); },
+    login.mutate({ data: { username: username.trim(), pin } }, {
+      onSuccess: (student) => { setLanguage(toLang(student.language)); qc.clear(); qc.setQueryData(getGetStudentSessionQueryKey(), { student }); },
+      onError: (e) => { setPin(''); setError((e as { status?: number } | null)?.status === 429 ? s.tooMany : s.badLogin); },
     });
   };
 
@@ -40,12 +43,8 @@ export default function StudentLogin() {
     <div {...la} className="min-h-[100dvh] px-4 py-6">
       <div className="max-w-md mx-auto flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <Link href="/" data-testid="link-home" className="inline-flex items-center gap-2 min-h-14 px-4 rounded-full">{lang === 'ar' ? <ArrowRight size={22} className="text-steel" aria-hidden /> : <ArrowLeft size={22} className="text-steel" aria-hidden />}{s.home}</Link>
-          <div role="radiogroup" aria-label={s.language} className="flex gap-2" data-testid="select-language">
-            {(['ar', 'en'] as const).map((l) => (
-              <button key={l} type="button" role="radio" aria-checked={lang === l} lang={l} onClick={() => pick(l)} className={cx('min-h-14 px-4 rounded-full border border-navy', lang === l ? 'bg-navy text-white' : 'bg-card')} data-testid={`button-lang-${l}`}>{l === 'ar' ? 'العربية' : 'English'}</button>
-            ))}
-          </div>
+          <Link href="/" data-testid="link-home" className="inline-flex items-center gap-2 min-h-14 px-4 rounded-full"><ArrowLeft size={22} className="text-steel rtl:-scale-x-100" aria-hidden />{s.home}</Link>
+          <LangToggle value={lang} onChange={pick} label={s.language} testId="toggle-public-language" />
           <img src={brand('lumi-logo.png')} alt={s.logo} className="size-16 object-contain" />
         </div>
         <div className="text-center">

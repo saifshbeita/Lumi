@@ -3,10 +3,10 @@ import { Link, useParams } from 'wouter';
 import { ArrowLeft, Volume2, Square, RotateCcw } from 'lucide-react';
 import { useGetStudent, useGetAdultChat, getGetStudentQueryKey, getGetAdultChatQueryKey, getGetAdultMessageAudioUrl } from '@workspace/api-client-react';
 import { AdultShell } from './adult-shell';
+import { NamedText } from '@/components/isolated-text';
 import { Button, Card, ErrorBox, SkeletonBlock, cx } from '@/components/lumi';
-
-const AR = /[\u0600-\u06FF]/;
-const dirOf = (t: string) => (AR.test(t) ? 'rtl' : 'ltr');
+import { useTranslation } from 'react-i18next';
+import { localeOf, useLang } from '@/i18n';
 
 function parseSteps(c: string): string[] | null {
   try {
@@ -20,6 +20,7 @@ function parseSteps(c: string): string[] | null {
 }
 
 function AudioControl({ studentId, messageId }: { studentId: number; messageId: number }) {
+  const { t } = useTranslation();
   const [state, setState] = useState<'idle' | 'loading' | 'playing' | 'error'>('idle');
   const audio = useRef<HTMLAudioElement | null>(null);
   const url = useRef<string | null>(null);
@@ -53,31 +54,33 @@ function AudioControl({ studentId, messageId }: { studentId: number; messageId: 
   };
   const stop = () => { audio.current?.pause(); if (audio.current) audio.current.currentTime = 0; setState('idle'); };
   return (
-    <div className="mt-3 flex items-center gap-3 flex-wrap" dir="ltr">
+    <div className="mt-3 flex items-center gap-3 flex-wrap">
       {state === 'playing' ? (
-        <Button variant="secondary" onClick={stop} data-testid={`button-stop-audio-${messageId}`}><Square size={18} aria-hidden />Stop</Button>
+        <Button variant="secondary" onClick={stop} data-testid={`button-stop-audio-${messageId}`}><Square size={18} aria-hidden />{t('transcript.stop')}</Button>
       ) : state === 'error' ? (
         <>
-          <span role="alert" data-testid={`text-audio-error-${messageId}`}>Audio could not load.</span>
-          <Button variant="secondary" onClick={play} data-testid={`button-retry-audio-${messageId}`}><RotateCcw size={18} aria-hidden />Retry</Button>
+          <span role="alert" data-testid={`text-audio-error-${messageId}`}>{t('transcript.audioFail')}</span>
+          <Button variant="secondary" onClick={play} data-testid={`button-retry-audio-${messageId}`}><RotateCcw size={18} aria-hidden />{t('transcript.retry')}</Button>
         </>
       ) : (
-        <Button variant="secondary" onClick={play} disabled={state === 'loading'} data-testid={`button-play-audio-${messageId}`}><Volume2 size={18} aria-hidden />{state === 'loading' ? 'Loading...' : 'Play'}</Button>
+        <Button variant="secondary" onClick={play} disabled={state === 'loading'} data-testid={`button-play-audio-${messageId}`}><Volume2 size={18} aria-hidden />{state === 'loading' ? t('transcript.loadingAudio') : t('transcript.play')}</Button>
       )}
     </div>
   );
 }
 
 function Transcript({ id, chatId }: { id: number; chatId: number }) {
+  const { t } = useTranslation();
+  const lang = useLang();
   const ok = Number.isFinite(id) && Number.isFinite(chatId);
   const profile = useGetStudent(id, { query: { queryKey: getGetStudentQueryKey(id), enabled: ok } });
   const chat = useGetAdultChat(id, chatId, { query: { queryKey: getGetAdultChatQueryKey(id, chatId), enabled: ok } });
   const name = profile.data?.student.name;
   const mode = profile.data?.student.conditions[0];
-  const back = <Link href={`/adult/students/${id}`} data-testid="link-back-profile" className="inline-flex items-center gap-2 min-h-14 mb-4 rounded-full pe-4"><ArrowLeft size={22} className="text-steel" aria-hidden />{name ? `${name}'s profile` : 'Back to profile'}</Link>;
+  const back = <Link href={`/adult/students/${id}`} data-testid="link-back-profile" className="inline-flex items-center gap-2 min-h-14 mb-4 rounded-full pe-4"><ArrowLeft size={22} className="text-steel rtl:-scale-x-100" aria-hidden /><span>{name ? <NamedText template={t('transcript.backTo', { name: '__NAME__' })} name={name} /> : t('transcript.backProfile')}</span></Link>;
 
-  if (chat.isLoading || profile.isLoading) return <div role="status" aria-label="Loading" className="flex flex-col gap-6">{back}<SkeletonBlock className="h-24" /><SkeletonBlock className="h-64" /></div>;
-  if (chat.isError || !chat.data) return <div>{back}<ErrorBox>We could not open this chat.</ErrorBox><Button className="mt-4" onClick={() => chat.refetch()} data-testid="button-retry-chat">Try again</Button></div>;
+  if (chat.isLoading || profile.isLoading) return <div role="status" aria-label={t('common.loading')} className="flex flex-col gap-6">{back}<SkeletonBlock className="h-24" /><SkeletonBlock className="h-64" /></div>;
+  if (chat.isError || !chat.data) return <div>{back}<ErrorBox>{t('transcript.openFail')}</ErrorBox><Button className="mt-4" onClick={() => chat.refetch()} data-testid="button-retry-chat">{t('common.tryAgain')}</Button></div>;
   const { chat: c, messages } = chat.data;
   return (
     <div>
@@ -86,19 +89,18 @@ function Transcript({ id, chatId }: { id: number; chatId: number }) {
         {c.icon && <span className="text-4xl" aria-hidden>{c.icon}</span>}
         <h1 className="text-4xl" dir="auto" data-testid="text-chat-title">{c.title}</h1>
       </div>
-      <p className="mb-8" data-testid="text-chat-meta">{new Date(c.createdAt).toLocaleString()} · {messages.length} message{messages.length === 1 ? '' : 's'} · Read only</p>
+      <p className="mb-8" data-testid="text-chat-meta">{new Date(c.createdAt).toLocaleString(localeOf(lang))} · {t('profile.messageCount', { count: messages.length })} · {t('transcript.readOnly')}</p>
       <Card data-testid="section-transcript">
-        {messages.length === 0 ? <p className="bg-mist rounded-2xl p-4">No messages in this chat yet.</p> : (
+        {messages.length === 0 ? <p className="bg-mist rounded-2xl p-4">{t('transcript.noMessages')}</p> : (
           <ol className="flex flex-col gap-4">
             {messages.map((m) => {
               const ai = m.role === 'ai';
               const steps = ai ? parseSteps(m.content) : null;
               const text = steps ? steps.join(' ') : m.content;
-              const dir = dirOf(text);
               return (
                 <li key={m.id} className={cx('flex flex-col max-w-[85%]', ai ? 'self-start' : 'self-end items-end')} data-testid={`message-${m.id}`}>
-                  <span className="text-base mb-1">{ai ? 'Lumi' : name ?? 'Student'} · {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                  <div dir={dir} lang={dir === 'rtl' ? 'ar' : undefined} className={cx('rounded-2xl px-5 py-4 border border-navy text-start', ai ? 'bg-mist' : 'bg-card')} data-testid={`text-message-${m.id}`}>
+                  <span className="text-base mb-1"><bdi>{ai ? t('common.lumi') : name ?? t('transcript.student')}</bdi> · {new Date(m.createdAt).toLocaleTimeString(localeOf(lang), { hour: '2-digit', minute: '2-digit' })}</span>
+                  <div dir="auto" className={cx('rounded-2xl px-5 py-4 border border-navy text-start', ai ? 'bg-mist' : 'bg-card')} data-testid={`text-message-${m.id}`}>
                     {steps ? (
                       <ol className="list-decimal ps-6 flex flex-col gap-1">{steps.map((s, i) => <li key={i}>{s}</li>)}</ol>
                     ) : <p className="whitespace-pre-wrap">{text}</p>}

@@ -29,6 +29,14 @@ export const Mode = {
   autism: 'autism',
 } as const;
 
+export type AdultLanguage = typeof AdultLanguage[keyof typeof AdultLanguage];
+
+
+export const AdultLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 export type AdultRole = typeof AdultRole[keyof typeof AdultRole];
 
 
@@ -38,6 +46,7 @@ export const AdultRole = {
 } as const;
 
 export interface Adult {
+  language: AdultLanguage;
   id: number;
   name: string;
   email: string;
@@ -46,9 +55,29 @@ export interface Adult {
   school: string | null;
 }
 
+export type AdultLanguageInputLanguage = typeof AdultLanguageInputLanguage[keyof typeof AdultLanguageInputLanguage];
+
+
+export const AdultLanguageInputLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
+export interface AdultLanguageInput {
+  language: AdultLanguageInputLanguage;
+}
+
 export interface AdultSession {
   adult: Adult | null;
 }
+
+export type AdultLoginLanguage = typeof AdultLoginLanguage[keyof typeof AdultLoginLanguage];
+
+
+export const AdultLoginLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
 
 export type AdultLoginRole = typeof AdultLoginRole[keyof typeof AdultLoginRole];
 
@@ -59,6 +88,7 @@ export const AdultLoginRole = {
 } as const;
 
 export interface AdultLogin {
+  language?: AdultLoginLanguage;
   email: string;
   /**
      * @minLength 8
@@ -67,6 +97,14 @@ export interface AdultLogin {
   password: string;
   role: AdultLoginRole;
 }
+
+export type AdultSignupLanguage = typeof AdultSignupLanguage[keyof typeof AdultSignupLanguage];
+
+
+export const AdultSignupLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
 
 export type AdultSignupRole = typeof AdultSignupRole[keyof typeof AdultSignupRole];
 
@@ -77,6 +115,7 @@ export const AdultSignupRole = {
 } as const;
 
 export interface AdultSignup {
+  language?: AdultSignupLanguage;
   /**
      * @minLength 1
      * @maxLength 100
@@ -161,7 +200,16 @@ export interface StudentUpdate {
   interests?: Interests;
 }
 
+export type DemoQuestionLanguage = typeof DemoQuestionLanguage[keyof typeof DemoQuestionLanguage];
+
+
+export const DemoQuestionLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 export interface DemoQuestion {
+  language?: DemoQuestionLanguage;
   /**
      * @minLength 1
      * @maxLength 2000
@@ -170,7 +218,16 @@ export interface DemoQuestion {
   interests?: Interests;
 }
 
+export type DemoSpeechLanguage = typeof DemoSpeechLanguage[keyof typeof DemoSpeechLanguage];
+
+
+export const DemoSpeechLanguage = {
+  ar: 'ar',
+  en: 'en',
+} as const;
+
 export interface DemoSpeech {
+  language?: DemoSpeechLanguage;
   /**
      * @minLength 1
      * @maxLength 800
@@ -226,6 +283,14 @@ export const InsightType = {
 } as const;
 
 export interface Insight {
+  /** @nullable */
+  textAr?: string | null;
+  /** @nullable */
+  textEn?: string | null;
+  /** @nullable */
+  evidenceAr?: string | null;
+  /** @nullable */
+  evidenceEn?: string | null;
   id: number;
   type: InsightType;
   text: string;

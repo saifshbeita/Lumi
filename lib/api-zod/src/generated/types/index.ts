@@ -6,11 +6,16 @@
  */
 
 export * from './adult';
+export * from './adultLanguage';
+export * from './adultLanguageInput';
+export * from './adultLanguageInputLanguage';
 export * from './adultLogin';
+export * from './adultLoginLanguage';
 export * from './adultLoginRole';
 export * from './adultRole';
 export * from './adultSession';
 export * from './adultSignup';
+export * from './adultSignupLanguage';
 export * from './adultSignupRole';
 export * from './chat';
 export * from './chatExchange';
@@ -20,7 +25,9 @@ export * from './chatMessageRole';
 export * from './demoModeResult';
 export * from './demoModeResultStatus';
 export * from './demoQuestion';
+export * from './demoQuestionLanguage';
 export * from './demoSpeech';
+export * from './demoSpeechLanguage';
 export * from './healthStatus';
 export * from './insight';
 export * from './insightType';

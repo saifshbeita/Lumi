@@ -22,7 +22,7 @@ export function parseSteps(c: string): string[] {
 
 /** Plain AI reply bubble (dyslexia and autism modes). */
 export function ModeReply({ mode, children, className, testId }: { mode: Mode; children: ReactNode; className?: string; testId?: string }) {
-  return <div className={cx('bg-card border border-border rounded-3xl px-5 py-3 whitespace-pre-line', className)} style={modeTextStyle(mode)} data-testid={testId}>{children}</div>;
+  return <div dir="auto" className={cx('bg-card border border-border rounded-3xl px-5 py-3 whitespace-pre-line', className)} style={modeTextStyle(mode)} data-testid={testId}>{children}</div>;
 }
 
 export type SpeakerState = 'loading' | 'playing' | 'error' | null;
@@ -51,7 +51,7 @@ export function LearningSteps({ steps, progress, active = true, onNext, compact 
     <div className={cx('flex flex-col gap-2', className)} data-testid={testId}>
       {shown.map((s, k) => {
         const i = k + offset;
-        return <div key={i} className={cx('bg-card border border-border rounded-3xl px-5 py-3', active && i < p || !active ? 'opacity-50' : '')} style={stepStyle} data-testid={compact ? 'text-current-step' : undefined}>{s}</div>;
+        return <div key={i} dir="auto" className={cx('bg-card border border-border rounded-3xl px-5 py-3', active && i < p || !active ? 'opacity-50' : '')} style={stepStyle} data-testid={compact ? 'text-current-step' : undefined}>{s}</div>;
       })}
       {active && steps.length > 1 && (
         <div className="flex items-center gap-4">

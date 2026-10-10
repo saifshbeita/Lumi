@@ -29,7 +29,7 @@ router.post("/compare", limit, async (req, res): Promise<void> => {
     let timeout: ReturnType<typeof setTimeout> | undefined;
     try {
       const result = await Promise.race([
-        generateStudentReply(mode, [{ role: "student", content: parsed.data.question.trim() }], interests, signal),
+        generateStudentReply(mode, [{ role: "student", content: parsed.data.question.trim() }], interests, signal, parsed.data.language ?? "ar"),
         new Promise<never>((_, reject) => { timeout = setTimeout(() => reject(new Error("Demo deadline")), 9200); }),
       ]);
       if (!res.destroyed) res.write(JSON.stringify({ mode, status: "success", content: result }) + "\n");
@@ -52,7 +52,7 @@ router.post("/audio", limit, async (req, res): Promise<void> => {
     const speech = await voiceOpenAI.audio.speech.create({
       model: "gpt-4o-mini-tts", voice: "sage", speed: 0.9, response_format: "mp3",
       input: parsed.data.text,
-      instructions: "Read the supplied Arabic text exactly. Use a warm, calm, clear voice for a child, with gentle pauses. Do not add or change any words.",
+      instructions: `Read the supplied ${parsed.data.language === "en" ? "English" : "Arabic"} text exactly. Use a warm, calm, clear voice for a child, with gentle pauses. Do not add or change any words.`,
     }, { signal: controller.signal });
     const audio = Buffer.from(await speech.arrayBuffer());
     if (!res.destroyed) res.set({ "Content-Type": "audio/mpeg", "Content-Length": String(audio.length), "Cache-Control": "no-store" }).send(audio);

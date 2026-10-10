@@ -3,8 +3,9 @@ import { t, type Lang } from '@/lib/student-i18n';
 
 type Phase = 'idle' | 'listening' | 'thinking';
 const api = (path: string) => `${import.meta.env.BASE_URL.replace(/\/$/, '')}/api/student${path}`;
-async function friendlyError(response: Response, fallback: string) {
-  try { const body = await response.json(); return typeof body.error === 'string' ? body.error : fallback; } catch { return fallback; }
+// Localized fallback only: server text may not match the student's language.
+async function friendlyError(_response: Response, fallback: string) {
+  return fallback;
 }
 function silence() {
   const data = new Uint8Array(44 + 3200);

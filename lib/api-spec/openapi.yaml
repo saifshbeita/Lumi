@@ -5,6 +5,21 @@ info:
 servers:
   - url: /api
 paths:
+  /adult/language:
+    patch:
+      operationId: updateAdultLanguage
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdultLanguageInput" }
+      responses:
+        "200":
+          description: Updated adult language preference
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Adult" }
+        "403": { description: Adult session required }
   /adult/demo/compare:
     post:
       operationId: compareDemoModes
@@ -333,13 +348,19 @@ components:
       enum: [dyslexia, learning, autism]
     Adult:
       type: object
-      required: [id, name, email, role, school]
+      required: [id, name, email, role, school, language]
       properties:
+        language: { type: string, enum: [ar, en] }
         id: { type: integer }
         name: { type: string }
         email: { type: string }
         role: { type: string, enum: [teacher, parent] }
         school: { type: [string, "null"] }
+    AdultLanguageInput:
+      type: object
+      required: [language]
+      properties:
+        language: { type: string, enum: [ar, en] }
     AdultSession:
       type: object
       required: [adult]
@@ -352,6 +373,7 @@ components:
       type: object
       required: [email, password, role]
       properties:
+        language: { type: string, enum: [ar, en] }
         email: { type: string, format: email }
         password: { type: string, minLength: 8, maxLength: 72 }
         role: { type: string, enum: [teacher, parent] }
@@ -359,6 +381,7 @@ components:
       type: object
       required: [name, email, password, role]
       properties:
+        language: { type: string, enum: [ar, en] }
         name: { type: string, minLength: 1, maxLength: 100 }
         email: { type: string, format: email }
         password: { type: string, minLength: 8, maxLength: 72 }
@@ -404,12 +427,14 @@ components:
       type: object
       required: [question]
       properties:
+        language: { type: string, enum: [ar, en] }
         question: { type: string, minLength: 1, maxLength: 2000 }
         interests: { $ref: "#/components/schemas/Interests" }
     DemoSpeech:
       type: object
       required: [text]
       properties:
+        language: { type: string, enum: [ar, en] }
         text: { type: string, minLength: 1, maxLength: 800 }
     DemoModeResult:
       type: object
@@ -438,6 +463,10 @@ components:
       type: object
       required: [id, type, text, evidence, sourceChatId]
       properties:
+        textAr: { type: [string, "null"] }
+        textEn: { type: [string, "null"] }
+        evidenceAr: { type: [string, "null"] }
+        evidenceEn: { type: [string, "null"] }
         id: { type: integer }
         type: { type: string, enum: [strength, weakness, need] }
         text: { type: string }

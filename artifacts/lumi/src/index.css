@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Readex+Pro:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Readex+Pro:wght@400;600&display=swap');
 @import 'tailwindcss';
 
 /* Shared design tokens and Tailwind v4 configuration: one source of truth. */
@@ -29,6 +29,8 @@
   html { font-size: var(--text-body); }
   body { font-family: var(--font-sans); font-weight: 400; font-size: 1rem; line-height: var(--leading-body); background: var(--color-background); color: var(--color-foreground); text-align: start; }
   h1, h2, h3 { font-family: var(--font-heading); font-weight: 600; line-height: 1.2; color: var(--color-navy); }
+  /* Fraunces has no Arabic glyphs: Arabic headings use Readex Pro 600. */
+  :lang(ar) h1, :lang(ar) h2, :lang(ar) h3, :lang(ar) .font-heading, :lang(ar) legend.font-heading { font-family: 'Readex Pro', system-ui, sans-serif; }
   button, input, select, textarea { font: inherit; font-weight: 400; }
   :focus-visible { outline: 4px solid var(--color-navy); outline-offset: 3px; }
   ::placeholder { color: var(--color-navy); opacity: 0.6; }
