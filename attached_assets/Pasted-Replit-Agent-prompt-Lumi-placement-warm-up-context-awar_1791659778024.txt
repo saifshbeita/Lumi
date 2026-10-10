@@ -1,0 +1,164 @@
+Replit Agent prompt: Lumi placement warm-up + context-aware tutor
+
+Paste everything below into Replit Agent after uploading dyslexia.md, learning-difficulties.md and autism.md to docs/placement/ in the project.
+
+You are working inside the existing Lumi project. Lumi is a responsive website with an AI tutor for kids (6 to 12) with dyslexia, learning difficulties or autism. Adults (teachers or parents) create child accounts and assign the condition. Children log in with username + PIN and chat with Lumi in a mode built for their condition. One backend, one chat API, three mode frontends.
+
+Do not rebuild or restyle what already exists. Use the project's existing stack, database, auth, routing, design tokens and TTS. Add only what this prompt describes.
+
+Read first
+
+These 3 files are the source of truth for items, scoring, flags, tutor rules, context templates and dashboard wording. Follow them exactly. If this prompt and a file disagree, the file wins.
+
+docs/placement/dyslexia.md
+docs/placement/learning-difficulties.md
+docs/placement/autism.md
+What we are building
+A placement warm-up ("يلا نتعرّف!") the child does the first time they log in, one per condition.
+Deterministic scoring that turns answers into levels, a band, flags, interests and preferences.
+A learner context built from that result and injected into the tutor's system prompt on every chat call, so Lumi adapts from the first message.
+A "Starting point" card on the adult's student profile, plus seeded profile insights.
+Non-negotiable rules
+The warm-up is never called a test or exam in the child UI.
+No AI in scoring. Scoring is pure code from the rules in the MD files.
+The child never sees scores, levels, flags, right/wrong, or red. Same neutral reaction after every answer (defined per file).
+The AI never diagnoses, never names the condition to the child, never mentions levels or the warm-up results to the child.
+A child only ever sees their own mode's routes. The warm-up lives inside each mode's frontend (e.g. /dyslexia/warmup, /ld/warmup, /autism/warmup). Match the existing route naming.
+Mode UI rules apply during the warm-up (dyslexia: auto audio, big text; learning difficulties: one item per screen + Next; autism: visual schedule, no animations, fixed layout).
+Colors: bg 
+#FAF9F4, text 
+#2D4059, soft 
+#E5EEF5, secondary 
+#7898B5 (never for text), primary button 
+#F3D982 with navy text, success 
+#8DBF9B, try-again 
+#E8A598. Fonts: Fraunces headings, Readex Pro body, min 18px. Buttons min 56px (72px for warm-up options). Cards radius 24px, borders not shadows.
+Pictures are emoji for the MVP. No image generation.
+Arabic is RTL. Respect the existing AR/EN toggle for UI chrome. Item content stays Arabic.
+Build order
+
+Work in these phases. After each phase, run the app, check it works, and give me a 3-line summary before moving on.
+
+Phase 1: Data
+
+Add:
+
+placements
+
+column	type
+id	uuid / serial
+student_id	fk students
+test	text: dyslexia / learning_difficulties / autism
+version	int (1)
+status	text: in_progress / done
+current_index	int (for resume)
+answers	jsonb array: { item_id, picked, correct, points, supported, skipped, response_ms, replays }
+result	jsonb (the output JSON from the MD file, null until done)
+started_at, completed_at	timestamps
+
+profile_insights: add column source text (placement / session), default session.
+
+A student's active placement = latest done placement whose test matches the student's current condition.
+
+Phase 2: Item banks + runner
+Convert the items in each MD file into JSON item banks: placement/items/dyslexia.json, learning_difficulties.json, autism.json. Keep item ids exactly as in the files. Suggested shape:
+json
+   {
+     "test": "dyslexia",
+     "version": 1,
+     "sections": [
+       {
+         "id": "A", "domain": "phonology", "title_ar": "الأصوات",
+         "stop_rule": true, "audio": "auto", "show_labels": false,
+         "items": [
+           {
+             "id": "A1", "type": "choice",
+             "prompt_ar": "أيّ صورة تبدأ بصوت «سـ»؟",
+             "tts_ar": "أيّ صورة تبدأ بصوت سـ؟",
+             "options": [
+               { "id": "a", "emoji": "🐟", "label_ar": "سمكة", "correct": true },
+               { "id": "b", "emoji": "🚪", "label_ar": "باب", "tag": "sound" },
+               { "id": "c", "emoji": "🌙", "label_ar": "قمر", "tag": "sound" }
+             ]
+           }
+         ]
+       }
+     ]
+   }
+Build one generic warm-up runner component that renders any item bank. Item types needed:
+choice (emoji / letter / word / text options, optional passage with passage_audio: true|false)
+sequence_memory (show sequence for count × 1.5s, hide, tap in order on a 6-tile grid)
+ordered_taps (fixed 6-shape grid, tap a sequence; instruction text hidden after audio)
+multi_pick (interests, up to 3)
+preference (no right answer)
+size_pick (same word at 3 sizes)
+free_text_optional (text or voice, skippable)
+Runner behavior (all from the MD files): shuffle options, stop rule (2 wrong in a row ends a section where enabled), skip button, replay counting, supported scoring (0.5), response time tracking, progress dots / schedule, neutral feedback, save each answer to placements.answers immediately and update current_index so a refresh resumes where the child stopped.
+Mode skins on the runner: dyslexia auto-TTS + big type; learning difficulties one item per screen + Next button; autism visual schedule between parts, break button, no animations, static Lumi.
+TTS: use the project's existing TTS. Fallback: browser speechSynthesis with lang ar-JO, then ar-SA, then any ar.
+Digits: Western digits by default, one config flag to switch to Arabic-Indic.
+Phase 3: Scoring
+
+Write one pure function per test: scorePlacement(test, answers) → result, implementing section 4 of each MD file exactly (points per item, level thresholds, band, step size for learning difficulties, flags, error patterns for dyslexia, signals). Output must match section 5 of each file.
+
+Write unit tests with at least 3 fixtures per test (low, mixed, high). The mixed fixtures must trigger the hidden-strength flags: understands_more_than_reads, reasons_beyond_school_level, academically_ready.
+
+When a placement finishes: run scoring, save result, set status = done, then seed insights (Phase 5).
+
+Phase 4: Learner context + chat
+buildLearnerContext(result) → string. Deterministic, no AI. Uses the context block template in section 7 of the matching MD file and includes one line per applicable tutor rule from section 6.
+In the existing chat API, assemble the system prompt in this order:
+   [BASE RULES]      shared safety rules (below)
+   [MODE PROMPT]     the existing system prompt for the child's mode (do not change it)
+   [LEARNER CONTEXT] buildLearnerContext(active placement result)
+   [RECENT INSIGHTS] up to 5 latest profile_insights for this student (both sources), as bullet lines
+
+then the chat history. 3. BASE RULES text:
+
+   You are Lumi, a kind learning helper for a child aged 6 to 12.
+   - You help the child learn. You never diagnose and never name any condition.
+   - Never tell the child about levels, scores, flags, tests or what their teacher or parent sees.
+   - Never call the child smart, weak, slow or any label. Praise effort and thinking.
+   - Follow LEARNER CONTEXT strictly. It tells you the child's starting level, step size, text limits and interests.
+   - Start at the band's level. After 3 correct in a row, make it a bit harder. After 2 wrong in a row, make it easier and give an example.
+   - Use the child's interests in examples.
+   - If the child seems upset or says something worrying about their safety, respond gently and tell them to talk to their teacher or parent.
+If a student has no active placement (old accounts), the chat still works without the LEARNER CONTEXT block.
+Cache the context string on the placement row if needed, but rebuild it whenever the result changes.
+Phase 5: Gate, insights, dashboard
+Gate: on student login, if there's no active placement for the current condition, send them to their mode's warm-up. If an in_progress one exists, resume it. After completion, show the mode's final screen, then go to the mode home.
+Condition change: when the adult changes a child's condition, the next login requires the matching warm-up. Old placements are kept.
+Seed insights: on completion, delete the student's profile_insights where source = placement, then insert strengths / weaknesses / needs from section 8 of the matching MD file (use the dashboard's current language, both strings are in the file).
+Starting point card on the adult's student profile page (same component for teacher and parent roles):
+Title: "Starting point" / "نقطة البداية", date of the warm-up
+Each domain as a plain-language name + 4 dots (filled = level). No numbers, no "score"
+Hidden strength flag, if any, shown at the top in a soft 
+#E5EEF5 box with the sentence from section 8 (this is the most important line on the card)
+Interests as chips, favorite thing if present
+Small footer: "A starting point for personalizing learning, not a diagnosis." / "نقطة بداية لتخصيص التعلّم، مش تشخيص."
+Button "Redo warm-up" / "إعادة التعرّف": creates a new required placement for the next login
+If no placement yet: "Not started yet. It runs on the child's first login."
+Phase 6: Demo data
+
+Seed under the existing demo adult account 3 fictional students, each with a done placement, a result that matches the mixed fixtures, and seeded insights:
+
+عمر, dyslexia: understands_more_than_reads, similar_letters (ث↔ت), interests football + space
+لين, learning difficulties: reasons_beyond_school_level, short_memory, step 2, interests animals + drawing
+يزن, autism: academically_ready, literal_language, prefers_choices, favorite thing "القطارات"
+
+Add an adult-only "Reset warm-up (demo)" action so we can run a warm-up live on stage.
+
+Acceptance checklist
+ New student logs in → lands in their mode's warm-up, not home
+ Refresh mid warm-up → resumes on the same item
+ Stop rule ends a section after 2 wrong in a row
+ Child never sees right/wrong, scores or red
+ Dyslexia: prompts auto-read, E3/E4 passage not read aloud
+ Learning difficulties: one item per screen, Next button, memory and instruction items work
+ Autism: schedule shown before and between parts, no animations, break button saves progress
+ Scoring unit tests pass, outputs match the JSON shape in each MD file
+ Chat system prompt contains the LEARNER CONTEXT block (log it in dev)
+ Lumi's replies visibly follow the rules (e.g. عمر gets ≤ 1 short written sentence, لين gets 1 step at a time, يزن gets 2 to 3 tap options and train examples)
+ Adult profile shows the Starting point card and seeded insights, in both teacher and parent roles
+ Changing a child's condition triggers the new mode's warm-up on next login
+ A child can't open another mode's warm-up route
