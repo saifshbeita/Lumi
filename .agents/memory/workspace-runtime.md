@@ -20,3 +20,9 @@ Run development seeds through a TypeScript-aware runtime rather than externalizi
 **Why:** Workspace package exports point at TypeScript source, whose extensionless directory imports fail under plain Node ESM; bundling only the workspace package also moves dependency resolution outside its owning package.
 
 **How to apply:** Use the package's seed command and keep seeding development-only.
+
+Server-only files also need protection in development web previews, not just exclusion from the production client bundle.
+
+**Why:** Vite's pnpm workspace file access can permit direct filesystem URLs to server files; an answer bank can otherwise be reachable even when no frontend imports it.
+
+**How to apply:** When adding or changing web previews, deny private banks, guide/instruction sources and backend generators across every preview service while preserving the default environment/key-file denies.

@@ -9,6 +9,7 @@ import StudentProfilePage from '@/pages/adult/student-profile';
 import DemoPage from '@/pages/adult/demo/demo';
 import ChatTranscriptPage from '@/pages/adult/chat-transcript';
 import StudentLogin from '@/pages/student/login';
+import { StudentGuard } from '@/pages/student/student-guard';
 import DyslexiaHome from '@/pages/student/dyslexia';
 import LearningHome from '@/pages/student/learning';
 import AutismHome from '@/pages/student/autism';
@@ -33,6 +34,9 @@ function Router() {
         <Route path="/student/dyslexia/chat/:id" component={DyslexiaChat} />
         <Route path="/student/learning/chat/:id" component={LearningChat} />
         <Route path="/student/autism/chat/:id" component={AutismChat} />
+        <Route path="/student/dyslexia/warmup"><StudentGuard mode="dyslexia" warmup /></Route>
+        <Route path="/student/learning/warmup"><StudentGuard mode="learning" warmup /></Route>
+        <Route path="/student/autism/warmup"><StudentGuard mode="autism" warmup /></Route>
         <Route path="/student/dyslexia" component={DyslexiaHome} />
         <Route path="/student/learning" component={LearningHome} />
         <Route path="/student/autism" component={AutismHome} />

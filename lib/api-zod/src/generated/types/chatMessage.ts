@@ -4,9 +4,14 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { ChatMessagePresentation } from './chatMessagePresentation';
 import type { ChatMessageRole } from './chatMessageRole';
 
 export interface ChatMessage {
+  /** @nullable */
+  spokenContent?: string | null;
+  /** @nullable */
+  presentation?: ChatMessagePresentation;
   id: number;
   chatId: number;
   role: ChatMessageRole;

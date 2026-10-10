@@ -1,0 +1,756 @@
+{
+  "test": "dyslexia",
+  "version": 1,
+  "sections": [
+    {
+      "id": "A",
+      "title_ar": "الأصوات",
+      "items": [
+        {
+          "id": "A1",
+          "section": "A",
+          "domain": "phonology",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "أيّ صورة تبدأ بصوت «سـ»؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🐟",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🚪",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🌙",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "A2",
+          "section": "A",
+          "domain": "phonology",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "أيّ كلمة آخرها مثل «نار»؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🏠",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🐕",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "☀️",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "A3",
+          "section": "A",
+          "domain": "phonology",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "كم مقطع في كلمة «دَجاجة» 🐔؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "👏👏👏",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "👏👏",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "👏",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "A4",
+          "section": "A",
+          "domain": "phonology",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اسمع: «قـ... طّـ... ة». شو الكلمة؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🐱",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🌙",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🚂",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title_ar": "الحروف",
+      "items": [
+        {
+          "id": "B1",
+          "section": "B",
+          "domain": "letters",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اضغط على حرف «م»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "م",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "ب",
+              "correct": false,
+              "tag": "shape"
+            },
+            {
+              "id": "c",
+              "label_ar": "ل",
+              "correct": false,
+              "tag": "shape"
+            }
+          ],
+          "tts_ar": "ميم، مَـ. اضغط على حرف ميم."
+        },
+        {
+          "id": "B2",
+          "section": "B",
+          "domain": "letters",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اضغط على حرف «ث»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "ث",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "ت",
+              "correct": false,
+              "tag": "dots"
+            },
+            {
+              "id": "c",
+              "label_ar": "ب",
+              "correct": false,
+              "tag": "dots"
+            }
+          ],
+          "tts_ar": "ثاء، ثَـ. اضغط على حرف ثاء."
+        },
+        {
+          "id": "B3",
+          "section": "B",
+          "domain": "letters",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اضغط على حرف «خ»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "خ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "ح",
+              "correct": false,
+              "tag": "dots"
+            },
+            {
+              "id": "c",
+              "label_ar": "ج",
+              "correct": false,
+              "tag": "dots"
+            }
+          ],
+          "tts_ar": "خاء، خَـ. اضغط على حرف خاء."
+        },
+        {
+          "id": "B4",
+          "section": "B",
+          "domain": "letters",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اضغط على «ت» في وسط الكلمة",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "ـتـ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "ـنـ",
+              "correct": false,
+              "tag": "dots"
+            },
+            {
+              "id": "c",
+              "label_ar": "ـيـ",
+              "correct": false,
+              "tag": "position"
+            }
+          ],
+          "tts_ar": "تاء، تَـ. اضغط على تاء في وسط الكلمة."
+        },
+        {
+          "id": "B5",
+          "section": "B",
+          "domain": "letters",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اضغط على «غ» في أول الكلمة",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "غـ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "عـ",
+              "correct": false,
+              "tag": "dots"
+            },
+            {
+              "id": "c",
+              "label_ar": "فـ",
+              "correct": false,
+              "tag": "position"
+            }
+          ],
+          "tts_ar": "غين، غَـ. اضغط على غين في أول الكلمة."
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "title_ar": "التشكيل",
+      "items": [
+        {
+          "id": "C1",
+          "section": "C",
+          "domain": "diacritics",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اسمع: «بَ»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "بَ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "بُ",
+              "correct": false,
+              "tag": "harakat"
+            },
+            {
+              "id": "c",
+              "label_ar": "بِ",
+              "correct": false,
+              "tag": "harakat"
+            }
+          ]
+        },
+        {
+          "id": "C2",
+          "section": "C",
+          "domain": "diacritics",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اسمع: «سِ»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "سِ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "سَ",
+              "correct": false,
+              "tag": "harakat"
+            },
+            {
+              "id": "c",
+              "label_ar": "سُ",
+              "correct": false,
+              "tag": "harakat"
+            }
+          ]
+        },
+        {
+          "id": "C3",
+          "section": "C",
+          "domain": "diacritics",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اسمع: «كِتابٌ»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "كِتابٌ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "كِتابًا",
+              "correct": false,
+              "tag": "tanween"
+            },
+            {
+              "id": "c",
+              "label_ar": "كِتابٍ",
+              "correct": false,
+              "tag": "tanween"
+            }
+          ]
+        },
+        {
+          "id": "C4",
+          "section": "C",
+          "domain": "diacritics",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اسمع: «دَرَّسَ»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "دَرَّسَ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "دَرَسَ",
+              "correct": false,
+              "tag": "shadda"
+            },
+            {
+              "id": "c",
+              "label_ar": "دُرِسَ",
+              "correct": false,
+              "tag": "shadda"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "title_ar": "الكلمات",
+      "items": [
+        {
+          "id": "D1",
+          "section": "D",
+          "domain": "word_reading",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "«بَيْت»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "بَيْت",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "بِنْت",
+              "correct": false,
+              "tag": "dots"
+            },
+            {
+              "id": "c",
+              "label_ar": "ثَبَت",
+              "correct": false,
+              "tag": "dots"
+            }
+          ]
+        },
+        {
+          "id": "D2",
+          "section": "D",
+          "domain": "word_reading",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "«جَمَل»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "جَمَل",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "حَمَل",
+              "correct": false,
+              "tag": "dots"
+            },
+            {
+              "id": "c",
+              "label_ar": "جَبَل",
+              "correct": false,
+              "tag": "shape"
+            }
+          ]
+        },
+        {
+          "id": "D3",
+          "section": "D",
+          "domain": "word_reading",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "«كَتَبَ»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "كَتَبَ",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "كَبَتَ",
+              "correct": false,
+              "tag": "order"
+            },
+            {
+              "id": "c",
+              "label_ar": "بَكَتَ",
+              "correct": false,
+              "tag": "order"
+            }
+          ]
+        },
+        {
+          "id": "D4",
+          "section": "D",
+          "domain": "word_reading",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "«مدرسة»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "مدرسة",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "مدسرة",
+              "correct": false,
+              "tag": "order"
+            },
+            {
+              "id": "c",
+              "label_ar": "مرسدة",
+              "correct": false,
+              "tag": "order"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title_ar": "الفهم",
+      "items": [
+        {
+          "id": "E1",
+          "section": "E",
+          "domain": "listening",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "أين ذهبت سلمى؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🌊",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🏫",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🌳",
+              "correct": false
+            }
+          ],
+          "passage": "ذَهَبَتْ سَلْمى مَعَ أَبيها إِلى البَحْر. بَنَتْ سَلْمى قَلْعَةً مِنَ الرَّمْل. جاءَتْ مَوْجَةٌ كَبيرَةٌ وَهَدَمَتِ القَلْعَة. ضَحِكَتْ سَلْمى وَبَنَتْ قَلْعَةً جَديدَة.",
+          "passage_audio": true,
+          "hidden_passage": true
+        },
+        {
+          "id": "E2",
+          "section": "E",
+          "domain": "listening",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "شو عملت سلمى بعد ما الموجة هدمت القلعة؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🏰",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "😢",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🏠",
+              "correct": false
+            }
+          ],
+          "passage": "ذَهَبَتْ سَلْمى مَعَ أَبيها إِلى البَحْر. بَنَتْ سَلْمى قَلْعَةً مِنَ الرَّمْل. جاءَتْ مَوْجَةٌ كَبيرَةٌ وَهَدَمَتِ القَلْعَة. ضَحِكَتْ سَلْمى وَبَنَتْ قَلْعَةً جَديدَة.",
+          "passage_audio": true,
+          "hidden_passage": true
+        },
+        {
+          "id": "E3",
+          "section": "E",
+          "domain": "reading_comp",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "شو بحب نمر؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🥛",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🐟",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🍎",
+              "correct": false
+            }
+          ],
+          "passage": "كانَ لِعُمَرَ قِطٌّ صَغيرٌ اسْمُهُ نَمِر. نَمِرٌ يُحِبُّ الحَليبَ، وَيَنامُ عَلى الكَنَبَة.",
+          "passage_audio": false
+        },
+        {
+          "id": "E4",
+          "section": "E",
+          "domain": "reading_comp",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "وين بنام نمر؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🛋️",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🛏️",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🌳",
+              "correct": false
+            }
+          ],
+          "passage": "كانَ لِعُمَرَ قِطٌّ صَغيرٌ اسْمُهُ نَمِر. نَمِرٌ يُحِبُّ الحَليبَ، وَيَنامُ عَلى الكَنَبَة.",
+          "passage_audio": false
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "title_ar": "عنّي",
+      "items": [
+        {
+          "id": "F1",
+          "section": "F",
+          "stop_rule": false,
+          "audio": "auto",
+          "type": "multi_pick",
+          "prompt_ar": "شو بتحب؟ اختار لحد ٣",
+          "options": [
+            {
+              "id": "animals",
+              "label_ar": "🐶 حيوانات"
+            },
+            {
+              "id": "dinosaurs",
+              "label_ar": "🦖 ديناصورات"
+            },
+            {
+              "id": "cars",
+              "label_ar": "🚗 سيارات"
+            },
+            {
+              "id": "trains",
+              "label_ar": "🚂 قطارات"
+            },
+            {
+              "id": "space",
+              "label_ar": "🚀 الفضاء"
+            },
+            {
+              "id": "football",
+              "label_ar": "⚽ كرة قدم"
+            },
+            {
+              "id": "drawing",
+              "label_ar": "🎨 رسم"
+            },
+            {
+              "id": "games",
+              "label_ar": "🎮 ألعاب"
+            },
+            {
+              "id": "building",
+              "label_ar": "🧱 بناء وتركيب"
+            },
+            {
+              "id": "maps",
+              "label_ar": "🌍 بلاد وخرائط"
+            },
+            {
+              "id": "numbers",
+              "label_ar": "🔢 أرقام"
+            },
+            {
+              "id": "music",
+              "label_ar": "🎵 موسيقى"
+            }
+          ],
+          "save": "interests"
+        },
+        {
+          "id": "F2",
+          "section": "F",
+          "stop_rule": false,
+          "audio": "auto",
+          "type": "preference",
+          "prompt_ar": "بتحب أقرأ لك أنا، ولّا تقرأ إنت؟",
+          "options": [
+            {
+              "id": "read_to_me",
+              "label_ar": "🔊 إنت اقرأ"
+            },
+            {
+              "id": "read_myself",
+              "label_ar": "📖 أنا بقرأ"
+            },
+            {
+              "id": "both",
+              "label_ar": "🔊📖 الاثنين"
+            }
+          ],
+          "save": "reading"
+        },
+        {
+          "id": "F3",
+          "section": "F",
+          "stop_rule": false,
+          "audio": "auto",
+          "type": "size_pick",
+          "prompt_ar": "أيّ كلمة أسهل تقرأها؟",
+          "options": [
+            {
+              "id": "24",
+              "label_ar": "مَرْحَبًا",
+              "size": 24
+            },
+            {
+              "id": "32",
+              "label_ar": "مَرْحَبًا",
+              "size": 32
+            },
+            {
+              "id": "40",
+              "label_ar": "مَرْحَبًا",
+              "size": 40
+            }
+          ],
+          "save": "text_size"
+        },
+        {
+          "id": "F4",
+          "section": "F",
+          "stop_rule": false,
+          "audio": "auto",
+          "type": "preference",
+          "prompt_ar": "بتحب تحكي ولّا تكتب؟",
+          "options": [
+            {
+              "id": "voice",
+              "label_ar": "🎤 أحكي"
+            },
+            {
+              "id": "keyboard",
+              "label_ar": "⌨️ أكتب"
+            }
+          ],
+          "save": "input"
+        }
+      ]
+    }
+  ]
+}

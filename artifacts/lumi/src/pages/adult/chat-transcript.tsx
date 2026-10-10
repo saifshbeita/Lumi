@@ -104,6 +104,7 @@ function Transcript({ id, chatId }: { id: number; chatId: number }) {
                     {steps ? (
                       <ol className="list-decimal ps-6 flex flex-col gap-1">{steps.map((s, i) => <li key={i}>{s}</li>)}</ol>
                     ) : <p className="whitespace-pre-wrap">{text}</p>}
+                    {ai&&m.spokenContent&&m.spokenContent!==m.content&&<details className="mt-3"><summary>{lang==="ar"?"الشرح الصوتي":"Spoken explanation"}</summary><p dir="auto" className="whitespace-pre-wrap mt-2">{m.spokenContent}</p></details>}
                     {ai && mode === 'dyslexia' && <AudioControl studentId={id} messageId={m.id} />}
                   </div>
                 </li>

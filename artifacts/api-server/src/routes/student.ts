@@ -7,6 +7,7 @@ import { LoginStudentBody, LoginStudentResponse, GetStudentSessionResponse, GetS
 import { publicStudent, currentStudent, studentProfile } from "../lib/profiles";
 import { regenerateSession, saveSession, destroySession } from "../lib/session";
 import { checkLogin } from "../lib/login-lock";
+import { activePlacement } from "../placement/store";
 
 const router: IRouter = Router();
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, limit: 15, standardHeaders: "draft-8", legacyHeaders: false, skipSuccessfulRequests: true, message: (req: import("express").Request) => ({ error: req.body?.language === "en" ? "Too many tries from this connection. Please take a break and try again in 15 minutes." : "محاولات كثيرة من هذا الاتصال. خذ استراحة وحاول بعد ١٥ دقيقة." }) });
@@ -37,6 +38,7 @@ router.get("/modes/:mode", async (req, res): Promise<void> => {
   const student = await currentStudent(req.session.studentId);
   if (!student) { res.status(401).json({ error: "سجل دخولك أولاً." }); return; }
   if (student.conditions[0] !== parsed.data.mode) { res.status(403).json({ error: "هذه الصفحة ليست مخصصة لحسابك.", mode: student.conditions[0] }); return; }
-  res.json(GetStudentModeResponse.parse(await studentProfile(student)));
+   const placement=await activePlacement(student);
+   res.json(GetStudentModeResponse.parse({ ...await studentProfile(student), insights: [], tutorPreferences:placement?{...(placement.result?.preferences as object??{}),placementId:placement.id}:{} }));
 });
 export default router;

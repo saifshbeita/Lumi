@@ -1,23 +1,27 @@
 import { Router, type IRouter } from "express";
-import { and, asc, desc, eq } from "drizzle-orm";
+import { and, asc, desc, eq,sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { db, pool, chats, messages, students, type StudentRow } from "@workspace/db";
+import { db, pool, chats, messages, students, profileInsights, type StudentRow } from "@workspace/db";
 import { rateLimit } from "express-rate-limit";
 import {
   CreateStudentChatResponse, ListStudentChatsResponse, ListStudentMessagesParams, ListStudentMessagesResponse,
   SendStudentMessageParams, SendStudentMessageBody, SendStudentMessageResponse,
 } from "@workspace/api-zod";
 import { currentStudent } from "../lib/profiles";
-import { generateStudentReply, generateChatLabel, type StudentMode } from "../lib/student-ai";
+import { generateStudentReply, generatePersonalizedReply, generateChatLabel, type StudentMode } from "../lib/student-ai";
+import { activePlacement,placementChatRequired } from "../placement/store";
+import { evaluatePractice } from "../placement/practice";
+import type { Result } from "../placement/types";
 import { scheduleInsights } from "../services/insights";
 
 const router: IRouter = Router();
 const limiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "لنأخذ استراحة قصيرة. حاول مرة أخرى بعد قليل." } });
 const publicChat = (c: typeof chats.$inferSelect) => ({ id: c.id, title: c.title, icon: c.icon, createdAt: c.createdAt.toISOString() });
-const publicMessage = (m: typeof messages.$inferSelect) => ({ ...m, createdAt: m.createdAt.toISOString() });
+const publicMessage = (m: typeof messages.$inferSelect) => { const {practiceKey,...visible}=m;return { ...visible, createdAt: m.createdAt.toISOString() }; };
 router.use(async (req, res, next): Promise<void> => {
   const student = await currentStudent(req.session.studentId);
   if (!student) { res.status(403).json({ error: "سجل دخولك أولاً لتتحدث مع لومي." }); return; }
+  if(await placementChatRequired(student)){res.status(409).json({error:student.language==="en"?"Let’s finish our warm-up first.":"خلّينا نكمّل التعرّف أولاً.",warmupRequired:true});return;}
   res.locals.student = student;
   next();
 });
@@ -65,8 +69,30 @@ router.post("/:id/messages", limiter, async (req, res): Promise<void> => {
     const mode = current.conditions[0];
     if (mode !== "dyslexia" && mode !== "learning" && mode !== "autism") { res.status(403).json({ error: "اطلب المساعدة من معلمك أو أحد والديك." }); return; }
     const history = await lockedDb.select().from(messages).where(eq(messages.chatId, chatId)).orderBy(desc(messages.id)).limit(20);
+    if(await placementChatRequired(current,lockedDb)){res.status(409).json({error:current.language==="en"?"Let’s finish our warm-up first.":"خلّينا نكمّل التعرّف أولاً.",warmupRequired:true});return;}
+    const placement=await activePlacement(current,lockedDb);
+    let learnerState:Record<string,unknown>=chat.learnerState.placementId===placement?.id?{...chat.learnerState}:{placementId:placement?.id};
+    let content = body.data.content.trim();
+    if(body.data.practiceMessageId || body.data.practiceChoiceId){
+      const practice=history.find(m=>m.id===body.data.practiceMessageId);
+      const latestAi=history.find(m=>m.role==="ai");
+      const choices=practice?.presentation?.choices as {id:string;label:string}[]|undefined;
+      const choice=choices?.find(c=>c.id===body.data.practiceChoiceId);
+      if(!practice||practice.role!=="ai"||latestAi?.id!==practice.id||!choice||practice.practiceKey?.placementId!==placement?.id||!practice.practiceKey?.choiceIds.includes(choice.id)){
+        res.status(400).json({error:"اختار من النشاط الحالي."});return;
+      }
+      content=choice.label;
+      if(learnerState.lastAnsweredAiId!==practice.id){
+        const skill=practice.presentation?.kind==="numbers"?"numbers":practice.presentation?.kind==="lesson"?"lesson":"reading";
+        learnerState=evaluatePractice(learnerState,choice.id===practice.practiceKey.correctId,skill);
+        learnerState.respondedToPractice=true;
+        learnerState.lastAnsweredAiId=practice.id;
+        const kind=practice.presentation?.kind;
+        if(kind==="letters")learnerState.pairTurns=Number(learnerState.pairTurns??0)+1;
+        if(kind==="sound")learnerState.soundTurns=Number(learnerState.soundTurns??0)+1;
+      }
+    }
     let studentMessage: typeof messages.$inferSelect | undefined;
-    const content = body.data.content.trim();
     if (body.data.retryMessageId) {
       const [original] = await lockedDb.select().from(messages).where(and(eq(messages.id, body.data.retryMessageId), eq(messages.chatId, chatId)));
       if (!original || original.role !== "student" || original.content !== content) { res.status(400).json({ error: "اختر السؤال المحفوظ لإعادة المحاولة." }); return; }
@@ -87,13 +113,25 @@ router.post("/:id/messages", limiter, async (req, res): Promise<void> => {
       [studentMessage] = await lockedDb.insert(messages).values({ chatId, role: "student", content }).returning();
     }
     if (!studentMessage) throw new Error("Student message was not saved");
+    await lockedDb.update(chats).set({learnerState}).where(eq(chats.id,chatId));
     savedId = studentMessage.id;
-    const contextRows = await lockedDb.select({ role: messages.role, content: messages.content }).from(messages).where(eq(messages.chatId, chatId)).orderBy(desc(messages.id)).limit(20);
-    const answer = await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests, undefined, current.language);
-    // A mode reassignment during generation must not return the old mode's reply.
-    const [fresh] = await lockedDb.select().from(students).where(eq(students.id, student.id));
-    if (!fresh || fresh.conditions[0] !== mode) { res.status(409).json({ error: "تم تحديث مساحة التعلم. افتحها من جديد ثم أعد المحاولة.", studentMessageId: savedId }); return; }
-    const [reply] = await lockedDb.insert(messages).values({ chatId, role: "ai", content: answer }).returning();
+    const contextRows = (await lockedDb.select({ role: messages.role, content: messages.content, spokenContent:messages.spokenContent }).from(messages).where(eq(messages.chatId, chatId)).orderBy(desc(messages.id)).limit(20)).map(m=>({role:m.role,content:m.role==="ai"?m.spokenContent??m.content:m.content}));
+    const recent=await lockedDb.select().from(profileInsights).where(eq(profileInsights.studentId,student.id)).orderBy(desc(profileInsights.updatedAt),desc(profileInsights.id)).limit(5);
+    const personalized=placement?.result?await generatePersonalizedReply(mode as StudentMode,contextRows.reverse(),current.language,placement.result as unknown as Result,recent.map(i=>current.language==="en"?i.textEn??i.text:i.textAr??i.text),learnerState):null;
+    const answer = personalized?.content ?? await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests, undefined, current.language,recent.map(i=>current.language==="en"?i.textEn??i.text:i.textAr??i.text));
+    // Serialize the final check/save with adult mode/redo changes. Saved child text remains outside this transaction.
+    const reply=await lockedDb.transaction(async tx=>{
+      await tx.execute(sql`SELECT id FROM students WHERE id=${student.id} FOR UPDATE`);
+      const [fresh]=await tx.select().from(students).where(eq(students.id,student.id));
+      if(!fresh||fresh.conditions[0]!==mode||fresh.placementEpoch!==current.placementEpoch||fresh.language!==current.language||await placementChatRequired(fresh,tx))return null;
+      const [saved]=await tx.insert(messages).values({chatId,role:"ai",content:answer,
+        spokenContent:personalized?.spokenContent??null,presentation:personalized?.presentation?{...personalized.presentation,placementId:placement?.id}:null,practiceKey:personalized?.practiceKey?{...personalized.practiceKey,placementId:placement?.id}:null}).returning();
+      const stepCount=Number(personalized?.presentation?.stepCount??0);
+      const stepsSinceCheck=personalized?.presentation?.awaitNext?Number(learnerState.stepsSinceCheck??0)+stepCount:0;
+      await tx.update(chats).set({learnerState:{...learnerState,...personalized?.learnerStatePatch,respondedToPractice:false,needsExample:false,activityChanged:false,stepsSinceCheck}}).where(eq(chats.id,chatId));
+      return saved!;
+    });
+    if(!reply){res.status(409).json({error:"تم تحديث مساحة التعلم. افتحها من جديد ثم أعد المحاولة.",warmupRequired:true,studentMessageId:savedId});return;}
     // A descriptive title must never hold back the visible answer or speech.
     let labeledChat = chat;
     if (!chat.icon) {

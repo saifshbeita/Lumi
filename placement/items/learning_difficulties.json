@@ -1,0 +1,814 @@
+{
+  "test": "learning_difficulties",
+  "version": 1,
+  "sections": [
+    {
+      "id": "A",
+      "title_ar": "الأنماط",
+      "items": [
+        {
+          "id": "A1",
+          "section": "A",
+          "domain": "reasoning",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "شو بيجي بعدين؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🔵",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🔴",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🟢",
+              "correct": false
+            }
+          ],
+          "shown": "🔴🔵🔴🔵🔴 ❓"
+        },
+        {
+          "id": "A2",
+          "section": "A",
+          "domain": "reasoning",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "شو بيجي بعدين؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🍎",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🍌",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🍇",
+              "correct": false
+            }
+          ],
+          "shown": "🍎🍎🍌🍎🍎🍌🍎 ❓"
+        },
+        {
+          "id": "A3",
+          "section": "A",
+          "domain": "reasoning",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "شو بيجي بعدين؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "⬇️",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "⬆️",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "⬅️",
+              "correct": false
+            }
+          ],
+          "shown": "⬆️➡️⬇️⬅️⬆️➡️ ❓"
+        },
+        {
+          "id": "A4",
+          "section": "A",
+          "domain": "reasoning",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "شو بيجي بعدين؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "⭐⭐⭐⭐",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "⭐⭐",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "⭐⭐⭐⭐⭐",
+              "correct": false
+            }
+          ],
+          "shown": "⭐ · ⭐⭐ · ⭐⭐⭐ · ❓"
+        }
+      ]
+    },
+    {
+      "id": "B",
+      "title_ar": "الأرقام",
+      "items": [
+        {
+          "id": "B1",
+          "section": "B",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "كم تفاحة؟ 🍎🍎🍎🍎🍎",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "5",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "4",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "6",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "B2",
+          "section": "B",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "اضغط على الرقم 17",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "17",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "71",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "14",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "B3",
+          "section": "B",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "3 + 4 = ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "7",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "6",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "8",
+              "correct": false
+            }
+          ],
+          "shown": "🟡🟡🟡 + 🟡🟡🟡🟡"
+        },
+        {
+          "id": "B4",
+          "section": "B",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "مع ليلى 9 بالونات 🎈، طار منهم 3. كم ضلّ معها؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "6",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "5",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "12",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "B5",
+          "section": "B",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "25 + 13 = ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "38",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "37",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "48",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "C",
+      "title_ar": "القراءة",
+      "items": [
+        {
+          "id": "C1",
+          "section": "C",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "اضغط على الصورة",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "☀️",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🌙",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "⭐",
+              "correct": false
+            }
+          ],
+          "shown": "شَمْس"
+        },
+        {
+          "id": "C2",
+          "section": "C",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "اضغط على الصورة",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🧒🍎",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🧒⚽",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "👧🍎",
+              "correct": false
+            }
+          ],
+          "shown": "الوَلَدُ يَأْكُلُ تُفّاحَة."
+        },
+        {
+          "id": "C3",
+          "section": "C",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "ماذا اشْتَرى سامي؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🍞",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🥛",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🍌",
+              "correct": false
+            }
+          ],
+          "shown": "ذَهَبَ سامي إِلى السّوقِ وَاشْتَرى خُبْزًا."
+        },
+        {
+          "id": "C4",
+          "section": "C",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "لِماذا أَخَذَتْ هِنْدُ المِظَلَّة؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "لِأَنَّ السَّماءَ تُمْطِر ☔",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "لِأَنَّها تُحِبُّ اللَّوْنَ الأَحْمَر",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "لِأَنَّ الجَوَّ حارّ",
+              "correct": false
+            }
+          ],
+          "shown": "كانَتِ السَّماءُ تُمْطِرُ. أَخَذَتْ هِنْدُ المِظَلَّةَ قَبْلَ أَنْ تَخْرُج."
+        }
+      ]
+    },
+    {
+      "id": "D",
+      "title_ar": "الذاكرة",
+      "items": [
+        {
+          "id": "D1",
+          "section": "D",
+          "domain": "memory",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "sequence_memory",
+          "prompt_ar": "شوف الصور منيح. رح يختفوا، وبعدين اضغط عليهم بالترتيب.",
+          "options": [
+            {
+              "id": "🐶",
+              "emoji": "🐶"
+            },
+            {
+              "id": "🚗",
+              "emoji": "🚗"
+            },
+            {
+              "id": "🍎",
+              "emoji": "🍎"
+            },
+            {
+              "id": "⭐",
+              "emoji": "⭐"
+            },
+            {
+              "id": "🏠",
+              "emoji": "🏠"
+            },
+            {
+              "id": "🎈",
+              "emoji": "🎈"
+            }
+          ],
+          "sequence": [
+            "🐶",
+            "🚗"
+          ]
+        },
+        {
+          "id": "D2",
+          "section": "D",
+          "domain": "memory",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "sequence_memory",
+          "prompt_ar": "شوف الصور منيح. رح يختفوا، وبعدين اضغط عليهم بالترتيب.",
+          "options": [
+            {
+              "id": "⭐",
+              "emoji": "⭐"
+            },
+            {
+              "id": "🍎",
+              "emoji": "🍎"
+            },
+            {
+              "id": "🏠",
+              "emoji": "🏠"
+            },
+            {
+              "id": "🐶",
+              "emoji": "🐶"
+            },
+            {
+              "id": "🚗",
+              "emoji": "🚗"
+            },
+            {
+              "id": "🎈",
+              "emoji": "🎈"
+            }
+          ],
+          "sequence": [
+            "⭐",
+            "🍎",
+            "🏠"
+          ]
+        },
+        {
+          "id": "D3",
+          "section": "D",
+          "domain": "memory",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "sequence_memory",
+          "prompt_ar": "شوف الصور منيح. رح يختفوا، وبعدين اضغط عليهم بالترتيب.",
+          "options": [
+            {
+              "id": "🐟",
+              "emoji": "🐟"
+            },
+            {
+              "id": "🌙",
+              "emoji": "🌙"
+            },
+            {
+              "id": "⚽",
+              "emoji": "⚽"
+            },
+            {
+              "id": "🎈",
+              "emoji": "🎈"
+            },
+            {
+              "id": "🍎",
+              "emoji": "🍎"
+            },
+            {
+              "id": "🏠",
+              "emoji": "🏠"
+            }
+          ],
+          "sequence": [
+            "🐟",
+            "🌙",
+            "⚽",
+            "🎈"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "E",
+      "title_ar": "التعليمات",
+      "items": [
+        {
+          "id": "E1",
+          "section": "E",
+          "domain": "instructions",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "ordered_taps",
+          "prompt_ar": "اضغط على النجمة",
+          "options": [
+            {
+              "id": "🔴",
+              "emoji": "🔴"
+            },
+            {
+              "id": "⭐",
+              "emoji": "⭐"
+            },
+            {
+              "id": "🟦",
+              "emoji": "🟦"
+            },
+            {
+              "id": "🔺",
+              "emoji": "🔺"
+            },
+            {
+              "id": "🟢",
+              "emoji": "🟢"
+            },
+            {
+              "id": "💛",
+              "emoji": "💛"
+            }
+          ],
+          "sequence": [
+            "⭐"
+          ]
+        },
+        {
+          "id": "E2",
+          "section": "E",
+          "domain": "instructions",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "ordered_taps",
+          "prompt_ar": "اضغط على المربع الأزرق، بعدين على القلب",
+          "options": [
+            {
+              "id": "🔴",
+              "emoji": "🔴"
+            },
+            {
+              "id": "⭐",
+              "emoji": "⭐"
+            },
+            {
+              "id": "🟦",
+              "emoji": "🟦"
+            },
+            {
+              "id": "🔺",
+              "emoji": "🔺"
+            },
+            {
+              "id": "🟢",
+              "emoji": "🟢"
+            },
+            {
+              "id": "💛",
+              "emoji": "💛"
+            }
+          ],
+          "sequence": [
+            "🟦",
+            "💛"
+          ]
+        },
+        {
+          "id": "E3",
+          "section": "E",
+          "domain": "instructions",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "ordered_taps",
+          "prompt_ar": "اضغط على الدائرة الخضراء، بعدين المثلث، بعدين الدائرة الحمراء",
+          "options": [
+            {
+              "id": "🔴",
+              "emoji": "🔴"
+            },
+            {
+              "id": "⭐",
+              "emoji": "⭐"
+            },
+            {
+              "id": "🟦",
+              "emoji": "🟦"
+            },
+            {
+              "id": "🔺",
+              "emoji": "🔺"
+            },
+            {
+              "id": "🟢",
+              "emoji": "🟢"
+            },
+            {
+              "id": "💛",
+              "emoji": "💛"
+            }
+          ],
+          "sequence": [
+            "🟢",
+            "🔺",
+            "🔴"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "title_ar": "نتعلّم من مثال",
+      "items": [
+        {
+          "id": "F1",
+          "section": "F",
+          "domain": "learns_from_example",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "🖐️🖐️🖐️ = ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "15",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "10",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "3",
+              "correct": false
+            }
+          ],
+          "example": "كل 🖐️ فيها 5 أصابع. 🖐️🖐️ = 10"
+        },
+        {
+          "id": "F2",
+          "section": "F",
+          "domain": "learns_from_example",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "مُهَنْدِس ← ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "مُهَنْدِسون",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "مُهَنْدِس",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "مُهَنْدِسَة",
+              "correct": false
+            }
+          ],
+          "example": "مُعَلِّم ← مُعَلِّمون · لاعِب ← لاعِبون"
+        },
+        {
+          "id": "F3",
+          "section": "F",
+          "domain": "learns_from_example",
+          "stop_rule": true,
+          "audio": "auto",
+          "type": "choice",
+          "prompt_ar": "4 ← ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "8",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "6",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "9",
+              "correct": false
+            }
+          ],
+          "example": "2 ← 4 · 3 ← 6 · 5 ← 10"
+        }
+      ]
+    },
+    {
+      "id": "G",
+      "title_ar": "عنّي",
+      "items": [
+        {
+          "id": "G1",
+          "section": "G",
+          "stop_rule": false,
+          "audio": "optional",
+          "type": "multi_pick",
+          "prompt_ar": "شو بتحب؟ اختار لحد ٣",
+          "options": [
+            {
+              "id": "animals",
+              "label_ar": "🐶 حيوانات"
+            },
+            {
+              "id": "dinosaurs",
+              "label_ar": "🦖 ديناصورات"
+            },
+            {
+              "id": "cars",
+              "label_ar": "🚗 سيارات"
+            },
+            {
+              "id": "trains",
+              "label_ar": "🚂 قطارات"
+            },
+            {
+              "id": "space",
+              "label_ar": "🚀 الفضاء"
+            },
+            {
+              "id": "football",
+              "label_ar": "⚽ كرة قدم"
+            },
+            {
+              "id": "drawing",
+              "label_ar": "🎨 رسم"
+            },
+            {
+              "id": "games",
+              "label_ar": "🎮 ألعاب"
+            },
+            {
+              "id": "building",
+              "label_ar": "🧱 بناء وتركيب"
+            },
+            {
+              "id": "maps",
+              "label_ar": "🌍 بلاد وخرائط"
+            },
+            {
+              "id": "numbers",
+              "label_ar": "🔢 أرقام"
+            },
+            {
+              "id": "music",
+              "label_ar": "🎵 موسيقى"
+            }
+          ],
+          "save": "interests"
+        },
+        {
+          "id": "G2",
+          "section": "G",
+          "stop_rule": false,
+          "audio": "optional",
+          "type": "preference",
+          "prompt_ar": "كيف بتحب نتعلّم؟",
+          "options": [
+            {
+              "id": "pictures",
+              "label_ar": "🖼️ بالصور"
+            },
+            {
+              "id": "listen",
+              "label_ar": "🔊 أسمع"
+            },
+            {
+              "id": "read",
+              "label_ar": "📝 أقرأ"
+            }
+          ],
+          "save": "style"
+        },
+        {
+          "id": "G3",
+          "section": "G",
+          "stop_rule": false,
+          "audio": "optional",
+          "type": "preference",
+          "prompt_ar": "بتحب تحكي ولّا تكتب؟",
+          "options": [
+            {
+              "id": "voice",
+              "label_ar": "🎤 أحكي"
+            },
+            {
+              "id": "keyboard",
+              "label_ar": "⌨️ أكتب"
+            }
+          ],
+          "save": "input"
+        }
+      ]
+    }
+  ]
+}

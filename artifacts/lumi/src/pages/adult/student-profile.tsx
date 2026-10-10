@@ -6,6 +6,7 @@ import { type Insight, useGetStudent, useUpdateStudent, useRefreshStudentInsight
 import { AdultShell } from './adult-shell';
 import { InterestsInput } from '@/components/interests-input';
 import { Button, Card, ErrorBox, SkeletonBlock, cx } from '@/components/lumi';
+import { StartingPoint } from './starting-point';
 import { MODES, type Mode } from '@/lib/tokens';
 import { useTranslation } from 'react-i18next';
 import { localeOf, useLang } from '@/i18n';
@@ -62,6 +63,7 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
         setSavedInterests(sent);
         qc.setQueryData(getGetStudentQueryKey(id), (old: typeof data) => (old ? { ...old, student: { ...old.student, interests: s?.interests ?? sent } } : old));
         qc.invalidateQueries({ queryKey: getListStudentsQueryKey() });
+        qc.invalidateQueries({queryKey:["/api/adult/students/"+id+"/placement"]});
         setIMsg({ ok: true, text: t(sent.length ? 'profile.interestsSaved' : 'profile.interestsCleared') });
       },
       onError: (e) => setIMsg({ ok: false, text: errMsg(e, t('profile.interestsFail')) }),
@@ -164,6 +166,7 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
               ) : (
                 <ul className="flex flex-col gap-2">{items.map((i) => { const loc = localizedInsight(i, lang); return (
                   <li key={i.id} className="bg-mist rounded-2xl p-4 border-s-4" style={{ borderInlineStartColor: s.accent }} data-testid={`insight-${i.id}`}>
+                    <span className="text-base text-steel" data-testid={`insight-source-${i.id}`}>{i.source==="placement"?(lang==="ar"?"من نشاط البداية":"From warm-up"):(lang==="ar"?"من المحادثات":"From conversations")}</span>
                     {loc.text ? <p dir="auto" data-testid={`text-insight-${i.id}`}>{loc.text}</p> : <p className="text-base" data-testid={`text-insight-unavailable-${i.id}`}>{t('profile.translationUnavailable')}</p>}
               {loc.text && loc.evidence && <p dir={lang === 'ar' ? 'rtl' : 'ltr'} className="text-base mt-1" data-testid={`text-evidence-${i.id}`}><QuotedText text={loc.evidence} /></p>}
                     {i.sourceChatId != null && <Link href={`/students/${id}/chats/${i.sourceChatId}`} className="inline-flex items-center gap-1 mt-2 underline min-h-11" data-testid={`link-evidence-chat-${i.id}`}>{t('profile.openChat')}<ChevronRight size={18} aria-hidden className="rtl:-scale-x-100" /></Link>}
@@ -174,6 +177,7 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
           );
         })}
       </div>
+      <div className="mb-8"><StartingPoint id={id}/></div>
       <Card data-testid="section-chats">
         <h2 className="text-2xl mb-3">{t('profile.chats')}</h2>
         {chats.length === 0 ? (

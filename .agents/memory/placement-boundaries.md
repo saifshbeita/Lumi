@@ -26,3 +26,21 @@ The placement guides explicitly require warm-up audio beyond dyslexia, optional 
 **Why:** The newer feature needs audio to deliver and distinguish the guide-defined activities and supported answers.
 
 **How to apply:** Authorize only the requested capabilities, preserve the managed-text/direct-speech provider boundary, and do not infer general conversational microphones for every mode.
+
+Presentation limits are mode-specific: dyslexia needs its full voice explanation despite the written cap; learning-mode reading aid follows the current chunk. Check actual displayed prose, not unused fields or emoji/list/decimal formatting as extra sentences.
+
+**Why:** The guide separates writing, voice and step-size constraints. A generic shared-output validator can reject compliant beginner replies or bypass short-memory pacing.
+
+**How to apply:** Keep correctness-independent guide encouragement verbatim even when it praises effort. Validate only the fields used by the mode; preserve full meaning and never use truncation as a validation fallback.
+
+Untouched legacy accounts retain no-placement chat compatibility. New enrollments, started warm-ups, redos, and mode changes must complete the current required warm-up before chatting; prior results remain adult history, not pending tutor context.
+
+**Why:** The user requires both legacy compatibility and first-login/redo gates. A missing result alone cannot distinguish a legacy account from a required unfinished attempt.
+
+**How to apply:** Enforce the gate on the backend independently of page redirects. Serialize the final reply check/save with adult reassignment and redo changes.
+
+Practice must match the lesson and assessed domain rather than become an arithmetic-only loop. Keep activity authoring separate from evaluation: canonical placement scoring never uses AI, and ordinary lesson answers are evaluated against private server-held keys, not by asking the model to grade children.
+
+**Why:** Reading and conceptual learning need relevant checks; correctness in letter recognition is not evidence for increasing math difficulty.
+
+**How to apply:** Track evidence by domain, keep answer keys out of child responses, and never treat Next as a correct answer.

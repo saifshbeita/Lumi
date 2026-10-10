@@ -6,6 +6,10 @@
  */
 
 export interface MessageInput {
+  /** @minimum 1 */
+  practiceMessageId?: number;
+  /** @maxLength 80 */
+  practiceChoiceId?: string;
   /**
      * @minLength 1
      * @maxLength 2000

@@ -1,0 +1,541 @@
+{
+  "test": "autism",
+  "version": 1,
+  "sections": [
+    {
+      "id": "P",
+      "title_ar": "🧡 أشياء بحبّها",
+      "items": [
+        {
+          "id": "P1",
+          "section": "P",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "multi_pick",
+          "prompt_ar": "اختار الأشياء اللي بتحبّها. لحد ٣.",
+          "options": [
+            {
+              "id": "animals",
+              "label_ar": "🐶 حيوانات"
+            },
+            {
+              "id": "dinosaurs",
+              "label_ar": "🦖 ديناصورات"
+            },
+            {
+              "id": "cars",
+              "label_ar": "🚗 سيارات"
+            },
+            {
+              "id": "trains",
+              "label_ar": "🚂 قطارات"
+            },
+            {
+              "id": "space",
+              "label_ar": "🚀 الفضاء"
+            },
+            {
+              "id": "football",
+              "label_ar": "⚽ كرة قدم"
+            },
+            {
+              "id": "drawing",
+              "label_ar": "🎨 رسم"
+            },
+            {
+              "id": "games",
+              "label_ar": "🎮 ألعاب"
+            },
+            {
+              "id": "building",
+              "label_ar": "🧱 بناء وتركيب"
+            },
+            {
+              "id": "maps",
+              "label_ar": "🌍 بلاد وخرائط"
+            },
+            {
+              "id": "numbers",
+              "label_ar": "🔢 أرقام"
+            },
+            {
+              "id": "music",
+              "label_ar": "🎵 موسيقى"
+            }
+          ],
+          "save": "interests"
+        },
+        {
+          "id": "P2",
+          "section": "P",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "free_text_optional",
+          "prompt_ar": "شو أكثر شي بتحبّه بالدنيا؟ (اكتب أو احكي، أو اضغط تخطّي)",
+          "options": [],
+          "save": "favorite_thing"
+        }
+      ]
+    },
+    {
+      "id": "N",
+      "title_ar": "🔢 أرقام",
+      "items": [
+        {
+          "id": "N1",
+          "section": "N",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "كم نجمة؟ ⭐⭐⭐⭐⭐⭐⭐",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "7",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "6",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "8",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "N2",
+          "section": "N",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "8 + 5 = ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "13",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "12",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "14",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "N3",
+          "section": "N",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "عند خالد 12 قلم. أعطى أخته 5 أقلام. كم قلم ضلّ معه؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "7",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "17",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "6",
+              "correct": false
+            }
+          ]
+        },
+        {
+          "id": "N4",
+          "section": "N",
+          "domain": "numbers",
+          "stop_rule": true,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "3 × 4 = ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "12",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "7",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "34",
+              "correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "R",
+      "title_ar": "📖 كلمات",
+      "items": [
+        {
+          "id": "R1",
+          "section": "R",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "اضغط على الصورة",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🌙",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "☀️",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🌳",
+              "correct": false
+            }
+          ],
+          "shown": "قَمَر"
+        },
+        {
+          "id": "R2",
+          "section": "R",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "اضغط على الصورة",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "👧🚲",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "👧🚗",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🧒🚲",
+              "correct": false
+            }
+          ],
+          "shown": "البِنْتُ تَرْكَبُ الدَّرّاجَة."
+        },
+        {
+          "id": "R3",
+          "section": "R",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "ماذا يَزْرَعُ جَدّي؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🫒",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🍅",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "🌻",
+              "correct": false
+            }
+          ],
+          "shown": "يَزْرَعُ جَدّي الزَّيْتونَ في الحَديقَة."
+        },
+        {
+          "id": "R4",
+          "section": "R",
+          "domain": "reading",
+          "stop_rule": true,
+          "audio": "optional",
+          "type": "choice",
+          "prompt_ar": "كَيْفَ شَعَرَ عَلِيّ؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "🥶 بالبرد",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "🥵 بالحَرّ",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "😴 بالنُّعاس",
+              "correct": false
+            }
+          ],
+          "shown": "نَسِيَ عَلِيٌّ مِعْطَفَهُ في البَيْت. كانَ الجَوُّ بارِدًا جِدًّا."
+        }
+      ]
+    },
+    {
+      "id": "F",
+      "title_ar": "💬 شو قصدهم؟",
+      "items": [
+        {
+          "id": "F1",
+          "section": "F",
+          "domain": "figurative",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "قالت المعلّمة: «الوقت من ذهب.»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "الوقت مهم، ما لازم نضيّعه",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "الساعة مصنوعة من ذهب",
+              "correct": false,
+              "tag": "literal"
+            },
+            {
+              "id": "c",
+              "label_ar": "رح نشتري ذهب",
+              "correct": false,
+              "tag": "literal"
+            }
+          ]
+        },
+        {
+          "id": "F2",
+          "section": "F",
+          "domain": "figurative",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "قال أبو سامي: «سامي قلبه أبيض.»",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "سامي طيّب",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "قلب سامي لونه أبيض",
+              "correct": false,
+              "tag": "literal"
+            },
+            {
+              "id": "c",
+              "label_ar": "سامي بحب اللون الأبيض",
+              "correct": false,
+              "tag": "literal"
+            }
+          ]
+        },
+        {
+          "id": "F3",
+          "section": "F",
+          "domain": "figurative",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "ليلى طارت من الفرح لمّا شافت هديّتها.",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "ليلى فرحت كثير",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "ليلى طارت بالسما",
+              "correct": false,
+              "tag": "literal"
+            },
+            {
+              "id": "c",
+              "label_ar": "ليلى خافت من الهديّة",
+              "correct": false,
+              "tag": "literal"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "S",
+      "title_ar": "👥 قصص",
+      "items": [
+        {
+          "id": "S1",
+          "section": "S",
+          "domain": "social_understanding",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "كيف شعر يوسف؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "😢 حزين",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "😄 فرحان",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "😴 نعسان",
+              "correct": false
+            }
+          ],
+          "shown": "وقع آيس كريم يوسف على الأرض."
+        },
+        {
+          "id": "S2",
+          "section": "S",
+          "domain": "social_understanding",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "choice",
+          "prompt_ar": "ليش ريم أعطتها؟",
+          "options": [
+            {
+              "id": "a",
+              "label_ar": "لأنها بدها تساعدها",
+              "correct": true
+            },
+            {
+              "id": "b",
+              "label_ar": "لأنها ما بتحب السندويش",
+              "correct": false
+            },
+            {
+              "id": "c",
+              "label_ar": "لأنّ المعلّمة زعلانة",
+              "correct": false
+            }
+          ],
+          "shown": "ريم أعطت صاحبتها نصّ سندويشتها، لأنّ صاحبتها نسيت أكلها."
+        }
+      ]
+    },
+    {
+      "id": "L",
+      "title_ar": "⚙️ كيف بحب أتعلّم",
+      "items": [
+        {
+          "id": "L1",
+          "section": "L",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "preference",
+          "prompt_ar": "بتحب Lumi يحكي:",
+          "options": [
+            {
+              "id": "short",
+              "label_ar": "💬 جمل قصيرة"
+            },
+            {
+              "id": "long",
+              "label_ar": "📄 أكثر"
+            }
+          ],
+          "save": "reply_length"
+        },
+        {
+          "id": "L2",
+          "section": "L",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "preference",
+          "prompt_ar": "بتحب تجاوب:",
+          "options": [
+            {
+              "id": "tap",
+              "label_ar": "👆 أضغط على خيارات"
+            },
+            {
+              "id": "text",
+              "label_ar": "⌨️ أكتب"
+            },
+            {
+              "id": "voice",
+              "label_ar": "🎤 أحكي"
+            }
+          ],
+          "save": "answer_mode"
+        },
+        {
+          "id": "L3",
+          "section": "L",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "preference",
+          "prompt_ar": "الصوت:",
+          "options": [
+            {
+              "id": "on",
+              "label_ar": "🔊 شغّال"
+            },
+            {
+              "id": "off",
+              "label_ar": "🔇 مطفي"
+            }
+          ],
+          "save": "sound"
+        },
+        {
+          "id": "L4",
+          "section": "L",
+          "stop_rule": false,
+          "audio": "off",
+          "type": "preference",
+          "prompt_ar": "بتحب تعرف شو رح نعمل قبل ما نبدأ؟",
+          "options": [
+            {
+              "id": "true",
+              "label_ar": "✅ أيوا"
+            },
+            {
+              "id": "false",
+              "label_ar": "➖ مش مهم"
+            }
+          ],
+          "save": "show_plan"
+        }
+      ]
+    }
+  ]
+}

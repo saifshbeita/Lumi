@@ -1,0 +1,15 @@
+import assert from "node:assert/strict";
+import {generatePersonalizedReply,replyMatchesLanguage} from "../lib/student-ai";
+import {fixture} from "../placement/fixtures";
+import {scorePlacement} from "../placement/scoring";
+const r=scorePlacement("autism",fixture("autism","mixed"));
+r.favorite_thing="الفيلة";
+const reply=await generatePersonalizedReply("autism",[{role:"student",content:"Can we practise addition?"}],"en",r,[],{});
+assert(replyMatchesLanguage(reply.content,"en"));
+assert(replyMatchesLanguage(reply.spokenContent,"en"));
+assert(/elephant/i.test(reply.presentation!.question!));
+assert(!reply.spokenContent.includes("FAVORITE_TOPIC"));
+assert(reply.learnerStatePatch?.favoriteTopicEn);
+assert.equal(reply.presentation!.choices.length,3);
+assert.equal(r.favorite_thing,"الفيلة");
+console.log("English favorite-topic localization passed; original favorite preserved, private numeric answer key unchanged.");

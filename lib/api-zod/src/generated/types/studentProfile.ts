@@ -8,8 +8,10 @@ import type { Chat } from './chat';
 import type { Insight } from './insight';
 import type { Student } from './student';
 import type { StudentProfileStats } from './studentProfileStats';
+import type { StudentProfileTutorPreferences } from './studentProfileTutorPreferences';
 
 export interface StudentProfile {
+  tutorPreferences?: StudentProfileTutorPreferences;
   /** @nullable */
   insightsUpdatedAt: string | null;
   stats: StudentProfileStats;

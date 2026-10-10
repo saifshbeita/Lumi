@@ -4,12 +4,14 @@ import { Link } from 'wouter';
 import { Redirect } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocation } from 'wouter';
-import { useListStudentChats, useCreateStudentChat, getListStudentChatsQueryKey, useGetStudentSession, useGetStudentMode, useLogoutStudent, getGetStudentSessionQueryKey, getGetStudentModeQueryKey } from '@workspace/api-client-react';
+import { useListStudentChats, useCreateStudentChat, getListStudentChatsQueryKey, useGetStudentSession, useGetStudentMode, useLogoutStudent, getGetStudentSessionQueryKey, getGetStudentModeQueryKey, useGetWarmup } from '@workspace/api-client-react';
 import { Button, Card, ErrorBox, Loading } from '@/components/lumi';
 import { brand } from '@/lib/util';
 import { StudentChat } from './student-chat';
 import { type Mode } from '@/lib/tokens';
 import { asLang, langAttrs, t, type Lang } from '@/lib/student-i18n';
+import { WarmupRunner } from './warmup';
+import { getGetWarmupQueryKey } from '@workspace/api-client-react';
 
 function Home({ mode, student, out, loggingOut, lang }: { mode: Mode; student: { name: string }; out: () => void; loggingOut: boolean; lang: Lang }) {
   const s = t(lang);
@@ -60,11 +62,20 @@ function Inner({ mode, student, chatId }: { mode: Mode; student: { name: string;
   const lang = asLang(check.data?.student.language ?? student.language);
   if (check.isLoading || !check.data) return <div {...langAttrs(lang)}><Loading label={t(lang).loading} /></div>;
   const out = () => logout.mutate(undefined, { onSettled: () => { qc.clear(); qc.setQueryData(getGetStudentSessionQueryKey(), { student: null }); } });
-   if (chatId !== undefined) return <StudentChat key={chatId} mode={mode} chatId={chatId} lang={lang} />;
+   if (chatId !== undefined) return <StudentChat key={chatId} mode={mode} chatId={chatId} lang={lang} preferences={check.data.tutorPreferences??{}} />;
   return <Home mode={mode} student={student} out={out} loggingOut={logout.isPending} lang={lang} />;
 }
 
-export function StudentGuard({ mode, chatId }: { mode: Mode; chatId?: number }): ReactNode {
+function PlacementGate({mode,chatId,student,warmup}:{mode:Mode;chatId?:number;student:{name:string;language?:string};warmup:boolean}) {
+  const lang=asLang(student.language);
+  const q=useGetWarmup(mode,{query:{queryKey:getGetWarmupQueryKey(mode),retry:false,staleTime:0,refetchInterval:warmup?false:10000,refetchOnWindowFocus:!warmup}});
+  if(q.isLoading)return <Loading label={t(lang).loading}/>;
+  if(q.isError||!q.data)return <div {...langAttrs(lang)} className="p-6"><ErrorBox>{lang==="ar"?"تعذّر فتح نشاط البداية.":"Could not open the starting activity."}</ErrorBox><Button onClick={()=>q.refetch()}>{t(lang).tryAgain}</Button></div>;
+  if(q.data.required&&!warmup)return <Redirect to={`/student/${mode}/warmup`}/>;
+  if(warmup)return <WarmupRunner mode={mode} lang={lang}/>;
+  return <Inner mode={mode} student={student} chatId={chatId}/>;
+}
+export function StudentGuard({ mode, chatId, warmup=false }: { mode: Mode; chatId?: number;warmup?:boolean }): ReactNode {
   const session = useGetStudentSession({ query: { queryKey: getGetStudentSessionQueryKey(), refetchInterval: 10000, staleTime: 0, retry: false } });
   const s = session.data?.student;
   const L = asLang(s?.language);
@@ -76,5 +87,5 @@ export function StudentGuard({ mode, chatId }: { mode: Mode; chatId?: number }):
   const assigned = s.conditions[0];
   if (!assigned) return <Redirect to="/student/login" />;
   if (assigned !== mode) return <Redirect to={`/student/${assigned}`} />;
-  return <Inner mode={mode} student={s} chatId={chatId} />;
+  return <PlacementGate mode={mode} student={s} chatId={chatId} warmup={warmup}/>;
 }

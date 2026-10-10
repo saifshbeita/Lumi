@@ -7,17 +7,31 @@ import { db, pool, messages, chats, students } from "@workspace/db";
 import { currentStudent } from "../lib/profiles";
 import { objectStorageClient } from "../lib/objectStorage";
 import { InvalidAudio, validatedWav, voiceOpenAI } from "../lib/voice-audio";
+import { placements } from "@workspace/db";
+import { itemsFor } from "../placement/banks";
 
 const router: IRouter = Router();
 const authorize: RequestHandler = async (req, res, next) => {
   const student = await currentStudent(req.session.studentId);
-  if (!student || student.conditions[0] !== "dyslexia") { res.status(403).json({ error: "الصوت غير متاح لهذا الحساب." }); return; }
+  const aid=student?.conditions[0]==="learning"&&req.path.startsWith("/messages/");
+  if (!student || student.conditions[0] !== "dyslexia" && !aid) { res.status(403).json({ error: "الصوت غير متاح لهذا الحساب." }); return; }
+  if(aid){
+    const [m]=await db.select({presentation:messages.presentation}).from(messages).innerJoin(chats,eq(chats.id,messages.chatId)).where(and(eq(messages.id,Number(req.params.id)),eq(chats.studentId,student.id),eq(messages.role,"ai")));
+    if(m?.presentation?.audio!==true){res.status(403).json({error:"هذا الصوت غير متاح."});return;}
+  }
   res.locals.voiceStudentId = student.id;
   next();
 };
 const limit = rateLimit({ windowMs: 60000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "انتظر قليلاً ثم حاول مرة أخرى." } });
 // Explicit adult-demo scope only; student recording and playback guards are unchanged.
-const authorizeTranscription: RequestHandler = (req, res, next) => {
+const authorizeTranscription: RequestHandler = async (req, res, next) => {
+  if(req.get("X-Lumi-Warmup")==="1") {
+    const s=await currentStudent(req.session.studentId);
+    const [attempt]=s?await db.select().from(placements).where(and(eq(placements.studentId,s.id),eq(placements.epoch,s.placementEpoch),eq(placements.test,"autism"),eq(placements.status,"in_progress"))):[];
+    if(!s||s.conditions[0]!=="autism"||!attempt||itemsFor("autism")[attempt.currentIndex]?.id!=="P2"||attempt.state.stage!=="question"){res.status(403).json({error:"التسجيل متاح فقط في هذا السؤال."});return;}
+    res.locals.warmupVoice=true;res.locals.warmupAttemptId=attempt.id;res.locals.warmupEpoch=s.placementEpoch;
+    next();return;
+  }
   if (req.get("X-Lumi-Demo") === "1" && req.session.adultId) {
     res.locals.adultDemo = true;
     next();
@@ -42,12 +56,14 @@ router.post("/voice/transcribe", authorizeTranscription, limit, (req, res) => {
     try {
       const audio = await validatedWav(req.file.buffer, req.file.mimetype.split(";")[0]!);
       const result = await voiceOpenAI.audio.transcriptions.create({
-        model: "gpt-4o-mini-transcribe", language: res.locals.adultDemo ? (req.body.language === "en" ? "en" : "ar") : (await currentStudent(req.session.studentId))?.language ?? "ar", response_format: "json",
+        model: "gpt-4o-mini-transcribe", language: res.locals.warmupVoice ? "ar" : res.locals.adultDemo ? (req.body.language === "en" ? "en" : "ar") : (await currentStudent(req.session.studentId))?.language ?? "ar", response_format: "json",
         file: await toFile(audio, "question.wav", { type: "audio/wav" }),
       });
       if (!res.locals.adultDemo) {
         const fresh = await currentStudent(req.session.studentId);
-        if (fresh?.conditions[0] !== "dyslexia") { res.status(403).json({ error: "تم تحديث حسابك. افتح مساحة التعلم من جديد." }); return; }
+        const [attempt]=res.locals.warmupVoice?await db.select().from(placements).where(eq(placements.id,res.locals.warmupAttemptId)):[];
+        const allowed=res.locals.warmupVoice?fresh?.conditions[0]==="autism"&&fresh.placementEpoch===res.locals.warmupEpoch&&attempt?.status==="in_progress"&&itemsFor("autism")[attempt.currentIndex]?.id==="P2"&&attempt.state.stage==="question":fresh?.conditions[0]==="dyslexia";
+        if (!allowed) { res.status(403).json({ error: "تم تحديث حسابك. افتح مساحة التعلم من جديد." }); return; }
       }
       const text = result.text.trim();
       if (!text || text.length > 2000) { res.status(422).json({ error: "لم أسمع سؤالاً واضحاً. حاول مرة أخرى أو اكتب سؤالك." }); return; }
@@ -61,7 +77,7 @@ router.post("/voice/transcribe", authorizeTranscription, limit, (req, res) => {
 router.get("/messages/:id/audio", authorize, limit, async (req, res): Promise<void> => {
   await serveMessageAudio(req, res, Number(req.params.id), res.locals.voiceStudentId as number, async () => {
     const fresh = await currentStudent(req.session.studentId);
-    return fresh?.conditions[0] === "dyslexia";
+    return fresh?.conditions[0] === "dyslexia" || fresh?.conditions[0] === "learning";
   });
 });
 
@@ -74,7 +90,7 @@ export async function serveMessageAudio(req: Request, res: Response, id: number,
       .where(and(eq(messages.id, id), eq(chats.studentId, studentId), eq(messages.role, "ai")));
     return row?.message;
   };
-  if (!await owned()) { res.status(403).json({ error: "هذا الصوت ليس في حسابك." }); return; }
+    if (!await owned()) { res.status(403).json({ error: "هذا الصوت ليس في حسابك." }); return; }
   const client = await pool.connect();
   let locked = false;
   let brokenConnection = false;
@@ -99,7 +115,7 @@ export async function serveMessageAudio(req: Request, res: Response, id: number,
       req.log.info({ messageId: id }, "voice_tts_generate");
       const speech = await voiceOpenAI.audio.speech.create({
         model: "gpt-4o-mini-tts", voice: "sage", speed: 0.9, response_format: "mp3",
-        input: message.content,
+        input: message.spokenContent ?? message.content,
         instructions: "Read the supplied text exactly, in its own language (Arabic or English). Use a warm, calm, clear voice for a child. Do not add or change words.",
       });
       if (!await verifyAccess()) { res.status(403).json({ error: "Audio access changed." }); return; }

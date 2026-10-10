@@ -5,6 +5,67 @@ info:
 servers:
   - url: /api
 paths:
+  /student/placement/{mode}:
+    parameters:
+      - { name: mode, in: path, required: true, schema: { $ref: "#/components/schemas/Mode" } }
+    get:
+      operationId: getWarmup
+      responses:
+        "200":
+          description: Owned warm-up state with no answer keys or result
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WarmupState" }
+    post:
+      operationId: warmupEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/WarmupEventInput" }
+      responses:
+        "200":
+          description: Persisted warm-up state
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/WarmupState" }
+  /student/placement/{mode}/{attemptId}/{itemId}/audio:
+    get:
+      operationId: getWarmupAudio
+      parameters:
+        - { name: mode, in: path, required: true, schema: { $ref: "#/components/schemas/Mode" } }
+        - { name: attemptId, in: path, required: true, schema: { type: integer } }
+        - { name: itemId, in: path, required: true, schema: { type: string } }
+      responses:
+        "200":
+          description: Authorized Arabic prompt only
+          content:
+            audio/mpeg:
+              schema: { type: string, format: binary }
+  /adult/students/{id}/placement:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: integer } }
+    get:
+      operationId: getStartingPoint
+      responses:
+        "200":
+          description: Owned adult placement summary
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StartingPoint" }
+    post:
+      operationId: redoWarmup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PlacementRedoInput" }
+      responses:
+        "200":
+          description: A new warm-up is required
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Success" }
   /adult/language:
     patch:
       operationId: updateAdultLanguage
@@ -323,6 +384,107 @@ paths:
               schema: { type: string, format: binary }
 components:
   schemas:
+    PlacementRedoInput:
+      type: object
+      properties:
+        demoReset: { type: boolean, default: false }
+    StartingPoint:
+      type: object
+      required: [result, pending, demo]
+      properties:
+        pending: { type: boolean }
+        demo: { type: boolean }
+        result:
+          anyOf:
+            - { $ref: "#/components/schemas/PlacementResult" }
+            - { type: "null" }
+    PlacementResult:
+      type: object
+      required: [test, version, completed_at, levels, band, flags, interests, preferences, signals]
+      properties:
+        test: { type: string, enum: [dyslexia, learning_difficulties, autism] }
+        version: { type: integer }
+        completed_at: { type: string }
+        levels: { type: object, additionalProperties: { type: integer } }
+        band: { type: string }
+        flags: { type: array, items: { type: string } }
+        interests: { type: array, items: { type: string } }
+        preferences: { type: object, additionalProperties: {} }
+        signals: { type: object, additionalProperties: { type: number } }
+        favorite_thing: { type: string }
+        error_patterns: { type: array, items: { type: string } }
+        step: { type: integer }
+    WarmupEventInput:
+      type: object
+      required: [attemptId, eventId, action]
+      properties:
+        attemptId: { type: integer, minimum: 1 }
+        eventId: { type: string, minLength: 8, maxLength: 80 }
+        itemId: { type: string }
+        action: { type: string, enum: [answer, next, audio, break, resume, schedule, preview_done, tap, sound] }
+        picked: { type: array, maxItems: 6, items: { type: string, maxLength: 500 } }
+        skipped: { type: boolean }
+        responseMs: { type: integer, minimum: 0, maximum: 600000 }
+        replay: { type: boolean }
+        sound: { type: boolean }
+    WarmupState:
+      type: object
+      required: [id, mode, required, stage, currentIndex, sections, sectionIndex, partItemIndex, feedback, selected, sound, audioPlayed, replays, taps, sequenceCount]
+      properties:
+        id: { type: integer }
+        mode: { $ref: "#/components/schemas/Mode" }
+        required: { type: boolean }
+        currentIndex: { type: integer }
+        stage: { type: string, enum: [schedule, question, preview, answered, paused, done] }
+        sections:
+          type: array
+          items: { $ref: "#/components/schemas/WarmupSection" }
+        sectionIndex: { type: integer }
+        partItemIndex: { type: integer }
+        feedback: { type: string }
+        selected: { type: array, items: { type: string } }
+        sound: { type: boolean }
+        audioPlayed: { type: boolean }
+        replays: { type: integer }
+        taps: { type: array, items: { type: string } }
+        sequenceCount: { type: integer }
+        item:
+          anyOf:
+            - { $ref: "#/components/schemas/WarmupItem" }
+            - { type: "null" }
+    WarmupSection:
+      type: object
+      required: [id, title_ar, count]
+      properties:
+        id: { type: string }
+        title_ar: { type: string }
+        count: { type: integer }
+    WarmupItem:
+      type: object
+      required: [id, type, prompt_ar, options, audio, section]
+      properties:
+        id: { type: string }
+        type: { type: string }
+        prompt_ar: { type: string }
+        tts_ar: { type: string }
+        audio: { type: string }
+        section: { type: string }
+        shown: { type: string }
+        passage: { type: string }
+        passage_audio: { type: boolean }
+        example: { type: string }
+        sequence: { type: array, items: { type: string } }
+        options:
+          type: array
+          items: { $ref: "#/components/schemas/WarmupOption" }
+    WarmupOption:
+      type: object
+      required: [id]
+      properties:
+        id: { type: string }
+        label_ar: { type: string }
+        emoji: { type: string }
+        size: { type: integer }
     VoiceRecording:
       type: object
       required: [audio]
@@ -463,6 +625,7 @@ components:
       type: object
       required: [id, type, text, evidence, sourceChatId]
       properties:
+        source: { type: string, enum: [session, placement] }
         textAr: { type: [string, "null"] }
         textEn: { type: [string, "null"] }
         evidenceAr: { type: [string, "null"] }
@@ -493,6 +656,8 @@ components:
       type: object
       required: [id, chatId, role, content, audioUrl, createdAt]
       properties:
+        spokenContent: { type: [string, "null"] }
+        presentation: { type: [object, "null"], additionalProperties: {} }
         id: { type: integer }
         chatId: { type: integer }
         role: { type: string, enum: [student, ai] }
@@ -503,6 +668,8 @@ components:
       type: object
       required: [content]
       properties:
+        practiceMessageId: { type: integer, minimum: 1 }
+        practiceChoiceId: { type: string, maxLength: 80 }
         content: { type: string, minLength: 1, maxLength: 2000 }
         retryMessageId: { type: integer, minimum: 1 }
     ChatHistory:
@@ -524,6 +691,7 @@ components:
       type: object
       required: [student, insights, chats, stats, insightsUpdatedAt]
       properties:
+        tutorPreferences: { type: object, additionalProperties: {} }
         insightsUpdatedAt: { type: [string, "null"] }
         stats:
           type: object

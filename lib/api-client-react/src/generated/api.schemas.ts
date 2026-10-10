@@ -4,6 +4,154 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+export interface PlacementRedoInput {
+  demoReset?: boolean;
+}
+
+export type PlacementResultTest = typeof PlacementResultTest[keyof typeof PlacementResultTest];
+
+
+export const PlacementResultTest = {
+  dyslexia: 'dyslexia',
+  learning_difficulties: 'learning_difficulties',
+  autism: 'autism',
+} as const;
+
+export type PlacementResultLevels = {[key: string]: number};
+
+export type PlacementResultPreferences = {[key: string]: unknown};
+
+export type PlacementResultSignals = {[key: string]: number};
+
+export interface PlacementResult {
+  test: PlacementResultTest;
+  version: number;
+  completed_at: string;
+  levels: PlacementResultLevels;
+  band: string;
+  flags: string[];
+  interests: string[];
+  preferences: PlacementResultPreferences;
+  signals: PlacementResultSignals;
+  favorite_thing?: string;
+  error_patterns?: string[];
+  step?: number;
+}
+
+export interface StartingPoint {
+  pending: boolean;
+  demo: boolean;
+  result: PlacementResult | null;
+}
+
+export type WarmupEventInputAction = typeof WarmupEventInputAction[keyof typeof WarmupEventInputAction];
+
+
+export const WarmupEventInputAction = {
+  answer: 'answer',
+  next: 'next',
+  audio: 'audio',
+  break: 'break',
+  resume: 'resume',
+  schedule: 'schedule',
+  preview_done: 'preview_done',
+  tap: 'tap',
+  sound: 'sound',
+} as const;
+
+export interface WarmupEventInput {
+  /** @minimum 1 */
+  attemptId: number;
+  /**
+     * @minLength 8
+     * @maxLength 80
+     */
+  eventId: string;
+  itemId?: string;
+  action: WarmupEventInputAction;
+  /**
+     * @maxItems 6
+     * @items.maxLength 500
+     */
+  picked?: string[];
+  skipped?: boolean;
+  /**
+     * @minimum 0
+     * @maximum 600000
+     */
+  responseMs?: number;
+  replay?: boolean;
+  sound?: boolean;
+}
+
+export type WarmupStateStage = typeof WarmupStateStage[keyof typeof WarmupStateStage];
+
+
+export const WarmupStateStage = {
+  schedule: 'schedule',
+  question: 'question',
+  preview: 'preview',
+  answered: 'answered',
+  paused: 'paused',
+  done: 'done',
+} as const;
+
+export type Mode = typeof Mode[keyof typeof Mode];
+
+
+export const Mode = {
+  dyslexia: 'dyslexia',
+  learning: 'learning',
+  autism: 'autism',
+} as const;
+
+export interface WarmupSection {
+  id: string;
+  title_ar: string;
+  count: number;
+}
+
+export interface WarmupOption {
+  id: string;
+  label_ar?: string;
+  emoji?: string;
+  size?: number;
+}
+
+export interface WarmupItem {
+  id: string;
+  type: string;
+  prompt_ar: string;
+  tts_ar?: string;
+  audio: string;
+  section: string;
+  shown?: string;
+  passage?: string;
+  passage_audio?: boolean;
+  example?: string;
+  sequence?: string[];
+  options: WarmupOption[];
+}
+
+export interface WarmupState {
+  id: number;
+  mode: Mode;
+  required: boolean;
+  currentIndex: number;
+  stage: WarmupStateStage;
+  sections: WarmupSection[];
+  sectionIndex: number;
+  partItemIndex: number;
+  feedback: string;
+  selected: string[];
+  sound: boolean;
+  audioPlayed: boolean;
+  replays: number;
+  taps: string[];
+  sequenceCount: number;
+  item?: WarmupItem | null;
+}
+
 export interface VoiceRecording {
   audio: Blob;
 }
@@ -19,15 +167,6 @@ export interface HealthStatus {
 export interface Success {
   success: boolean;
 }
-
-export type Mode = typeof Mode[keyof typeof Mode];
-
-
-export const Mode = {
-  dyslexia: 'dyslexia',
-  learning: 'learning',
-  autism: 'autism',
-} as const;
 
 export type AdultLanguage = typeof AdultLanguage[keyof typeof AdultLanguage];
 
@@ -273,6 +412,14 @@ export interface StudentSession {
   student: Student | null;
 }
 
+export type InsightSource = typeof InsightSource[keyof typeof InsightSource];
+
+
+export const InsightSource = {
+  session: 'session',
+  placement: 'placement',
+} as const;
+
 export type InsightType = typeof InsightType[keyof typeof InsightType];
 
 
@@ -283,6 +430,7 @@ export const InsightType = {
 } as const;
 
 export interface Insight {
+  source?: InsightSource;
   /** @nullable */
   textAr?: string | null;
   /** @nullable */
@@ -317,6 +465,11 @@ export interface StudentChat {
   createdAt: string;
 }
 
+/**
+ * @nullable
+ */
+export type ChatMessagePresentation = {[key: string]: unknown} | null;
+
 export type ChatMessageRole = typeof ChatMessageRole[keyof typeof ChatMessageRole];
 
 
@@ -326,6 +479,10 @@ export const ChatMessageRole = {
 } as const;
 
 export interface ChatMessage {
+  /** @nullable */
+  spokenContent?: string | null;
+  /** @nullable */
+  presentation?: ChatMessagePresentation;
   id: number;
   chatId: number;
   role: ChatMessageRole;
@@ -336,6 +493,10 @@ export interface ChatMessage {
 }
 
 export interface MessageInput {
+  /** @minimum 1 */
+  practiceMessageId?: number;
+  /** @maxLength 80 */
+  practiceChoiceId?: string;
   /**
      * @minLength 1
      * @maxLength 2000
@@ -356,6 +517,8 @@ export interface ChatExchange {
   reply: ChatMessage;
 }
 
+export type StudentProfileTutorPreferences = {[key: string]: unknown};
+
 export type StudentProfileStats = {
   sessions: number;
   messages: number;
@@ -364,6 +527,7 @@ export type StudentProfileStats = {
 };
 
 export interface StudentProfile {
+  tutorPreferences?: StudentProfileTutorPreferences;
   /** @nullable */
   insightsUpdatedAt: string | null;
   stats: StudentProfileStats;

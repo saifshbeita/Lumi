@@ -97,7 +97,7 @@ async function generate(studentId: number) {
         textAr: insight.text_ar, textEn: insight.text_en, evidenceAr, evidenceEn, sourceChatId: insight.chat_id };
     }));
     await lockedDb.transaction(async tx => {
-      await tx.delete(profileInsights).where(eq(profileInsights.studentId, studentId));
+      await tx.delete(profileInsights).where(and(eq(profileInsights.studentId, studentId),eq(profileInsights.source,"session")));
       if (values.length) await tx.insert(profileInsights).values(values);
       await tx.update(students).set({ insightsUpdatedAt: new Date() }).where(eq(students.id, studentId));
     });

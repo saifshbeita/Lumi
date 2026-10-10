@@ -7,6 +7,171 @@
 import * as zod from 'zod';
 
 
+export const GetWarmupParams = zod.object({
+  "mode": zod.enum(['dyslexia', 'learning', 'autism'])
+})
+
+export const GetWarmupResponse = zod.object({
+  "id": zod.number().int(),
+  "mode": zod.enum(['dyslexia', 'learning', 'autism']),
+  "required": zod.boolean(),
+  "currentIndex": zod.number().int(),
+  "stage": zod.enum(['schedule', 'question', 'preview', 'answered', 'paused', 'done']),
+  "sections": zod.array(zod.object({
+  "id": zod.string(),
+  "title_ar": zod.string(),
+  "count": zod.number().int()
+})),
+  "sectionIndex": zod.number().int(),
+  "partItemIndex": zod.number().int(),
+  "feedback": zod.string(),
+  "selected": zod.array(zod.string()),
+  "sound": zod.boolean(),
+  "audioPlayed": zod.boolean(),
+  "replays": zod.number().int(),
+  "taps": zod.array(zod.string()),
+  "sequenceCount": zod.number().int(),
+  "item": zod.union([zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "prompt_ar": zod.string(),
+  "tts_ar": zod.string().optional(),
+  "audio": zod.string(),
+  "section": zod.string(),
+  "shown": zod.string().optional(),
+  "passage": zod.string().optional(),
+  "passage_audio": zod.boolean().optional(),
+  "example": zod.string().optional(),
+  "sequence": zod.array(zod.string()).optional(),
+  "options": zod.array(zod.object({
+  "id": zod.string(),
+  "label_ar": zod.string().optional(),
+  "emoji": zod.string().optional(),
+  "size": zod.number().int().optional()
+}))
+}),zod.null()]).optional()
+})
+
+
+export const WarmupEventParams = zod.object({
+  "mode": zod.enum(['dyslexia', 'learning', 'autism'])
+})
+
+
+export const warmupEventBodyEventIdMin = 8;
+export const warmupEventBodyEventIdMax = 80;
+
+export const warmupEventBodyPickedItemMax = 500;
+
+export const warmupEventBodyPickedMax = 6;
+
+export const warmupEventBodyResponseMsMin = 0;
+export const warmupEventBodyResponseMsMax = 600000;
+
+
+
+export const WarmupEventBody = zod.object({
+  "attemptId": zod.number().int().min(1),
+  "eventId": zod.string().min(warmupEventBodyEventIdMin).max(warmupEventBodyEventIdMax),
+  "itemId": zod.string().optional(),
+  "action": zod.enum(['answer', 'next', 'audio', 'break', 'resume', 'schedule', 'preview_done', 'tap', 'sound']),
+  "picked": zod.array(zod.string().max(warmupEventBodyPickedItemMax)).max(warmupEventBodyPickedMax).optional(),
+  "skipped": zod.boolean().optional(),
+  "responseMs": zod.number().int().min(warmupEventBodyResponseMsMin).max(warmupEventBodyResponseMsMax).optional(),
+  "replay": zod.boolean().optional(),
+  "sound": zod.boolean().optional()
+})
+
+export const WarmupEventResponse = zod.object({
+  "id": zod.number().int(),
+  "mode": zod.enum(['dyslexia', 'learning', 'autism']),
+  "required": zod.boolean(),
+  "currentIndex": zod.number().int(),
+  "stage": zod.enum(['schedule', 'question', 'preview', 'answered', 'paused', 'done']),
+  "sections": zod.array(zod.object({
+  "id": zod.string(),
+  "title_ar": zod.string(),
+  "count": zod.number().int()
+})),
+  "sectionIndex": zod.number().int(),
+  "partItemIndex": zod.number().int(),
+  "feedback": zod.string(),
+  "selected": zod.array(zod.string()),
+  "sound": zod.boolean(),
+  "audioPlayed": zod.boolean(),
+  "replays": zod.number().int(),
+  "taps": zod.array(zod.string()),
+  "sequenceCount": zod.number().int(),
+  "item": zod.union([zod.object({
+  "id": zod.string(),
+  "type": zod.string(),
+  "prompt_ar": zod.string(),
+  "tts_ar": zod.string().optional(),
+  "audio": zod.string(),
+  "section": zod.string(),
+  "shown": zod.string().optional(),
+  "passage": zod.string().optional(),
+  "passage_audio": zod.boolean().optional(),
+  "example": zod.string().optional(),
+  "sequence": zod.array(zod.string()).optional(),
+  "options": zod.array(zod.object({
+  "id": zod.string(),
+  "label_ar": zod.string().optional(),
+  "emoji": zod.string().optional(),
+  "size": zod.number().int().optional()
+}))
+}),zod.null()]).optional()
+})
+
+
+export const GetWarmupAudioParams = zod.object({
+  "mode": zod.enum(['dyslexia', 'learning', 'autism']),
+  "attemptId": zod.coerce.number().int(),
+  "itemId": zod.coerce.string()
+})
+
+export const GetWarmupAudioResponse = zod.unknown()
+
+
+export const GetStartingPointParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const GetStartingPointResponse = zod.object({
+  "pending": zod.boolean(),
+  "demo": zod.boolean(),
+  "result": zod.union([zod.object({
+  "test": zod.enum(['dyslexia', 'learning_difficulties', 'autism']),
+  "version": zod.number().int(),
+  "completed_at": zod.string(),
+  "levels": zod.record(zod.string(), zod.number().int()),
+  "band": zod.string(),
+  "flags": zod.array(zod.string()),
+  "interests": zod.array(zod.string()),
+  "preferences": zod.record(zod.string(), zod.unknown()),
+  "signals": zod.record(zod.string(), zod.number()),
+  "favorite_thing": zod.string().optional(),
+  "error_patterns": zod.array(zod.string()).optional(),
+  "step": zod.number().int().optional()
+}),zod.null()])
+})
+
+
+export const RedoWarmupParams = zod.object({
+  "id": zod.coerce.number().int()
+})
+
+export const redoWarmupBodyDemoResetDefault = false;
+
+export const RedoWarmupBody = zod.object({
+  "demoReset": zod.boolean().default(redoWarmupBodyDemoResetDefault)
+})
+
+export const RedoWarmupResponse = zod.object({
+  "success": zod.boolean()
+})
+
+
 export const UpdateAdultLanguageBody = zod.object({
   "language": zod.enum(['ar', 'en'])
 })
@@ -68,6 +233,7 @@ export const refreshStudentInsightsResponseStudentInterestsMax = 5;
 
 
 export const RefreshStudentInsightsResponse = zod.object({
+  "tutorPreferences": zod.record(zod.string(), zod.unknown()).optional(),
   "insightsUpdatedAt": zod.string().nullable(),
   "stats": zod.object({
   "sessions": zod.number().int(),
@@ -84,6 +250,7 @@ export const RefreshStudentInsightsResponse = zod.object({
   "assessmentConfirmed": zod.boolean()
 }),
   "insights": zod.array(zod.object({
+  "source": zod.enum(['session', 'placement']).optional(),
   "textAr": zod.string().nullish(),
   "textEn": zod.string().nullish(),
   "evidenceAr": zod.string().nullish(),
@@ -121,6 +288,8 @@ export const GetAdultChatResponse = zod.object({
   "createdAt": zod.string()
 }),
   "messages": zod.array(zod.object({
+  "spokenContent": zod.string().nullish(),
+  "presentation": zod.record(zod.string(), zod.unknown()).nullish(),
   "id": zod.number().int(),
   "chatId": zod.number().int(),
   "role": zod.enum(['student', 'ai']),
@@ -293,6 +462,7 @@ export const getStudentResponseStudentInterestsMax = 5;
 
 
 export const GetStudentResponse = zod.object({
+  "tutorPreferences": zod.record(zod.string(), zod.unknown()).optional(),
   "insightsUpdatedAt": zod.string().nullable(),
   "stats": zod.object({
   "sessions": zod.number().int(),
@@ -309,6 +479,7 @@ export const GetStudentResponse = zod.object({
   "assessmentConfirmed": zod.boolean()
 }),
   "insights": zod.array(zod.object({
+  "source": zod.enum(['session', 'placement']).optional(),
   "textAr": zod.string().nullish(),
   "textEn": zod.string().nullish(),
   "evidenceAr": zod.string().nullish(),
@@ -435,6 +606,7 @@ export const getStudentModeResponseStudentInterestsMax = 5;
 
 
 export const GetStudentModeResponse = zod.object({
+  "tutorPreferences": zod.record(zod.string(), zod.unknown()).optional(),
   "insightsUpdatedAt": zod.string().nullable(),
   "stats": zod.object({
   "sessions": zod.number().int(),
@@ -451,6 +623,7 @@ export const GetStudentModeResponse = zod.object({
   "assessmentConfirmed": zod.boolean()
 }),
   "insights": zod.array(zod.object({
+  "source": zod.enum(['session', 'placement']).optional(),
   "textAr": zod.string().nullish(),
   "textEn": zod.string().nullish(),
   "evidenceAr": zod.string().nullish(),
@@ -503,6 +676,8 @@ export const ListStudentMessagesResponse = zod.object({
   "createdAt": zod.string()
 }),
   "messages": zod.array(zod.object({
+  "spokenContent": zod.string().nullish(),
+  "presentation": zod.record(zod.string(), zod.unknown()).nullish(),
   "id": zod.number().int(),
   "chatId": zod.number().int(),
   "role": zod.enum(['student', 'ai']),
@@ -520,12 +695,17 @@ export const SendStudentMessageParams = zod.object({
   "id": zod.coerce.number().int().min(1)
 })
 
+
+export const sendStudentMessageBodyPracticeChoiceIdMax = 80;
+
 export const sendStudentMessageBodyContentMax = 2000;
 
 
 
 
 export const SendStudentMessageBody = zod.object({
+  "practiceMessageId": zod.number().int().min(1).optional(),
+  "practiceChoiceId": zod.string().max(sendStudentMessageBodyPracticeChoiceIdMax).optional(),
   "content": zod.string().min(1).max(sendStudentMessageBodyContentMax),
   "retryMessageId": zod.number().int().min(1).optional()
 })
@@ -538,6 +718,8 @@ export const SendStudentMessageResponse = zod.object({
   "createdAt": zod.string()
 }),
   "studentMessage": zod.object({
+  "spokenContent": zod.string().nullish(),
+  "presentation": zod.record(zod.string(), zod.unknown()).nullish(),
   "id": zod.number().int(),
   "chatId": zod.number().int(),
   "role": zod.enum(['student', 'ai']),
@@ -546,6 +728,8 @@ export const SendStudentMessageResponse = zod.object({
   "createdAt": zod.string()
 }),
   "reply": zod.object({
+  "spokenContent": zod.string().nullish(),
+  "presentation": zod.record(zod.string(), zod.unknown()).nullish(),
   "id": zod.number().int(),
   "chatId": zod.number().int(),
   "role": zod.enum(['student', 'ai']),

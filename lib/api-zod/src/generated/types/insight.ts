@@ -4,9 +4,11 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { InsightSource } from './insightSource';
 import type { InsightType } from './insightType';
 
 export interface Insight {
+  source?: InsightSource;
   /** @nullable */
   textAr?: string | null;
   /** @nullable */

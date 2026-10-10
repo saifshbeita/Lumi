@@ -2,15 +2,16 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'wouter';
 import { useDyslexiaVoice } from './dyslexia/use-voice';
 import { useQueryClient } from '@tanstack/react-query';
-import { useListStudentMessages, useSendStudentMessage, getListStudentMessagesQueryKey, getListStudentChatsQueryKey } from '@workspace/api-client-react';
+import { useListStudentMessages, useSendStudentMessage, getListStudentMessagesQueryKey, getListStudentChatsQueryKey, getGetWarmupQueryKey,getGetStudentSessionQueryKey,type ChatMessage } from '@workspace/api-client-react';
 import { Button, ErrorBox, Loading, cx } from '@/components/lumi';
 import { parseSteps, DYSLEXIA_TEXT_STYLE, ModeReply, SpeakerButton, LearningSteps, AutismSchedule, MicButton } from './mode-parts';
 import type { Mode } from '@/lib/tokens';
 import { langAttrs, t, type Lang } from '@/lib/student-i18n';
 
-type Msg = { id: number; role: 'student' | 'ai'; content: string };
+type Msg = ChatMessage;
+type Presentation = { choices?: {id:string;label:string}[]; question?:string; showQuestion?:boolean; textSize?:number; audio?:boolean; pair?:string[]; plan?:boolean; announcement?:string;awaitNext?:boolean;placementId?:number };
 
-export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId: number; lang?: Lang }) {
+export function StudentChat({ mode, chatId, lang = 'ar', preferences = {} }: { mode: Mode; chatId: number; lang?: Lang; preferences?:Record<string,unknown> }) {
   const s = t(lang);
   const la = langAttrs(lang);
   const qc = useQueryClient();
@@ -22,7 +23,7 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
   const [progress, setProgress] = useState<Record<number, number>>({});
   const [voiceQuestion, setVoiceQuestion] = useState('');
   const input = useRef<HTMLInputElement>(null);
-  const voice = useDyslexiaVoice(mode === 'dyslexia', text => {
+  const voice = useDyslexiaVoice(mode === 'dyslexia' || mode === 'learning', text => {
     setDraft(text); setVoiceQuestion(text); submit(text);
   }, () => input.current?.focus(), lang);
   const scroller = useRef<HTMLDivElement>(null);
@@ -32,7 +33,9 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
   const lastAi = last && last.role === 'ai' ? last : null;
   const lastAiSteps = lastAi && mode === 'learning' ? parseSteps(lastAi.content) : null;
   const lastAiProg = lastAi ? Math.min(progress[lastAi.id] ?? 0, (lastAiSteps?.length ?? 1) - 1) : 0;
-  const locked = !!lastAiSteps && lastAiProg < lastAiSteps.length - 1;
+  const currentPresentation=lastAi?.presentation as Presentation|null;
+  const placementCurrent=currentPresentation?.placementId===preferences.placementId;
+  const locked = !!lastAiSteps && (lastAiProg < lastAiSteps.length - 1 || placementCurrent&&currentPresentation?.awaitNext===true);
   const busy = send.isPending;
   const count = messages.length;
 
@@ -41,11 +44,11 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
     if (el) el.scrollTop = el.scrollHeight;
   }, [count, busy, lastAiProg]);
 
-  const submit = (content: string, retryMessageId?: number) => {
+  const submit = (content: string, retryMessageId?: number, practice?:{practiceMessageId:number;practiceChoiceId:string}) => {
     const text = content.trim();
     if (!text || busy) return;
     setFailed(false);
-    send.mutate({ id: chatId, data: retryMessageId ? { content: text, retryMessageId } : { content: text } }, {
+    send.mutate({ id: chatId, data: retryMessageId ? { content: text, retryMessageId } : { content: text, ...practice } }, {
       onSuccess: exchange => {
         setDraft('');
         setVoiceQuestion('');
@@ -61,7 +64,7 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
         qc.invalidateQueries({ queryKey: getListStudentChatsQueryKey() });
         if (mode === 'dyslexia') void voice.play(exchange.reply.id, true);
       },
-      onError: () => { setVoiceQuestion(''); setFailed(true); qc.invalidateQueries({ queryKey: key }); },
+      onError: () => { setVoiceQuestion(''); setFailed(true); qc.invalidateQueries({ queryKey: key }); qc.invalidateQueries({queryKey:getGetWarmupQueryKey(mode)}); qc.invalidateQueries({queryKey:getGetStudentSessionQueryKey()}); },
     });
   };
   const retry = () => { if (pendingRetry) submit(pendingRetry.content, pendingRetry.id); else submit(draft); };
@@ -86,11 +89,20 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
       const steps = parseSteps(m.content);
       const isLast = lastAi?.id === m.id;
       const p = isLast ? lastAiProg : steps.length - 1;
-      return <LearningSteps key={m.id} steps={steps} progress={p} active={isLast} onNext={() => setProgress(o => ({ ...o, [m.id]: p + 1 }))} testId={`msg-ai-${m.id}`} lang={lang} />;
+      const presentation=m.presentation as Presentation|null;
+      return <div key={m.id} className="self-end max-w-[90%] flex flex-col gap-3">
+        <LearningSteps steps={steps} progress={p} active={isLast} onNext={() => setProgress(o => ({ ...o, [m.id]: p + 1 }))} testId={`msg-ai-${m.id}`} lang={lang} />
+        {presentation?.audio && <SpeakerButton state={voice.audioState?.id===m.id?voice.audioState.state:null} onClick={()=>{voice.unlock();void voice.play(m.id);}} testId={`button-speaker-${m.id}`} lang={lang}/>}
+        {isLast&&p===steps.length-1&&presentation?.awaitNext&&presentation.placementId===preferences.placementId && <Button onClick={()=>submit(lang==="ar"?"التالي":"Next")} disabled={busy} data-testid="button-next-learner-step">{s.next}</Button>}
+        {practiceControls(m,isLast && p===steps.length-1)}
+      </div>;
     }
     return (
       <div key={m.id} className="self-end max-w-[90%] flex items-start gap-3" data-testid={`msg-ai-${m.id}`}>
-        <ModeReply mode={mode}>{m.content}</ModeReply>
+        <div className="flex flex-col gap-3">
+          <ModeReply mode={mode}><span style={dys ? {fontSize:Number((m.presentation as Presentation|null)?.textSize??preferences.text_size??22)}:undefined}>{m.content}</span></ModeReply>
+          {practiceControls(m,lastAi?.id===m.id)}
+        </div>
         {dys && <SpeakerButton state={voice.audioState?.id === m.id ? voice.audioState.state : null} disabled={voice.phase !== 'idle' || (voice.audioState?.id === m.id && voice.audioState.state === 'loading')} onClick={() => {
           // The displayed Stop control must never enter the playback/request path.
           if (voice.audioState?.id === m.id && voice.audioState.state === 'playing') voice.stopPlayback();
@@ -99,14 +111,26 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
       </div>
     );
   };
+  function practiceControls(m:Msg,active:boolean) {
+    const p=m.presentation as Presentation|null;
+    if(!p?.choices?.length) return null;
+    return <div className="flex flex-col gap-3" data-testid={`practice-${m.id}`}>
+      {p.announcement && <p dir="auto" data-testid={`practice-announcement-${m.id}`}>{p.announcement}</p>}
+      {p.showQuestion && <p dir="auto" data-testid={`practice-question-${m.id}`}>{p.question}</p>}
+      <div className="flex flex-wrap gap-3">
+        {p.choices.map(c=><Button key={c.id} variant={aut?'secondary':'primary'} disabled={!active||p.placementId!==preferences.placementId||busy||!!pendingRetry||voiceBusy} style={p.pair?{fontSize:40,minHeight:72}:undefined}
+          onClick={()=>{if(dys)voice.unlock();submit(c.label,undefined,{practiceMessageId:m.id,practiceChoiceId:c.id});}} data-testid={`practice-choice-${m.id}-${c.id}`}>{c.label}</Button>)}
+      </div>
+    </div>;
+  }
 
   const composer = (
     <form onSubmit={e => { e.preventDefault(); if (!locked && !voiceBusy) { if (dys) voice.unlock(); submit(draft); } }} className="flex flex-col gap-3">
       {dys && (
         <MicButton listening={voice.phase === 'listening'} thinking={thinking} disabled={thinking && voice.phase !== 'listening' || !!pendingRetry && voice.phase === 'idle'} onTap={() => voice.tap()} error={voice.error} onRetry={voice.retryTranscription} lang={lang} />
       )}
-      <div className="flex gap-3">
-        <input ref={input} value={draft} onChange={e => setDraft(e.target.value)} disabled={locked || busy || voiceBusy} maxLength={2000} aria-label={s.typeMsg} placeholder={locked ? s.nextFirst : s.typeHere} className={cx('flex-1 min-w-0 min-h-14 px-5 rounded-full border border-navy bg-card text-navy', dys ? 'text-base' : 'text-lg')} data-testid="input-message" />
+      <div className={cx("flex gap-3",dys&&preferences.input==="keyboard"?"order-first":"")}>
+        <input ref={input} autoFocus={dys&&preferences.input==="keyboard"} value={draft} onChange={e => setDraft(e.target.value)} disabled={locked || busy || voiceBusy} maxLength={2000} aria-label={s.typeMsg} placeholder={locked ? s.nextFirst : s.typeHere} className={cx('flex-1 min-w-0 min-h-14 px-5 rounded-full border border-navy bg-card text-navy', dys ? 'text-base' : 'text-lg')} data-testid="input-message" />
         <Button type="submit" disabled={locked || busy || voiceBusy || !draft.trim()} data-testid="button-send">{s.send}</Button>
       </div>
     </form>
@@ -128,6 +152,7 @@ export function StudentChat({ mode, chatId, lang = 'ar' }: { mode: Mode; chatId:
         <h1 className="text-xl line-clamp-2" dir="auto">{hist.data?.chat.icon ?? '💬'} {hist.data?.chat.title}</h1>
       </header>
       {aut && <AutismSchedule lang={lang} />}
+      {aut && !!preferences.reply_length && <p className="px-4 py-2 bg-mist" data-testid="personalized-session-plan">{lang==="ar"?"اليوم رح نعمل: 1) نتعلّم 2) نتدرّب 3) خلصنا ✅":"Today we will: 1) Learn 2) Practise 3) Finish ✅"}</p>}
       <div ref={scroller} className="flex-1 min-h-0 overflow-y-auto px-4 py-3 flex flex-col gap-3" style={aut ? { scrollBehavior: 'auto' } : undefined} data-testid="chat-scroll">
         {messages.length === 0 && <p className="bg-mist rounded-2xl p-5" style={textStyle} data-testid="empty-messages">{s.emptyChat}</p>}
         {messages.map(bubble)}

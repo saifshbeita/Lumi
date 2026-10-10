@@ -31,6 +31,8 @@ import type {
   HealthStatus,
   MessageInput,
   Mode,
+  PlacementRedoInput,
+  StartingPoint,
   Student,
   StudentChat,
   StudentInput,
@@ -40,7 +42,9 @@ import type {
   StudentUpdate,
   Success,
   VoiceRecording,
-  VoiceTranscript
+  VoiceTranscript,
+  WarmupEventInput,
+  WarmupState
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -69,6 +73,395 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getGetWarmupUrl = (mode: Mode,) => {
+
+
+
+
+  return `/api/student/placement/${mode}`
+}
+
+export const getWarmup = async (mode: Mode, options?: Parameters<typeof customFetch>[1]): Promise<WarmupState> => {
+
+  return customFetch<WarmupState>(getGetWarmupUrl(mode),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWarmupQueryKey = (mode: Mode,) => {
+    return [
+    `/api/student/placement/${mode}`
+    ] as const;
+    }
+
+
+export const getGetWarmupQueryOptions = <TData = Awaited<ReturnType<typeof getWarmup>>, TError = ErrorType<unknown>>(mode: Mode, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWarmup>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWarmupQueryKey(mode);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWarmup>>> = ({ signal }) => getWarmup(mode, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: mode !== null && mode !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWarmup>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWarmupQueryResult = NonNullable<Awaited<ReturnType<typeof getWarmup>>>
+export type GetWarmupQueryError = ErrorType<unknown>
+
+
+
+export function useGetWarmup<TData = Awaited<ReturnType<typeof getWarmup>>, TError = ErrorType<unknown>>(
+ mode: Mode, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWarmup>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWarmupQueryOptions(mode,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getWarmupEventUrl = (mode: Mode,) => {
+
+
+
+
+  return `/api/student/placement/${mode}`
+}
+
+export const warmupEvent = async (mode: Mode,
+    warmupEventInput: WarmupEventInput, options?: Parameters<typeof customFetch>[1]): Promise<WarmupState> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<WarmupState>(getWarmupEventUrl(mode),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(warmupEventInput)
+  }
+);}
+
+
+
+
+
+export const getWarmupEventMutationKey = () => ['warmupEvent'] as const;
+
+export const getWarmupEventMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof warmupEvent>>, TError,WarmupEventMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof warmupEvent>>, TError,WarmupEventMutationVariables, TContext> => {
+
+const mutationKey = getWarmupEventMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof warmupEvent>>, WarmupEventMutationVariables> = (props) => {
+          const {mode,data} = props ?? {};
+
+          return  warmupEvent(mode,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type WarmupEventMutationResult = NonNullable<Awaited<ReturnType<typeof warmupEvent>>>
+    export type WarmupEventMutationBody = BodyType<WarmupEventInput>
+    export type WarmupEventMutationError = ErrorType<unknown>
+    export type WarmupEventMutationVariables = {mode: Mode;data: BodyType<WarmupEventInput>}
+
+    export const useWarmupEvent = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof warmupEvent>>, TError,WarmupEventMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof warmupEvent>>,
+        TError,
+        WarmupEventMutationVariables,
+        TContext
+      > => {
+      return useMutation(getWarmupEventMutationOptions(options));
+    }
+
+export const getGetWarmupAudioUrl = (mode: Mode,
+    attemptId: number,
+    itemId: string,) => {
+
+
+
+
+  return `/api/student/placement/${mode}/${attemptId}/${itemId}/audio`
+}
+
+export const getWarmupAudio = async (mode: Mode,
+    attemptId: number,
+    itemId: string, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetWarmupAudioUrl(mode,attemptId,itemId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetWarmupAudioQueryKey = (mode: Mode,
+    attemptId: number,
+    itemId: string,) => {
+    return [
+    `/api/student/placement/${mode}/${attemptId}/${itemId}/audio`
+    ] as const;
+    }
+
+
+export const getGetWarmupAudioQueryOptions = <TData = Awaited<ReturnType<typeof getWarmupAudio>>, TError = ErrorType<unknown>>(mode: Mode,
+    attemptId: number,
+    itemId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWarmupAudio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetWarmupAudioQueryKey(mode,attemptId,itemId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getWarmupAudio>>> = ({ signal }) => getWarmupAudio(mode,attemptId,itemId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: mode !== null && mode !== undefined && attemptId !== null && attemptId !== undefined && itemId !== null && itemId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getWarmupAudio>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetWarmupAudioQueryResult = NonNullable<Awaited<ReturnType<typeof getWarmupAudio>>>
+export type GetWarmupAudioQueryError = ErrorType<unknown>
+
+
+
+export function useGetWarmupAudio<TData = Awaited<ReturnType<typeof getWarmupAudio>>, TError = ErrorType<unknown>>(
+ mode: Mode,
+    attemptId: number,
+    itemId: string, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getWarmupAudio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetWarmupAudioQueryOptions(mode,attemptId,itemId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetStartingPointUrl = (id: number,) => {
+
+
+
+
+  return `/api/adult/students/${id}/placement`
+}
+
+export const getStartingPoint = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<StartingPoint> => {
+
+  return customFetch<StartingPoint>(getGetStartingPointUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStartingPointQueryKey = (id: number,) => {
+    return [
+    `/api/adult/students/${id}/placement`
+    ] as const;
+    }
+
+
+export const getGetStartingPointQueryOptions = <TData = Awaited<ReturnType<typeof getStartingPoint>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStartingPoint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStartingPointQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStartingPoint>>> = ({ signal }) => getStartingPoint(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStartingPoint>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStartingPointQueryResult = NonNullable<Awaited<ReturnType<typeof getStartingPoint>>>
+export type GetStartingPointQueryError = ErrorType<unknown>
+
+
+
+export function useGetStartingPoint<TData = Awaited<ReturnType<typeof getStartingPoint>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStartingPoint>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStartingPointQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getRedoWarmupUrl = (id: number,) => {
+
+
+
+
+  return `/api/adult/students/${id}/placement`
+}
+
+export const redoWarmup = async (id: number,
+    placementRedoInput: PlacementRedoInput, options?: Parameters<typeof customFetch>[1]): Promise<Success> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Success>(getRedoWarmupUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(placementRedoInput)
+  }
+);}
+
+
+
+
+
+export const getRedoWarmupMutationKey = () => ['redoWarmup'] as const;
+
+export const getRedoWarmupMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof redoWarmup>>, TError,RedoWarmupMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof redoWarmup>>, TError,RedoWarmupMutationVariables, TContext> => {
+
+const mutationKey = getRedoWarmupMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof redoWarmup>>, RedoWarmupMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  redoWarmup(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RedoWarmupMutationResult = NonNullable<Awaited<ReturnType<typeof redoWarmup>>>
+    export type RedoWarmupMutationBody = BodyType<PlacementRedoInput>
+    export type RedoWarmupMutationError = ErrorType<unknown>
+    export type RedoWarmupMutationVariables = {id: number;data: BodyType<PlacementRedoInput>}
+
+    export const useRedoWarmup = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof redoWarmup>>, TError,RedoWarmupMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof redoWarmup>>,
+        TError,
+        RedoWarmupMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRedoWarmupMutationOptions(options));
+    }
 
 export const getUpdateAdultLanguageUrl = () => {
 

@@ -1,6 +1,6 @@
 import { Router, type IRouter } from "express";
 import bcrypt from "bcrypt";
-import { and, eq, asc } from "drizzle-orm";
+import { and, eq, asc, sql } from "drizzle-orm";
 import { db, adults, students, chats, messages } from "@workspace/db";
 import { GetAdultChatParams, GetAdultChatResponse } from "@workspace/api-zod";
 import { CreateStudentBody, CreateStudentResponse, ListStudentsResponse, GetStudentParams, GetStudentResponse, UpdateStudentParams, UpdateStudentBody, UpdateStudentResponse } from "@workspace/api-zod";
@@ -21,7 +21,9 @@ router.post("/", async (req, res): Promise<void> => {
   if (!adult) { res.status(401).json({ error: "Please log in again." }); return; }
   if (adult.role === "parent" && parsed.data.assessmentConfirmed !== true) { res.status(400).json({ error: "Please confirm your child has an assessment from a specialist." }); return; }
   const data = parsed.data;
-  const [student] = await db.insert(students).values({ adultId: adult.id, name: data.name.trim(), username: data.username.toLowerCase(), pinHash: await bcrypt.hash(data.pin, 12), conditions: [data.mode], language: data.language ?? "ar", interests: [...new Set((data.interests ?? []).map(s => s.trim()))], assessmentConfirmed: data.assessmentConfirmed ?? false }).onConflictDoNothing().returning();
+  const pinHash=await bcrypt.hash(data.pin,12);
+  // Epoch 1 marks new enrollments as required, without starting their timer before first login.
+  const [student]=await db.insert(students).values({ adultId: adult.id, name: data.name.trim(), username: data.username.toLowerCase(), pinHash, conditions: [data.mode], placementEpoch:1,language: data.language ?? "ar", interests: [...new Set((data.interests ?? []).map(s => s.trim()))], assessmentConfirmed: data.assessmentConfirmed ?? false }).onConflictDoNothing().returning();
   if (!student) { res.status(409).json({ error: "That username is already taken. Please choose another." }); return; }
   res.status(201).json(CreateStudentResponse.parse(publicStudent(student)));
 });
@@ -51,6 +53,7 @@ router.patch("/:id", async (req, res): Promise<void> => {
   if (!params.success || !body.success || (body.data.mode === undefined && body.data.interests === undefined && body.data.language === undefined)) { res.status(400).json({ error: "Please select a valid mode, language, or up to five interests." }); return; }
   const [student] = await db.update(students).set({
     ...(body.data.mode ? { conditions: [body.data.mode] } : {}),
+    ...(body.data.mode ? { placementEpoch: sql`CASE WHEN ${students.conditions}[1] <> ${body.data.mode} THEN ${students.placementEpoch} + 1 ELSE ${students.placementEpoch} END` } : {}),
     ...(body.data.language ? { language: body.data.language } : {}),
     ...(body.data.interests !== undefined ? { interests: [...new Set(body.data.interests.map(s => s.trim()))] } : {}),
   }).where(and(eq(students.id, params.data.id), eq(students.adultId, req.session.adultId!))).returning();

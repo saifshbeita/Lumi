@@ -5,7 +5,7 @@ export const publicAdult = (row: AdultRow) => ({ id: row.id, name: row.name, ema
 export const publicStudent = (row: StudentRow) => ({ id: row.id, name: row.name, username: row.username, conditions: row.conditions, interests: row.interests, language: row.language, assessmentConfirmed: row.assessmentConfirmed });
 export async function studentProfile(student: StudentRow) {
   const [insights, history] = await Promise.all([
-    db.select({ id: profileInsights.id, type: profileInsights.type, text: profileInsights.text, evidence: profileInsights.evidence, textAr: profileInsights.textAr, textEn: profileInsights.textEn, evidenceAr: profileInsights.evidenceAr, evidenceEn: profileInsights.evidenceEn, sourceChatId: profileInsights.sourceChatId }).from(profileInsights).where(eq(profileInsights.studentId, student.id)),
+    db.select({ id: profileInsights.id, source: profileInsights.source, type: profileInsights.type, text: profileInsights.text, evidence: profileInsights.evidence, textAr: profileInsights.textAr, textEn: profileInsights.textEn, evidenceAr: profileInsights.evidenceAr, evidenceEn: profileInsights.evidenceEn, sourceChatId: profileInsights.sourceChatId }).from(profileInsights).where(eq(profileInsights.studentId, student.id)),
     db.select({ id: chats.id, title: chats.title, icon: chats.icon, createdAt: chats.createdAt, messageCount: count(messages.id), lastActive: max(messages.createdAt) }).from(chats).leftJoin(messages, eq(messages.chatId, chats.id)).where(eq(chats.studentId, student.id)).groupBy(chats.id).orderBy(desc(chats.createdAt)),
   ]);
   const activity = history.map(c => c.lastActive && new Date(c.lastActive).getTime()).filter((v): v is number => typeof v === "number");

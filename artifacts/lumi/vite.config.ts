@@ -71,6 +71,7 @@ export default defineConfig({
     allowedHosts: true,
     fs: {
       strict: true,
+      deny: ['**/.env','**/.env.*','**/*.{crt,pem}','**/.git/**','**/artifacts/api-server/**','**/placement/items/**','**/docs/placement/**','**/attached_assets/*.{md,txt}'],
     },
   },
   preview: {
