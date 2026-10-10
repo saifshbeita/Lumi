@@ -35,6 +35,8 @@ minimumReleaseAge: 1440
 minimumReleaseAgeExclude:
   - '@replit/*'
   - stripe-replit-sync
+  # Express 5.3.0 requires the proxy-addr security fix but is under 24 hours old.
+  - express
 
 onlyBuiltDependencies:
   - '@swc/core'
@@ -43,6 +45,8 @@ onlyBuiltDependencies:
   - unrs-resolver
 
 overrides:
+  # Typography's latest release pins the vulnerable 6.x parser.
+  '@tailwindcss/typography>postcss-selector-parser': 7.1.6
   '@esbuild-kit/esm-loader': npm:tsx@^4.21.0
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-arm64': '-'
   '@expo/ngrok-bin>@expo/ngrok-bin-darwin-x64': '-'
