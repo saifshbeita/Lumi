@@ -23,9 +23,13 @@ import type {
   AdultLogin,
   AdultSession,
   AdultSignup,
+  ChatExchange,
+  ChatHistory,
   HealthStatus,
+  MessageInput,
   Mode,
   Student,
+  StudentChat,
   StudentInput,
   StudentLogin,
   StudentProfile,
@@ -1033,4 +1037,297 @@ export function useGetStudentMode<TData = Awaited<ReturnType<typeof getStudentMo
 
 
 
+
+export const getListStudentChatsUrl = () => {
+
+
+
+
+  return `/api/student/chats`
+}
+
+export const listStudentChats = async ( options?: Parameters<typeof customFetch>[1]): Promise<StudentChat[]> => {
+
+  return customFetch<StudentChat[]>(getListStudentChatsUrl(),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListStudentChatsQueryKey = () => {
+    return [
+    `/api/student/chats`
+    ] as const;
+    }
+
+
+export const getListStudentChatsQueryOptions = <TData = Awaited<ReturnType<typeof listStudentChats>>, TError = ErrorType<unknown>>( options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStudentChats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListStudentChatsQueryKey();
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudentChats>>> = ({ signal }) => listStudentChats({ signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStudentChats>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListStudentChatsQueryResult = NonNullable<Awaited<ReturnType<typeof listStudentChats>>>
+export type ListStudentChatsQueryError = ErrorType<unknown>
+
+
+
+export function useListStudentChats<TData = Awaited<ReturnType<typeof listStudentChats>>, TError = ErrorType<unknown>>(
+  options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStudentChats>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListStudentChatsQueryOptions(options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getCreateStudentChatUrl = () => {
+
+
+
+
+  return `/api/student/chats`
+}
+
+export const createStudentChat = async ( options?: Parameters<typeof customFetch>[1]): Promise<StudentChat> => {
+
+  return customFetch<StudentChat>(getCreateStudentChatUrl(),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getCreateStudentChatMutationKey = () => ['createStudentChat'] as const;
+
+export const getCreateStudentChatMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStudentChat>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof createStudentChat>>, TError,void, TContext> => {
+
+const mutationKey = getCreateStudentChatMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof createStudentChat>>, void> = () => {
+
+
+          return  createStudentChat(requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CreateStudentChatMutationResult = NonNullable<Awaited<ReturnType<typeof createStudentChat>>>
+
+    export type CreateStudentChatMutationError = ErrorType<unknown>
+
+
+    export const useCreateStudentChat = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof createStudentChat>>, TError,void, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof createStudentChat>>,
+        TError,
+        void,
+        TContext
+      > => {
+      return useMutation(getCreateStudentChatMutationOptions(options));
+    }
+
+export const getListStudentMessagesUrl = (id: number,) => {
+
+
+
+
+  return `/api/student/chats/${id}/messages`
+}
+
+export const listStudentMessages = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<ChatHistory> => {
+
+  return customFetch<ChatHistory>(getListStudentMessagesUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getListStudentMessagesQueryKey = (id: number,) => {
+    return [
+    `/api/student/chats/${id}/messages`
+    ] as const;
+    }
+
+
+export const getListStudentMessagesQueryOptions = <TData = Awaited<ReturnType<typeof listStudentMessages>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStudentMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getListStudentMessagesQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof listStudentMessages>>> = ({ signal }) => listStudentMessages(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof listStudentMessages>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type ListStudentMessagesQueryResult = NonNullable<Awaited<ReturnType<typeof listStudentMessages>>>
+export type ListStudentMessagesQueryError = ErrorType<unknown>
+
+
+
+export function useListStudentMessages<TData = Awaited<ReturnType<typeof listStudentMessages>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof listStudentMessages>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getListStudentMessagesQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getSendStudentMessageUrl = (id: number,) => {
+
+
+
+
+  return `/api/student/chats/${id}/messages`
+}
+
+export const sendStudentMessage = async (id: number,
+    messageInput: MessageInput, options?: Parameters<typeof customFetch>[1]): Promise<ChatExchange> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<ChatExchange>(getSendStudentMessageUrl(id),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(messageInput)
+  }
+);}
+
+
+
+
+
+export const getSendStudentMessageMutationKey = () => ['sendStudentMessage'] as const;
+
+export const getSendStudentMessageMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendStudentMessage>>, TError,SendStudentMessageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof sendStudentMessage>>, TError,SendStudentMessageMutationVariables, TContext> => {
+
+const mutationKey = getSendStudentMessageMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof sendStudentMessage>>, SendStudentMessageMutationVariables> = (props) => {
+          const {id,data} = props ?? {};
+
+          return  sendStudentMessage(id,data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SendStudentMessageMutationResult = NonNullable<Awaited<ReturnType<typeof sendStudentMessage>>>
+    export type SendStudentMessageMutationBody = BodyType<MessageInput>
+    export type SendStudentMessageMutationError = ErrorType<unknown>
+    export type SendStudentMessageMutationVariables = {id: number;data: BodyType<MessageInput>}
+
+    export const useSendStudentMessage = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof sendStudentMessage>>, TError,SendStudentMessageMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof sendStudentMessage>>,
+        TError,
+        SendStudentMessageMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSendStudentMessageMutationOptions(options));
+    }
 

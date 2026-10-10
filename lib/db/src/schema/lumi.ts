@@ -25,6 +25,7 @@ export const chats = pgTable("chats", {
   id: serial("id").primaryKey(),
   studentId: integer("student_id").references(() => students.id).notNull(),
   title: text("title").notNull(),
+  icon: text("icon"),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 });
 export const messages = pgTable("messages", {

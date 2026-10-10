@@ -150,6 +150,53 @@ export interface Chat {
   createdAt: string;
 }
 
+export interface StudentChat {
+  id: number;
+  title: string;
+  /** @nullable */
+  icon: string | null;
+  createdAt: string;
+}
+
+export type ChatMessageRole = typeof ChatMessageRole[keyof typeof ChatMessageRole];
+
+
+export const ChatMessageRole = {
+  student: 'student',
+  ai: 'ai',
+} as const;
+
+export interface ChatMessage {
+  id: number;
+  chatId: number;
+  role: ChatMessageRole;
+  content: string;
+  /** @nullable */
+  audioUrl: string | null;
+  createdAt: string;
+}
+
+export interface MessageInput {
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  content: string;
+  /** @minimum 1 */
+  retryMessageId?: number;
+}
+
+export interface ChatHistory {
+  chat: StudentChat;
+  messages: ChatMessage[];
+}
+
+export interface ChatExchange {
+  chat: StudentChat;
+  studentMessage: ChatMessage;
+  reply: ChatMessage;
+}
+
 export interface StudentProfile {
   student: Student;
   insights: Insight[];

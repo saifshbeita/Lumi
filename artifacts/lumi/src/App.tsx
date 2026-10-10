@@ -10,6 +10,9 @@ import StudentLogin from '@/pages/student/login';
 import DyslexiaHome from '@/pages/student/dyslexia';
 import LearningHome from '@/pages/student/learning';
 import AutismHome from '@/pages/student/autism';
+import DyslexiaChat from '@/pages/student/dyslexia/chat';
+import LearningChat from '@/pages/student/learning/chat';
+import AutismChat from '@/pages/student/autism/chat';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false, refetchOnWindowFocus: false } } });
@@ -23,6 +26,9 @@ function Router() {
         <Route path="/adult" component={Dashboard} />
         <Route path="/adult/students/:id" component={StudentProfilePage} />
         <Route path="/student/login" component={StudentLogin} />
+        <Route path="/student/dyslexia/chat/:id" component={DyslexiaChat} />
+        <Route path="/student/learning/chat/:id" component={LearningChat} />
+        <Route path="/student/autism/chat/:id" component={AutismChat} />
         <Route path="/student/dyslexia" component={DyslexiaHome} />
         <Route path="/student/learning" component={LearningHome} />
         <Route path="/student/autism" component={AutismHome} />

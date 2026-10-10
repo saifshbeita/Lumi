@@ -9,8 +9,8 @@ Lumi supports children with learning differences and never diagnoses. Adults ass
 
 **How to apply:** Preserve adult ownership and mode authorization on both client and server. Do not add diagnosis or automatic condition detection.
 
-The requested initial scope leaves chat and actual learning modes as placeholders. The brand uses the supplied mascot, flat borders, no shadows, no animations, and Arabic RTL student interfaces.
+The user expanded the original placeholder scope to real student chat with three assigned learning experiences. Microphone and speaker controls remain visual placeholders; actual voice is explicitly a later task. The brand uses the supplied mascot, flat borders, no shadows, no animations, and Arabic RTL student interfaces.
 
 **Why:** These are explicit scope and accessibility rules from the user.
 
-**How to apply:** Keep these constraints until the user explicitly expands scope; do not replace the mascot or introduce motion as general polish.
+**How to apply:** Do not add speech behavior until requested. Preserve the supplied mascot and motion-free accessibility constraints; do not display condition labels to children.

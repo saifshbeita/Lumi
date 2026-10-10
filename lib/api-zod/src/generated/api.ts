@@ -213,3 +213,88 @@ export const GetStudentModeResponse = zod.object({
 })
 
 
+export const ListStudentChatsResponseItem = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "icon": zod.string().nullable(),
+  "createdAt": zod.string()
+})
+export const ListStudentChatsResponse = zod.array(ListStudentChatsResponseItem)
+
+
+export const CreateStudentChatResponse = zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "icon": zod.string().nullable(),
+  "createdAt": zod.string()
+})
+
+
+
+
+
+export const ListStudentMessagesParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const ListStudentMessagesResponse = zod.object({
+  "chat": zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "icon": zod.string().nullable(),
+  "createdAt": zod.string()
+}),
+  "messages": zod.array(zod.object({
+  "id": zod.number().int(),
+  "chatId": zod.number().int(),
+  "role": zod.enum(['student', 'ai']),
+  "content": zod.string(),
+  "audioUrl": zod.string().nullable(),
+  "createdAt": zod.string()
+}))
+})
+
+
+
+
+
+export const SendStudentMessageParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const sendStudentMessageBodyContentMax = 2000;
+
+
+
+
+export const SendStudentMessageBody = zod.object({
+  "content": zod.string().min(1).max(sendStudentMessageBodyContentMax),
+  "retryMessageId": zod.number().int().min(1).optional()
+})
+
+export const SendStudentMessageResponse = zod.object({
+  "chat": zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "icon": zod.string().nullable(),
+  "createdAt": zod.string()
+}),
+  "studentMessage": zod.object({
+  "id": zod.number().int(),
+  "chatId": zod.number().int(),
+  "role": zod.enum(['student', 'ai']),
+  "content": zod.string(),
+  "audioUrl": zod.string().nullable(),
+  "createdAt": zod.string()
+}),
+  "reply": zod.object({
+  "id": zod.number().int(),
+  "chatId": zod.number().int(),
+  "role": zod.enum(['student', 'ai']),
+  "content": zod.string(),
+  "audioUrl": zod.string().nullable(),
+  "createdAt": zod.string()
+})
+})
+
+
