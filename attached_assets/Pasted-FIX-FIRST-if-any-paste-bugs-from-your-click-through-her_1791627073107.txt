@@ -1,0 +1,60 @@
+FIX FIRST (if any):
+[paste bugs from your click-through here, or delete this block]
+
+Next step: build the student chat and the three mode experiences. Do NOT change the adult side, auth, or the design system in this task. Keep the existing stack and folder structure.
+
+ARCHITECTURE
+One backend, three frontends. Same chat API for every mode. The server reads the logged-in student's conditions[0] from the DB via the student session and picks the system prompt and reply format from it. Never trust a mode sent from the client.
+
+SCHEMA CHANGE (shared/schema.ts, then push with Drizzle):
+- chats: add icon (text, nullable) for an emoji.
+- Keep everything else as is.
+
+BACKEND (server/routes/student-chat.ts, student session required, every query scoped to the logged-in student, 403 otherwise):
+- POST /api/student/chats -> create a chat, return it
+- GET /api/student/chats -> list (newest first) for the home screen
+- GET /api/student/chats/:id/messages
+- POST /api/student/chats/:id/messages -> save the student message, call the LLM, save and return the AI reply
+- LLM: use Replit's built-in AI integration if available so no API key is needed. Otherwise stop and ask me for a key. Use a fast model.
+- Send the last 20 messages as context.
+- After the first exchange in a chat, generate a short Arabic title (max 4 words) and one emoji, save to chats.title and chats.icon.
+
+SYSTEM PROMPTS (server/prompts/base.ts, dyslexia.ts, learning.ts, autism.ts; each mode prompt = base + mode rules):
+Base rules for all modes:
+- Reply in simple Arabic for a child aged 7 to 12.
+- You are Lumi, a friendly learning helper. You help the child learn. Never diagnose. Never mention any condition, disorder, or label, even if asked.
+- Never tell the child they are wrong in a harsh way. Praise effort, then guide.
+- If the child says they are hurt, scared, or unsafe, reply kindly and tell them to talk to their teacher or parent now.
+- Stay on learning. Gently bring off-topic chats back.
+Mode rules:
+- dyslexia: max 2 short sentences per reply, common simple words. When relevant, point out similar letters (ب ت ث) and how letters change shape by position.
+- learning: break every explanation into small steps. Return JSON only: {"steps": ["...", "..."]}, 2 to 5 steps, one idea per step, last step is a tiny check question. Store the JSON string in messages.content. If parsing fails, retry once, then fall back to a single step.
+- autism: short, literal, concrete. No metaphors, no idioms, no sarcasm, no exaggerated emotion. Same structure every reply.
+[PASTE OUR SYSTEM PROMPTS HERE IF WE HAVE THEM, OTHERWISE WRITE STRONG DRAFTS FROM THE RULES ABOVE]
+
+FRONTEND (Arabic, dir="rtl", use the existing design tokens):
+Shared for all modes:
+- Home: wire the existing "اسأل لومي" button to create a chat and open it. Show previous chats from the API.
+- Chat route per mode: /student/dyslexia/chat/:id, /student/learning/chat/:id, /student/autism/chat/:id. Same mode guards as before.
+- Errors: friendly Arabic message in #E8A598 with a retry button.
+
+Dyslexia (client/src/pages/student/dyslexia/):
+- Text 22px+, wider letter spacing.
+- Home chats show the emoji icon + short title, big tap targets.
+- Chat: a big round mic button is the main input (centered, bottom). A speaker button on every AI message. Both are visual placeholders for now, voice is the next task. Keep a small text input as fallback.
+
+Learning (client/src/pages/student/learning/):
+- Render AI replies one step at a time with a big "التالي" button and progress dots. Previous steps stay visible but faded.
+- Input stays disabled until the child reaches the last step.
+
+Autism (client/src/pages/student/autism/):
+- Zero animations or transitions, including scroll. No bouncing typing indicator, use static text "لومي يكتب...".
+- Fixed layout that never shifts when new messages arrive.
+- Static visual schedule at the top of the chat: ١. نسأل  ٢. نتعلم  ٣. نتدرب
+- Minimal yellow: primary button only.
+
+DONE WHEN:
+- Log in with the seeded students for each mode, send 3 messages each. Replies clearly follow each mode's style.
+- A student gets 403 on another mode's routes and on another student's chats.
+- Chat titles and icons appear on the home screens.
+- Show me screenshots of each mode's home and chat at 768px width.
