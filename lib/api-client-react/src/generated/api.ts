@@ -35,7 +35,9 @@ import type {
   StudentProfile,
   StudentSession,
   StudentUpdate,
-  Success
+  Success,
+  VoiceRecording,
+  VoiceTranscript
 } from './api.schemas';
 
 import { customFetch } from '../custom-fetch';
@@ -1330,4 +1332,145 @@ const {mutation: mutationOptions, request: requestOptions} = options ?
       > => {
       return useMutation(getSendStudentMessageMutationOptions(options));
     }
+
+export const getTranscribeStudentVoiceUrl = () => {
+
+
+
+
+  return `/api/student/voice/transcribe`
+}
+
+export const transcribeStudentVoice = async (voiceRecording: VoiceRecording, options?: Parameters<typeof customFetch>[1]): Promise<VoiceTranscript> => {
+    const formData = new FormData();
+formData.append(`audio`, voiceRecording.audio);
+
+  return customFetch<VoiceTranscript>(getTranscribeStudentVoiceUrl(),
+  {
+    ...options,
+    method: 'POST'
+    ,
+    body: formData
+  }
+);}
+
+
+
+
+
+export const getTranscribeStudentVoiceMutationKey = () => ['transcribeStudentVoice'] as const;
+
+export const getTranscribeStudentVoiceMutationOptions = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof transcribeStudentVoice>>, TError,TranscribeStudentVoiceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof transcribeStudentVoice>>, TError,TranscribeStudentVoiceMutationVariables, TContext> => {
+
+const mutationKey = getTranscribeStudentVoiceMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof transcribeStudentVoice>>, TranscribeStudentVoiceMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  transcribeStudentVoice(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type TranscribeStudentVoiceMutationResult = NonNullable<Awaited<ReturnType<typeof transcribeStudentVoice>>>
+    export type TranscribeStudentVoiceMutationBody = BodyType<VoiceRecording>
+    export type TranscribeStudentVoiceMutationError = ErrorType<unknown>
+    export type TranscribeStudentVoiceMutationVariables = {data: BodyType<VoiceRecording>}
+
+    export const useTranscribeStudentVoice = <TError = ErrorType<unknown>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof transcribeStudentVoice>>, TError,TranscribeStudentVoiceMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof transcribeStudentVoice>>,
+        TError,
+        TranscribeStudentVoiceMutationVariables,
+        TContext
+      > => {
+      return useMutation(getTranscribeStudentVoiceMutationOptions(options));
+    }
+
+export const getGetStudentMessageAudioUrl = (id: number,) => {
+
+
+
+
+  return `/api/student/messages/${id}/audio`
+}
+
+export const getStudentMessageAudio = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetStudentMessageAudioUrl(id),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetStudentMessageAudioQueryKey = (id: number,) => {
+    return [
+    `/api/student/messages/${id}/audio`
+    ] as const;
+    }
+
+
+export const getGetStudentMessageAudioQueryOptions = <TData = Awaited<ReturnType<typeof getStudentMessageAudio>>, TError = ErrorType<unknown>>(id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStudentMessageAudio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetStudentMessageAudioQueryKey(id);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getStudentMessageAudio>>> = ({ signal }) => getStudentMessageAudio(id, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getStudentMessageAudio>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetStudentMessageAudioQueryResult = NonNullable<Awaited<ReturnType<typeof getStudentMessageAudio>>>
+export type GetStudentMessageAudioQueryError = ErrorType<unknown>
+
+
+
+export function useGetStudentMessageAudio<TData = Awaited<ReturnType<typeof getStudentMessageAudio>>, TError = ErrorType<unknown>>(
+ id: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getStudentMessageAudio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetStudentMessageAudioQueryOptions(id,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
 

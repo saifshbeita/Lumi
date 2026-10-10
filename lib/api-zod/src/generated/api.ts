@@ -298,3 +298,22 @@ export const SendStudentMessageResponse = zod.object({
 })
 
 
+export const TranscribeStudentVoiceBody = zod.object({
+  "audio": zod.instanceof(Blob)
+})
+
+export const TranscribeStudentVoiceResponse = zod.object({
+  "text": zod.string()
+})
+
+
+
+
+
+export const GetStudentMessageAudioParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const GetStudentMessageAudioResponse = zod.unknown()
+
+

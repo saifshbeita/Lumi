@@ -4,6 +4,14 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+export interface VoiceRecording {
+  audio: Blob;
+}
+
+export interface VoiceTranscript {
+  text: string;
+}
+
 export interface HealthStatus {
   status: string;
 }

@@ -203,8 +203,46 @@ paths:
           content:
             application/json:
               schema: { $ref: "#/components/schemas/ChatExchange" }
+  /student/voice/transcribe:
+    post:
+      operationId: transcribeStudentVoice
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { $ref: "#/components/schemas/VoiceRecording" }
+      responses:
+        "200":
+          description: Arabic transcription
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/VoiceTranscript" }
+  /student/messages/{id}/audio:
+    get:
+      operationId: getStudentMessageAudio
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema: { type: integer, minimum: 1 }
+      responses:
+        "200":
+          description: Private cached speech
+          content:
+            audio/mpeg:
+              schema: { type: string, format: binary }
 components:
   schemas:
+    VoiceRecording:
+      type: object
+      required: [audio]
+      properties:
+        audio: { type: string, format: binary }
+    VoiceTranscript:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string }
     HealthStatus:
       type: object
       required: [status]

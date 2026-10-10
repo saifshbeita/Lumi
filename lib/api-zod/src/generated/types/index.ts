@@ -30,3 +30,5 @@ export * from './studentProfile';
 export * from './studentSession';
 export * from './studentUpdate';
 export * from './success';
+export * from './voiceRecording';
+export * from './voiceTranscript';

@@ -1,3 +1,4 @@
 - [Lumi boundaries](lumi-scope.md) — adult-led, non-diagnostic learning support; real voice is requested for dyslexia mode only.
 - [Workspace runtime](workspace-runtime.md) — generated Headers APIs need DOM.Iterable; development seeds need a TypeScript-aware runtime.
+- [Voice provider boundary](voice-provider.md) — direct OpenAI speech is separate from managed text chat because the managed speech endpoint was unsupported.
 - [Dependency remediation](dependency-remediation.md) — preserve the preview glob replacement and targeted typography parser override when updating dependencies.
