@@ -1,36 +1,271 @@
 openapi: 3.1.0
 info:
-  # Do not change the title, if the title changes, the import paths will be broken
   title: Api
   version: 0.1.0
-  description: API specification
 servers:
   - url: /api
-    description: Base API path
-tags:
-  - name: health
-    description: Health operations
 paths:
   /healthz:
     get:
       operationId: healthCheck
-      tags: [health]
-      summary: Health check
-      description: Returns server health status
       responses:
         "200":
           description: Healthy
           content:
             application/json:
+              schema: { $ref: "#/components/schemas/HealthStatus" }
+  /adult/session:
+    get:
+      operationId: getAdultSession
+      responses:
+        "200":
+          description: Adult session
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdultSession" }
+  /adult/signup:
+    post:
+      operationId: signupAdult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdultSignup" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Adult" }
+  /adult/login:
+    post:
+      operationId: loginAdult
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AdultLogin" }
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Adult" }
+  /adult/logout:
+    post:
+      operationId: logoutAdult
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Success" }
+  /students:
+    get:
+      operationId: listStudents
+      responses:
+        "200":
+          description: Owned students
+          content:
+            application/json:
               schema:
-                $ref: "#/components/schemas/HealthStatus"
+                type: array
+                items: { $ref: "#/components/schemas/Student" }
+    post:
+      operationId: createStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StudentInput" }
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Student" }
+  /students/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema: { type: integer }
+    get:
+      operationId: getStudent
+      responses:
+        "200":
+          description: Profile
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StudentProfile" }
+    patch:
+      operationId: updateStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StudentUpdate" }
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Student" }
+  /student/login:
+    post:
+      operationId: loginStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StudentLogin" }
+      responses:
+        "200":
+          description: Logged in
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Student" }
+  /student/session:
+    get:
+      operationId: getStudentSession
+      responses:
+        "200":
+          description: Student session
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StudentSession" }
+  /student/logout:
+    post:
+      operationId: logoutStudent
+      responses:
+        "200":
+          description: Logged out
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Success" }
+  /student/modes/{mode}:
+    get:
+      operationId: getStudentMode
+      parameters:
+        - name: mode
+          in: path
+          required: true
+          schema: { $ref: "#/components/schemas/Mode" }
+      responses:
+        "200":
+          description: Authorized mode home
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StudentProfile" }
 components:
   schemas:
     HealthStatus:
       type: object
+      required: [status]
       properties:
-        status:
-          type: string
-      required:
-        - status
-
+        status: { type: string }
+    Success:
+      type: object
+      required: [success]
+      properties:
+        success: { type: boolean }
+    Mode:
+      type: string
+      enum: [dyslexia, learning, autism]
+    Adult:
+      type: object
+      required: [id, name, email, role, school]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        email: { type: string }
+        role: { type: string, enum: [teacher, parent] }
+        school: { type: [string, "null"] }
+    AdultSession:
+      type: object
+      required: [adult]
+      properties:
+        adult:
+          anyOf:
+            - { $ref: "#/components/schemas/Adult" }
+            - { type: "null" }
+    AdultLogin:
+      type: object
+      required: [email, password, role]
+      properties:
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 72 }
+        role: { type: string, enum: [teacher, parent] }
+    AdultSignup:
+      type: object
+      required: [name, email, password, role]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        email: { type: string, format: email }
+        password: { type: string, minLength: 8, maxLength: 72 }
+        role: { type: string, enum: [teacher, parent] }
+        school: { type: string, maxLength: 200 }
+    Student:
+      type: object
+      required: [id, name, username, conditions, assessmentConfirmed]
+      properties:
+        id: { type: integer }
+        name: { type: string }
+        username: { type: string }
+        conditions:
+          type: array
+          items: { $ref: "#/components/schemas/Mode" }
+        assessmentConfirmed: { type: boolean }
+    StudentInput:
+      type: object
+      required: [name, username, pin, mode]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 100 }
+        username: { type: string, minLength: 3, maxLength: 40, pattern: "^[a-zA-Z0-9_]+$" }
+        pin: { type: string, pattern: "^[0-9]{4}$" }
+        mode: { $ref: "#/components/schemas/Mode" }
+        assessmentConfirmed: { type: boolean }
+    StudentUpdate:
+      type: object
+      required: [mode]
+      properties:
+        mode: { $ref: "#/components/schemas/Mode" }
+    StudentLogin:
+      type: object
+      required: [username, pin]
+      properties:
+        username: { type: string, minLength: 1, maxLength: 40 }
+        pin: { type: string, pattern: "^[0-9]{4}$" }
+    StudentSession:
+      type: object
+      required: [student]
+      properties:
+        student:
+          anyOf:
+            - { $ref: "#/components/schemas/Student" }
+            - { type: "null" }
+    Insight:
+      type: object
+      required: [id, type, text]
+      properties:
+        id: { type: integer }
+        type: { type: string, enum: [strength, weakness, need] }
+        text: { type: string }
+    Chat:
+      type: object
+      required: [id, title, createdAt]
+      properties:
+        id: { type: integer }
+        title: { type: string }
+        createdAt: { type: string }
+    StudentProfile:
+      type: object
+      required: [student, insights, chats]
+      properties:
+        student: { $ref: "#/components/schemas/Student" }
+        insights:
+          type: array
+          items: { $ref: "#/components/schemas/Insight" }
+        chats:
+          type: array
+          items: { $ref: "#/components/schemas/Chat" }

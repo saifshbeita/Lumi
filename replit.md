@@ -1,6 +1,6 @@
-# [Project name]
+# Lumi
 
-_Replace the heading above with the project's name, and this line with one sentence describing what this app does for users._
+An adult-guided learning companion for children with learning differences. Lumi never diagnoses.
 
 ## Run & Operate
 
@@ -9,7 +9,10 @@ _Replace the heading above with the project's name, and this line with one sente
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
+- `pnpm --filter @workspace/api-server run seed` — development-only demo accounts; details in DEMO.md
+- `pnpm --filter @workspace/lumi run dev` — frontend, through its managed workflow
 - Required env: `DATABASE_URL` — Postgres connection string
+- Required secret: `SESSION_SECRET`
 
 ## Stack
 
@@ -17,16 +20,19 @@ _Replace the heading above with the project's name, and this line with one sente
 - API: Express 5
 - DB: PostgreSQL + Drizzle ORM
 - Validation: Zod (`zod/v4`), `drizzle-zod`
+- Auth: explicitly requested express-session and bcrypt; separate PostgreSQL-backed adult/student cookies
 - API codegen: Orval (from OpenAPI spec)
 - Build: esbuild (CJS bundle)
 
 ## Where things live
 
-_Populate as you build — short repo map plus pointers to the source-of-truth file for DB schema, API contracts, theme files, etc._
+Frontend: artifacts/lumi/src. Backend: artifacts/api-server/src/routes. Database: lib/db/src/schema. Contract: lib/api-spec/openapi.yaml. Shared visual tokens and Tailwind configuration: artifacts/lumi/src/index.css.
 
 ## Architecture decisions
 
-_Populate as you build — non-obvious choices a reader couldn't infer from the code (3-5 bullets)._
+- Preserve pnpm artifact package structure rather than introducing parallel client/server roots.
+- No diagnostic logic or live AI/chat in this phase.
+- A student's current database assignment is authoritative, including after an adult changes it.
 
 ## Product
 

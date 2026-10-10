@@ -1,0 +1,57 @@
+Build "Lumi", a responsive website. Tagline: "Every mind learns differently".
+Lumi is an AI learning assistant for kids with learning differences (dyslexia, learning difficulties, autism). A teacher or parent creates the child's account and assigns their mode. Lumi never diagnoses.
+
+STACK (do not change): React + Vite + TypeScript + Tailwind, Express backend, Replit PostgreSQL with Drizzle ORM, Zod validation, express-session + bcrypt. One app.
+
+BUILD NOW: design system, entry screen, auth, database, adult dashboard. Do NOT build the chat or the student modes yet (placeholders only).
+
+DESIGN SYSTEM (all tokens in one shared file + Tailwind config):
+- Background #FAF9F4. Cards #FFFFFF with 1px border #E5EEF5. Soft sections #E5EEF5.
+- Text and headings #2D4059. Hero and selected states: #2D4059 with white text.
+- Primary button #F3D982 with #2D4059 text. Secondary/icons #7898B5 (never for text).
+- Success #8DBF9B. Try again #E8A598. No red anywhere.
+- Never white text on yellow. Never white text on #7898B5.
+- Google Fonts: Fraunces 600 for headings only, Readex Pro 400 for everything else.
+- Body min 18px, line-height 1.6. No italics, no justified text.
+- Card radius 24px, pill buttons, min height 56px, padding 24px.
+- Flat: borders, NO shadows. No animations.
+- Mascot images are in /client/public/brand/. Use them, do not draw a new mascot.
+
+ENTRY SCREEN ("/"):
+- Logo, tagline, mascot.
+- Two big cards: "I'm a teacher" and "I'm a parent". Each goes to /auth?role=teacher or /auth?role=parent.
+- Below them, a clear "Student login" button (not small, not hidden) going to /student/login.
+
+ADULT AUTH (/auth):
+- Login and sign up tabs. Role comes from the entry screen choice.
+- Sign up: name, email, password. Teachers also get a "School" field. Parents do not.
+- Email + password, bcrypt hash, session cookie.
+
+DATABASE (shared/schema.ts):
+- adults: id, name, email (unique), password_hash, role ('teacher' | 'parent'), school (nullable), created_at
+- students: id, adult_id, name, username (unique), pin_hash, conditions (text array, values 'dyslexia' | 'learning' | 'autism', single select for now), assessment_confirmed (boolean), created_at
+- chats: id, student_id, title, created_at
+- messages: id, chat_id, role ('student' | 'ai'), content, audio_url (nullable), created_at
+- profile_insights: id, student_id, type ('strength' | 'weakness' | 'need'), text, updated_at
+
+ADULT DASHBOARD (one dashboard for both roles, role only changes labels):
+- List page: title "My students" for teachers, "My children" for parents. Cards with name, username, mode.
+- Add student/child form: name, username, 4-digit PIN, mode (single select). For parents only, a required checkbox: "My child has an assessment from a specialist." No checkbox, no account. Hash the PIN.
+- Profile page: name, mode (editable, changing it changes the kid's interface), three sections Strengths / Weaknesses / Needs from profile_insights (empty states for now), list of chats (empty for now).
+- Adults can only see their own students.
+
+STUDENT LOGIN (/student/login):
+- Big friendly screen: username + 4-digit PIN (large number pad, tap targets 56px+). Separate student session.
+- After login, route by conditions[0] to /student/dyslexia, /student/learning or /student/autism.
+- A student can NEVER open another mode's routes. Guard on both frontend and backend.
+- Student UI is Arabic with dir="rtl".
+- Each mode route shows a placeholder home: mascot, "Ask Lumi" button (does nothing yet), empty chat list.
+
+FOLDERS:
+- client/src/pages/adult/
+- client/src/pages/student/dyslexia/, /learning/, /autism/
+- server/routes/
+
+Seed script: 1 teacher, 1 parent, and 3 students (one per mode) with known usernames and PINs, so we can demo all three modes fast.
+
+Mobile-first for student pages, desktop-first for adult pages. Accessible labels and visible focus states.

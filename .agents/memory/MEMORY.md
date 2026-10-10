@@ -1,0 +1,2 @@
+- [Lumi boundaries](lumi-scope.md) — adult-led, non-diagnostic learning support; preserve assessment, accessibility and placeholder scope.
+- [Workspace runtime](workspace-runtime.md) — generated Headers APIs need DOM.Iterable; development seeds need a TypeScript-aware runtime.

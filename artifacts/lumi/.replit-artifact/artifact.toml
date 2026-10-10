@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Lumi"
+description = "An accessible learning companion for children with learning differences, with teacher and parent dashboards and Arabic student entry."
+version = "1.0.0"
+id = "artifacts/lumi"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 20607
+
+[services.development]
+run = "pnpm --filter @workspace/lumi run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lumi", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/lumi/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "20607"
+BASE_PATH = "/"

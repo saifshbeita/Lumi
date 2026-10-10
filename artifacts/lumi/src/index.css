@@ -1,0 +1,35 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Readex+Pro:wght@400&display=swap');
+@import 'tailwindcss';
+
+/* Shared design tokens and Tailwind v4 configuration: one source of truth. */
+@theme inline {
+  --color-background: #faf9f4;
+  --color-foreground: #2d4059;
+  --color-border: #e5eef5;
+  --color-card: #ffffff;
+  --color-cream: #faf9f4;
+  --color-navy: #2d4059;
+  --color-mist: #e5eef5;
+  --color-sun: #f3d982;
+  --color-steel: #7898b5;
+  --color-sage: #8dbf9b;
+  --color-blush: #e8a598;
+  --font-sans: 'Readex Pro', system-ui, sans-serif;
+  --font-heading: 'Fraunces', 'Readex Pro', serif;
+  --radius-card: 24px;
+  --radius-3xl: 24px;
+  --text-body: 18px;
+  --leading-body: 1.6;
+  --spacing-target: 56px;
+  --spacing-card: 24px;
+}
+
+@layer base {
+  * { border-color: var(--color-border); box-shadow: none !important; animation: none !important; transition: none !important; font-style: normal; }
+  html { font-size: var(--text-body); }
+  body { font-family: var(--font-sans); font-weight: 400; font-size: 1rem; line-height: var(--leading-body); background: var(--color-background); color: var(--color-foreground); text-align: start; }
+  h1, h2, h3 { font-family: var(--font-heading); font-weight: 600; line-height: 1.2; color: var(--color-navy); }
+  button, input, select, textarea { font: inherit; font-weight: 400; }
+  :focus-visible { outline: 4px solid var(--color-navy); outline-offset: 3px; }
+  ::placeholder { color: var(--color-navy); opacity: 0.6; }
+}
