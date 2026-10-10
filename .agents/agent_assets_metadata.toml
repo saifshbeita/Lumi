@@ -42,3 +42,17 @@ mtime_ms = 1791638198013
 storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/eda1da14-f802-49c9-ab4c-1001143e26c1/5a45e595-0ba6-4111-a8c6-b8fd95ae55aa"
 storage_version_token = "1791641834748754"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "-ZJQ9qPhozYwcunaTWP2X"
+uri = "file://generated-artifacts/reports/lumi-full-report-2026-10-10.md"
+type = "text"
+title = "Lumi — Full Product and Project Report"
+description = "A 19-section report covering Lumi’s purpose, users, learning modes, bilingual experience, AI and voice, evidence-based insights, architecture, security, testing, release status, limitations, and next steps."
+logical_id = "2677e303-ddad-4b85-9d7e-45cffc8e0753"
+content_hash = "sha256:1fc2bfe96d19e4d420e07d08bc7cab084e4e15cc3367227b28cfe244bffa3eb3"
+size = 21653
+mtime_ms = 1791643633755
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/2677e303-ddad-4b85-9d7e-45cffc8e0753/d326b0d7-c2d5-4ae5-abc5-1776fda4a2d1"
+storage_version_token = "1791643660949223"
+content_type = "text/markdown"
