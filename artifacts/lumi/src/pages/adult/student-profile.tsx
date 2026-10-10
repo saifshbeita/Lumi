@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'wouter';
 import { useQueryClient } from '@tanstack/react-query';
 import { ArrowLeft, MessageCircle, RefreshCw, ChevronRight } from 'lucide-react';
 import { useGetStudent, useUpdateStudent, useRefreshStudentInsights, getGetStudentQueryKey, getListStudentsQueryKey } from '@workspace/api-client-react';
 import { AdultShell } from './adult-shell';
+import { InterestsInput } from '@/components/interests-input';
 import { Button, Card, ErrorBox, SkeletonBlock, cx } from '@/components/lumi';
 import { MODES, modeLabel, type Mode } from '@/lib/tokens';
 import { errMsg } from '@/lib/util';
@@ -27,6 +28,29 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
   const [mode, setMode] = useState<Mode | null>(null);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   useEffect(() => { if (current) setMode(current); }, [current]);
+  // Interests: init once per student; polling never overwrites local edits.
+  const [interests, setInterests] = useState<string[]>([]);
+  const [savedInterests, setSavedInterests] = useState<string[]>([]);
+  const [iMsg, setIMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  const initFor = useRef<number | null>(null);
+  const serverInterests = data?.student.interests;
+  useEffect(() => {
+    if (serverInterests && initFor.current !== id) { initFor.current = id; setInterests(serverInterests); setSavedInterests(serverInterests); }
+  }, [serverInterests, id]);
+  const interestsDirty = JSON.stringify(interests) !== JSON.stringify(savedInterests);
+  const saveInterests = () => {
+    setIMsg(null);
+    const sent = [...interests];
+    update.mutate({ id, data: { interests: sent } }, {
+      onSuccess: (s) => {
+        setSavedInterests(sent);
+        qc.setQueryData(getGetStudentQueryKey(id), (old: typeof data) => (old ? { ...old, student: { ...old.student, interests: s?.interests ?? sent } } : old));
+        qc.invalidateQueries({ queryKey: getListStudentsQueryKey() });
+        setIMsg({ ok: true, text: sent.length ? 'Interests saved.' : 'Interests cleared.' });
+      },
+      onError: (e) => setIMsg({ ok: false, text: errMsg(e, 'We could not save interests. Your edits are kept.') }),
+    });
+  };
   const back = <Link href="/adult" data-testid="link-back" className="inline-flex items-center gap-2 min-h-14 mb-4 rounded-full pe-4"><ArrowLeft size={22} className="text-steel" aria-hidden />{parent ? 'My children' : 'My students'}</Link>;
 
   if (isLoading) return <div role="status" aria-label="Loading" className="flex flex-col gap-6">{back}<SkeletonBlock className="h-40" /><SkeletonBlock className="h-64" /></div>;
@@ -83,6 +107,16 @@ function Profile({ id, parent }: { id: number; parent: boolean }) {
             {msg && (msg.ok ? <p role="status" className="bg-sage rounded-2xl px-5 py-3 border border-navy" data-testid="text-saved">{msg.text}</p> : <ErrorBox>{msg.text}</ErrorBox>)}
           </div>
         </fieldset>
+      </Card>
+      <Card className="!p-8 mb-8 bg-mist" data-testid="section-interests">
+        <h2 className="text-2xl mb-1">Interests</h2>
+        <p className="mb-4">Lumi uses these for examples. Optional.</p>
+        <InterestsInput id="edit-interests" label="Interests" value={interests} onChange={(v) => { setInterests(v); setIMsg(null); }} disabled={update.isPending} />
+        <div className="mt-5 flex items-center gap-4 flex-wrap">
+          <Button onClick={saveInterests} disabled={update.isPending || !interestsDirty} data-testid="button-save-interests">{update.isPending ? 'Saving...' : 'Save interests'}</Button>
+          {interestsDirty && <Button variant="secondary" onClick={() => { setInterests(savedInterests); setIMsg(null); }} data-testid="button-reset-interests">Undo changes</Button>}
+          {iMsg && (iMsg.ok ? <p role="status" className="bg-sage rounded-2xl px-5 py-3 border border-navy" data-testid="text-interests-saved">{iMsg.text}</p> : <ErrorBox>{iMsg.text}</ErrorBox>)}
+        </div>
       </Card>
       <div className="flex items-center justify-between gap-4 flex-wrap mb-4">
         <p data-testid="text-insights-updated">{insightsUpdatedAt ? `Updated ${relativeTime(insightsUpdatedAt, now)}` : 'Not updated yet'}</p>

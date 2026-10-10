@@ -41,7 +41,12 @@ app.use("/api", (req, res, next) => {
 });
 app.use("/api/adult", adultSession);
 app.use("/api/students", adultSession);
-app.use("/api/student", studentSession);
+app.use("/api/student", (req, res, next) => {
+  // The demo reuses only the transcription route with the existing adult cookie.
+  // Every other student request continues to use the unchanged student session.
+  const demoTranscription = req.method === "POST" && req.path === "/voice/transcribe" && req.get("X-Lumi-Demo") === "1";
+  return (demoTranscription ? adultSession : studentSession)(req, res, next);
+});
 
 app.use("/api", router);
 const errorHandler: ErrorRequestHandler = (err, req, res, _next) => {

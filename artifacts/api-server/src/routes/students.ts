@@ -21,7 +21,7 @@ router.post("/", async (req, res): Promise<void> => {
   if (!adult) { res.status(401).json({ error: "Please log in again." }); return; }
   if (adult.role === "parent" && parsed.data.assessmentConfirmed !== true) { res.status(400).json({ error: "Please confirm your child has an assessment from a specialist." }); return; }
   const data = parsed.data;
-  const [student] = await db.insert(students).values({ adultId: adult.id, name: data.name.trim(), username: data.username.toLowerCase(), pinHash: await bcrypt.hash(data.pin, 12), conditions: [data.mode], assessmentConfirmed: data.assessmentConfirmed ?? false }).onConflictDoNothing().returning();
+  const [student] = await db.insert(students).values({ adultId: adult.id, name: data.name.trim(), username: data.username.toLowerCase(), pinHash: await bcrypt.hash(data.pin, 12), conditions: [data.mode], interests: [...new Set((data.interests ?? []).map(s => s.trim()))], assessmentConfirmed: data.assessmentConfirmed ?? false }).onConflictDoNothing().returning();
   if (!student) { res.status(409).json({ error: "That username is already taken. Please choose another." }); return; }
   res.status(201).json(CreateStudentResponse.parse(publicStudent(student)));
 });
@@ -48,8 +48,11 @@ router.get("/:id/chats/:chatId", async (req, res): Promise<void> => {
 router.patch("/:id", async (req, res): Promise<void> => {
   const params = UpdateStudentParams.safeParse(req.params);
   const body = UpdateStudentBody.safeParse(req.body);
-  if (!params.success || !body.success) { res.status(400).json({ error: "Please select a valid learning mode." }); return; }
-  const [student] = await db.update(students).set({ conditions: [body.data.mode] }).where(and(eq(students.id, params.data.id), eq(students.adultId, req.session.adultId!))).returning();
+  if (!params.success || !body.success || (body.data.mode === undefined && body.data.interests === undefined)) { res.status(400).json({ error: "Please select a valid mode or up to five interests." }); return; }
+  const [student] = await db.update(students).set({
+    ...(body.data.mode ? { conditions: [body.data.mode] } : {}),
+    ...(body.data.interests !== undefined ? { interests: [...new Set(body.data.interests.map(s => s.trim()))] } : {}),
+  }).where(and(eq(students.id, params.data.id), eq(students.adultId, req.session.adultId!))).returning();
   if (!student) { res.status(404).json({ error: "Profile not found." }); return; }
   res.json(UpdateStudentResponse.parse(publicStudent(student)));
 });

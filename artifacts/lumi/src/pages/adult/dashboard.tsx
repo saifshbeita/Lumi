@@ -4,6 +4,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { Plus, ChevronRight, UserRound } from 'lucide-react';
 import { useListStudents, useCreateStudent, getListStudentsQueryKey } from '@workspace/api-client-react';
 import { AdultShell } from './adult-shell';
+import { InterestsInput } from '@/components/interests-input';
 import { Button, Card, ErrorBox, Field, SkeletonBlock, cx } from '@/components/lumi';
 import { MODES, modeLabel, type Mode } from '@/lib/tokens';
 import { errMsg } from '@/lib/util';
@@ -13,6 +14,7 @@ function AddStudent({ parent, noun, onClose }: { parent: boolean; noun: string; 
   const create = useCreateStudent();
   const [f, setF] = useState({ name: '', username: '', pin: '' });
   const [mode, setMode] = useState<Mode>('dyslexia');
+  const [interests, setInterests] = useState<string[]>([]);
   const [assessed, setAssessed] = useState(false);
   const [error, setError] = useState('');
   const submit = (e: FormEvent) => {
@@ -21,7 +23,7 @@ function AddStudent({ parent, noun, onClose }: { parent: boolean; noun: string; 
     if (!/^[a-zA-Z0-9_]{3,40}$/.test(f.username)) return setError('Username: 3 to 40 letters, numbers or underscores.');
     if (!/^[0-9]{4}$/.test(f.pin)) return setError('The PIN must be exactly 4 digits.');
     if (parent && !assessed) return setError('Please confirm the assessment checkbox. Without it we cannot create the account.');
-    create.mutate({ data: { name: f.name.trim(), username: f.username, pin: f.pin, mode, ...(parent ? { assessmentConfirmed: true } : {}) } }, {
+    create.mutate({ data: { name: f.name.trim(), username: f.username, pin: f.pin, mode, ...(interests.length ? { interests } : {}), ...(parent ? { assessmentConfirmed: true } : {}) } }, {
       onSuccess: () => { qc.invalidateQueries({ queryKey: getListStudentsQueryKey() }); onClose(); },
       onError: (er) => setError(errMsg(er, 'We could not add this account. The username may already be taken.')),
     });
@@ -35,6 +37,7 @@ function AddStudent({ parent, noun, onClose }: { parent: boolean; noun: string; 
           <Field id="s-user" label="Username" required autoCapitalize="none" autoComplete="off" hint="Letters, numbers, underscore." value={f.username} onChange={(e) => setF({ ...f, username: e.target.value })} data-testid="input-student-username" />
           <Field id="s-pin" label="4-digit PIN" required inputMode="numeric" pattern="[0-9]{4}" maxLength={4} autoComplete="off" type="password" value={f.pin} onChange={(e) => setF({ ...f, pin: e.target.value.replace(/\D/g, '') })} data-testid="input-student-pin" />
         </div>
+        <InterestsInput id="s-interests" value={interests} onChange={setInterests} />
         <fieldset>
           <legend className="mb-2">Mode</legend>
           <div className="flex flex-wrap gap-3" role="radiogroup">
@@ -109,5 +112,5 @@ function List({ parent }: { parent: boolean }) {
 }
 
 export default function Dashboard() {
-  return <AdultShell>{(a) => <List parent={a.role === 'parent'} />}</AdultShell>;
+  return <AdultShell showDemoLink>{(a) => <List parent={a.role === 'parent'} />}</AdultShell>;
 }

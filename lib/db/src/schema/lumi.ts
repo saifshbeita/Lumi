@@ -18,6 +18,7 @@ export const students = pgTable("students", {
   username: text("username").notNull().unique(),
   pinHash: text("pin_hash").notNull(),
   conditions: text("conditions").array().notNull(),
+  interests: text("interests").array().notNull().default(sql`ARRAY[]::text[]`),
   assessmentConfirmed: boolean("assessment_confirmed").notNull().default(false),
   insightsUpdatedAt: timestamp("insights_updated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),

@@ -89,7 +89,7 @@ router.post("/:id/messages", limiter, async (req, res): Promise<void> => {
     if (!studentMessage) throw new Error("Student message was not saved");
     savedId = studentMessage.id;
     const contextRows = await lockedDb.select({ role: messages.role, content: messages.content }).from(messages).where(eq(messages.chatId, chatId)).orderBy(desc(messages.id)).limit(20);
-    const answer = await generateStudentReply(mode as StudentMode, contextRows.reverse());
+    const answer = await generateStudentReply(mode as StudentMode, contextRows.reverse(), current.interests);
     // A mode reassignment during generation must not return the old mode's reply.
     const [fresh] = await lockedDb.select().from(students).where(eq(students.id, student.id));
     if (!fresh || fresh.conditions[0] !== mode) { res.status(409).json({ error: "تم تحديث مساحة التعلم. افتحها من جديد ثم أعد المحاولة.", studentMessageId: savedId }); return; }

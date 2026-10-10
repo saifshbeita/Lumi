@@ -16,11 +16,12 @@ async function seed() {
   const [parent] = await db.select().from(adults).where(eq(adults.email, "parent@lumi.demo"));
   if (!teacher || !parent) throw new Error("Demo adult accounts are missing.");
   for (const student of [
-    { name: "آدم", username: "adam", pin: "1234", mode: "dyslexia", adultId: teacher.id },
-    { name: "ليان", username: "layan", pin: "2345", mode: "learning", adultId: teacher.id },
-    { name: "عمر", username: "omar", pin: "3456", mode: "autism", adultId: parent.id },
+    { name: "آدم", username: "adam", pin: "1234", mode: "dyslexia", adultId: teacher.id, interests: ["cars", "dinosaurs", "football"] },
+    { name: "ليان", username: "layan", pin: "2345", mode: "learning", adultId: teacher.id, interests: ["drawing", "cats", "football"] },
+    { name: "عمر", username: "omar", pin: "3456", mode: "autism", adultId: parent.id, interests: ["cars", "trains", "dinosaurs"] },
   ]) {
-    await db.insert(students).values({ name: student.name, username: student.username, pinHash: await bcrypt.hash(student.pin, 12), conditions: [student.mode], adultId: student.adultId, assessmentConfirmed: true }).onConflictDoNothing();
+    await db.insert(students).values({ name: student.name, username: student.username, pinHash: await bcrypt.hash(student.pin, 12), conditions: [student.mode], interests: student.interests, adultId: student.adultId, assessmentConfirmed: true }).onConflictDoNothing();
+    await db.update(students).set({ interests: student.interests }).where(eq(students.username, student.username));
   }
   logger.info("Demo accounts seeded. See DEMO.md for development-only login details.");
 }

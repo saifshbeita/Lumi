@@ -1,0 +1,29 @@
+Next step: two pitch features. Do NOT change auth, voice internals, insights logic, or the design system.
+
+PART 1: CHILD INTERESTS
+- Schema: students.interests (text array, default empty). Push with Drizzle.
+- Adult add/edit student form: an "Interests" chips input (max 5, e.g. cars, dinosaurs, football, drawing). Optional field.
+- Base system prompt: if the child has interests, use them for examples when helpful.
+- Autism prompt: always ground examples in the child's interests when they exist. Keep examples literal and concrete.
+- Update the seeded students with 2 to 3 interests each.
+
+PART 2: SIDE-BY-SIDE DEMO PAGE (/demo)
+Purpose: on a projector, show judges the same question answered in all three modes at once.
+- Adult session required. Link it from the adult dashboard header as "Live demo".
+- One input bar at the top: Arabic text input + the same mic button used in dyslexia mode (reuse the transcription endpoint, allow adults on it for this page only). Optional interests field.
+- 3 preset question chips: "شو الفرق بين ب و ت؟", "كيف بنجمع ٧ + ٥؟", "ليش السما لونها أزرق؟"
+- Endpoint POST /api/adult/demo/compare { question, interests? }: runs the three real mode prompts in parallel with the same question. Do not save anything to any student, chat, or insight.
+- Three equal columns, each with a header: "Dyslexia: voice-first", "Learning difficulties: small steps", "Autism: calm and literal".
+- Each column renders the reply with the REAL student mode components and styles, not a mockup:
+  - Dyslexia: large spaced text, reply plays aloud automatically (generate TTS on the fly, do not cache), speaker button to replay.
+  - Learning: steps one at a time with the "التالي" button and progress dots.
+  - Autism: the static schedule, no animations, literal reply.
+- Each column shows its own loading state and fails independently (one failing column never breaks the others).
+- Must look clean at 1920x1080 and 1366x768 with no scrolling for typical replies. Large enough to read from the back of a room.
+
+DONE WHEN:
+- Each preset question returns three clearly different replies in under 10 seconds total.
+- The autism reply uses the given interests in its example.
+- The interests field saves and edits correctly for both teacher and parent accounts.
+- Nothing from /demo appears in any student's chats or insights.
+- Show me screenshots of /demo at 1920px and 1366px after running "ليش السما لونها أزرق؟".

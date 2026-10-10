@@ -16,6 +16,15 @@ const authorize: RequestHandler = async (req, res, next) => {
   next();
 };
 const limit = rateLimit({ windowMs: 60000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "انتظر قليلاً ثم حاول مرة أخرى." } });
+// Explicit adult-demo scope only; student recording and playback guards are unchanged.
+const authorizeTranscription: RequestHandler = (req, res, next) => {
+  if (req.get("X-Lumi-Demo") === "1" && req.session.adultId) {
+    res.locals.adultDemo = true;
+    next();
+    return;
+  }
+  return authorize(req, res, next);
+};
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024, files: 1, fields: 0, parts: 2 },
@@ -24,7 +33,7 @@ const upload = multer({
     done(null, true);
   },
 }).single("audio");
-router.post("/voice/transcribe", authorize, limit, (req, res) => {
+router.post("/voice/transcribe", authorizeTranscription, limit, (req, res) => {
   upload(req, res, async error => {
     if (error) {
       res.status(error instanceof multer.MulterError && error.code === "LIMIT_FILE_SIZE" ? 413 : 400).json({ error: error instanceof InvalidAudio ? error.message : "التسجيل كبير أو غير صالح. الحد الأقصى ٥ ميغابايت." }); return;
@@ -36,8 +45,10 @@ router.post("/voice/transcribe", authorize, limit, (req, res) => {
         model: "gpt-4o-mini-transcribe", language: "ar", response_format: "json",
         file: await toFile(audio, "question.wav", { type: "audio/wav" }),
       });
-      const fresh = await currentStudent(req.session.studentId);
-      if (fresh?.conditions[0] !== "dyslexia") { res.status(403).json({ error: "تم تحديث حسابك. افتح مساحة التعلم من جديد." }); return; }
+      if (!res.locals.adultDemo) {
+        const fresh = await currentStudent(req.session.studentId);
+        if (fresh?.conditions[0] !== "dyslexia") { res.status(403).json({ error: "تم تحديث حسابك. افتح مساحة التعلم من جديد." }); return; }
+      }
       const text = result.text.trim();
       if (!text || text.length > 2000) { res.status(422).json({ error: "لم أسمع سؤالاً واضحاً. حاول مرة أخرى أو اكتب سؤالك." }); return; }
       res.json({ text });

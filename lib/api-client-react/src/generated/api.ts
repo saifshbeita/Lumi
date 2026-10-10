@@ -25,6 +25,8 @@ import type {
   AdultSignup,
   ChatExchange,
   ChatHistory,
+  DemoQuestion,
+  DemoSpeech,
   HealthStatus,
   MessageInput,
   Mode,
@@ -66,6 +68,170 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   }
   return result;
 };
+
+export const getCompareDemoModesUrl = () => {
+
+
+
+
+  return `/api/adult/demo/compare`
+}
+
+export const compareDemoModes = async (demoQuestion: DemoQuestion, options?: Parameters<typeof customFetch>[1]): Promise<Response> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Response>(getCompareDemoModesUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(demoQuestion)
+  }
+);}
+
+
+
+
+
+export const getCompareDemoModesMutationKey = () => ['compareDemoModes'] as const;
+
+export const getCompareDemoModesMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof compareDemoModes>>, TError,CompareDemoModesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof compareDemoModes>>, TError,CompareDemoModesMutationVariables, TContext> => {
+
+const mutationKey = getCompareDemoModesMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof compareDemoModes>>, CompareDemoModesMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  compareDemoModes(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type CompareDemoModesMutationResult = NonNullable<Awaited<ReturnType<typeof compareDemoModes>>>
+    export type CompareDemoModesMutationBody = BodyType<DemoQuestion>
+    export type CompareDemoModesMutationError = ErrorType<void>
+    export type CompareDemoModesMutationVariables = {data: BodyType<DemoQuestion>}
+
+    export const useCompareDemoModes = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof compareDemoModes>>, TError,CompareDemoModesMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof compareDemoModes>>,
+        TError,
+        CompareDemoModesMutationVariables,
+        TContext
+      > => {
+      return useMutation(getCompareDemoModesMutationOptions(options));
+    }
+
+export const getSpeakDemoReplyUrl = () => {
+
+
+
+
+  return `/api/adult/demo/audio`
+}
+
+export const speakDemoReply = async (demoSpeech: DemoSpeech, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+    const getHeaders = (h?: NonNullable<RequestInit['headers']>): Record<string, string | readonly string[]> => {
+    if (!h) return {};
+    if (h instanceof Headers) return Object.fromEntries(h.entries());
+    if (Symbol.iterator in h) {
+      return Object.fromEntries(
+        Array.from(h as Iterable<Iterable<string>>, (entry) => Array.from(entry) as [string, string]),
+      );
+    }
+    const headers: Record<string, string | readonly string[]> = {};
+    for (const [name, value] of Object.entries<string | readonly string[] | undefined>(h)) {
+      if (value !== undefined) headers[name] = value;
+    }
+    return headers;
+  };
+return customFetch<Blob>(getSpeakDemoReplyUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getHeaders(options?.headers) },
+    body: JSON.stringify(demoSpeech)
+  }
+);}
+
+
+
+
+
+export const getSpeakDemoReplyMutationKey = () => ['speakDemoReply'] as const;
+
+export const getSpeakDemoReplyMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speakDemoReply>>, TError,SpeakDemoReplyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof speakDemoReply>>, TError,SpeakDemoReplyMutationVariables, TContext> => {
+
+const mutationKey = getSpeakDemoReplyMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof speakDemoReply>>, SpeakDemoReplyMutationVariables> = (props) => {
+          const {data} = props ?? {};
+
+          return  speakDemoReply(data,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type SpeakDemoReplyMutationResult = NonNullable<Awaited<ReturnType<typeof speakDemoReply>>>
+    export type SpeakDemoReplyMutationBody = BodyType<DemoSpeech>
+    export type SpeakDemoReplyMutationError = ErrorType<void>
+    export type SpeakDemoReplyMutationVariables = {data: BodyType<DemoSpeech>}
+
+    export const useSpeakDemoReply = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof speakDemoReply>>, TError,SpeakDemoReplyMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof speakDemoReply>>,
+        TError,
+        SpeakDemoReplyMutationVariables,
+        TContext
+      > => {
+      return useMutation(getSpeakDemoReplyMutationOptions(options));
+    }
 
 export const getRefreshStudentInsightsUrl = (id: number,) => {
 

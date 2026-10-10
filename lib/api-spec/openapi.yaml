@@ -5,6 +5,36 @@ info:
 servers:
   - url: /api
 paths:
+  /adult/demo/compare:
+    post:
+      operationId: compareDemoModes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DemoQuestion" }
+      responses:
+        "200":
+          description: One newline-delimited JSON event per completed mode; each event is independent.
+          content:
+            application/x-ndjson:
+              schema: { type: string }
+        "403": { description: Adult session required }
+  /adult/demo/audio:
+    post:
+      operationId: speakDemoReply
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/DemoSpeech" }
+      responses:
+        "200":
+          description: Temporary speech; never persisted or cached
+          content:
+            audio/mpeg:
+              schema: { type: string, format: binary }
+        "403": { description: Adult session required }
   /adult/students/{id}/insights/refresh:
     post:
       operationId: refreshStudentInsights
@@ -244,6 +274,12 @@ paths:
               schema: { $ref: "#/components/schemas/ChatExchange" }
   /student/voice/transcribe:
     post:
+      parameters:
+        - name: X-Lumi-Demo
+          in: header
+          required: false
+          description: Set to 1 only for adult demo transcription; requires an adult session.
+          schema: { type: string, enum: ["1"] }
       operationId: transcribeStudentVoice
       requestBody:
         required: true
@@ -330,8 +366,9 @@ components:
         school: { type: string, maxLength: 200 }
     Student:
       type: object
-      required: [id, name, username, conditions, assessmentConfirmed]
+      required: [id, name, username, conditions, assessmentConfirmed, interests]
       properties:
+        interests: { $ref: "#/components/schemas/Interests" }
         id: { type: integer }
         name: { type: string }
         username: { type: string }
@@ -343,6 +380,7 @@ components:
       type: object
       required: [name, username, pin, mode]
       properties:
+        interests: { $ref: "#/components/schemas/Interests" }
         name: { type: string, minLength: 1, maxLength: 100 }
         username: { type: string, minLength: 3, maxLength: 40, pattern: "^[a-zA-Z0-9_]+$" }
         pin: { type: string, pattern: "^[0-9]{4}$" }
@@ -350,9 +388,34 @@ components:
         assessmentConfirmed: { type: boolean }
     StudentUpdate:
       type: object
-      required: [mode]
+      minProperties: 1
       properties:
         mode: { $ref: "#/components/schemas/Mode" }
+        interests: { $ref: "#/components/schemas/Interests" }
+    Interests:
+      type: array
+      maxItems: 5
+      uniqueItems: true
+      items: { type: string, minLength: 1, maxLength: 40, pattern: "\\S" }
+    DemoQuestion:
+      type: object
+      required: [question]
+      properties:
+        question: { type: string, minLength: 1, maxLength: 2000 }
+        interests: { $ref: "#/components/schemas/Interests" }
+    DemoSpeech:
+      type: object
+      required: [text]
+      properties:
+        text: { type: string, minLength: 1, maxLength: 800 }
+    DemoModeResult:
+      type: object
+      required: [mode, status]
+      properties:
+        mode: { $ref: "#/components/schemas/Mode" }
+        status: { type: string, enum: [success, error] }
+        content: { type: string }
+        error: { type: string }
     StudentLogin:
       type: object
       required: [username, pin]

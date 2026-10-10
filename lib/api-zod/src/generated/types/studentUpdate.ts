@@ -4,8 +4,10 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { Interests } from './interests';
 import type { Mode } from './mode';
 
 export interface StudentUpdate {
-  mode: Mode;
+  mode?: Mode;
+  interests?: Interests;
 }

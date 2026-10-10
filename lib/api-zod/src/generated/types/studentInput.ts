@@ -4,9 +4,11 @@
  * Api
  * OpenAPI spec version: 0.1.0
  */
+import type { Interests } from './interests';
 import type { Mode } from './mode';
 
 export interface StudentInput {
+  interests?: Interests;
   /**
      * @minLength 1
      * @maxLength 100

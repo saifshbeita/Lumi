@@ -93,7 +93,16 @@ export interface AdultSignup {
   school?: string;
 }
 
+/**
+ * @maxItems 5
+ * @items.minLength 1
+ * @items.maxLength 40
+ * @items.pattern \S
+ */
+export type Interests = string[];
+
 export interface Student {
+  interests: Interests;
   id: number;
   name: string;
   username: string;
@@ -102,6 +111,7 @@ export interface Student {
 }
 
 export interface StudentInput {
+  interests?: Interests;
   /**
      * @minLength 1
      * @maxLength 100
@@ -120,7 +130,40 @@ export interface StudentInput {
 }
 
 export interface StudentUpdate {
+  mode?: Mode;
+  interests?: Interests;
+}
+
+export interface DemoQuestion {
+  /**
+     * @minLength 1
+     * @maxLength 2000
+     */
+  question: string;
+  interests?: Interests;
+}
+
+export interface DemoSpeech {
+  /**
+     * @minLength 1
+     * @maxLength 800
+     */
+  text: string;
+}
+
+export type DemoModeResultStatus = typeof DemoModeResultStatus[keyof typeof DemoModeResultStatus];
+
+
+export const DemoModeResultStatus = {
+  success: 'success',
+  error: 'error',
+} as const;
+
+export interface DemoModeResult {
   mode: Mode;
+  status: DemoModeResultStatus;
+  content?: string;
+  error?: string;
 }
 
 export interface StudentLogin {

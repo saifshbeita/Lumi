@@ -22,3 +22,9 @@ Adult insights must stay observational: no diagnoses, condition labels, or guess
 **Why:** The user explicitly set these boundaries for making adult profiles reflect children's sessions.
 
 **How to apply:** Treat a student's assigned mode and Lumi's answers as context, not proof of the child's abilities. Keep evidence traceable to the child's actual messages.
+
+The pitch demo is an adult-only, temporary comparison of the real student modes, not a separate mockup. It must not save questions, replies, audio, or insights to student records. Interests are optional learning-example topics; autism examples must use them literally and concretely when supplied.
+
+**Why:** The user requested a projector demonstration without contaminating children's histories, and explicitly protected existing authentication, voice internals, insights logic, and design tokens.
+
+**How to apply:** Reuse the student presentation components and generation prompts. Scope demo-only recording access to the adult session; keep existing student voice authorization unchanged. Verify projector fit inside each column, not just absence of page scrolling.
