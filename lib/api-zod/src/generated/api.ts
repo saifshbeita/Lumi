@@ -7,6 +7,83 @@
 import * as zod from 'zod';
 
 
+
+
+
+export const RefreshStudentInsightsParams = zod.object({
+  "id": zod.coerce.number().int().min(1)
+})
+
+export const RefreshStudentInsightsResponse = zod.object({
+  "insightsUpdatedAt": zod.string().nullable(),
+  "stats": zod.object({
+  "sessions": zod.number().int(),
+  "messages": zod.number().int(),
+  "lastActive": zod.string().nullable()
+}),
+  "student": zod.object({
+  "id": zod.number().int(),
+  "name": zod.string(),
+  "username": zod.string(),
+  "conditions": zod.array(zod.enum(['dyslexia', 'learning', 'autism'])),
+  "assessmentConfirmed": zod.boolean()
+}),
+  "insights": zod.array(zod.object({
+  "id": zod.number().int(),
+  "type": zod.enum(['strength', 'weakness', 'need']),
+  "text": zod.string(),
+  "evidence": zod.string().nullable(),
+  "sourceChatId": zod.number().int().nullable()
+})),
+  "chats": zod.array(zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "createdAt": zod.string(),
+  "icon": zod.string().nullable(),
+  "messageCount": zod.number().int()
+}))
+})
+
+
+
+
+
+
+export const GetAdultChatParams = zod.object({
+  "id": zod.coerce.number().int().min(1),
+  "chatId": zod.coerce.number().int().min(1)
+})
+
+export const GetAdultChatResponse = zod.object({
+  "chat": zod.object({
+  "id": zod.number().int(),
+  "title": zod.string(),
+  "icon": zod.string().nullable(),
+  "createdAt": zod.string()
+}),
+  "messages": zod.array(zod.object({
+  "id": zod.number().int(),
+  "chatId": zod.number().int(),
+  "role": zod.enum(['student', 'ai']),
+  "content": zod.string(),
+  "audioUrl": zod.string().nullable(),
+  "createdAt": zod.string()
+}))
+})
+
+
+
+
+
+
+export const GetAdultMessageAudioParams = zod.object({
+  "id": zod.coerce.number().int().min(1),
+  "messageId": zod.coerce.number().int().min(1)
+})
+
+export const GetAdultMessageAudioResponse = zod.unknown()
+
+
 export const HealthCheckResponse = zod.object({
   "status": zod.string()
 })
@@ -116,6 +193,12 @@ export const GetStudentParams = zod.object({
 })
 
 export const GetStudentResponse = zod.object({
+  "insightsUpdatedAt": zod.string().nullable(),
+  "stats": zod.object({
+  "sessions": zod.number().int(),
+  "messages": zod.number().int(),
+  "lastActive": zod.string().nullable()
+}),
   "student": zod.object({
   "id": zod.number().int(),
   "name": zod.string(),
@@ -126,12 +209,16 @@ export const GetStudentResponse = zod.object({
   "insights": zod.array(zod.object({
   "id": zod.number().int(),
   "type": zod.enum(['strength', 'weakness', 'need']),
-  "text": zod.string()
+  "text": zod.string(),
+  "evidence": zod.string().nullable(),
+  "sourceChatId": zod.number().int().nullable()
 })),
   "chats": zod.array(zod.object({
   "id": zod.number().int(),
   "title": zod.string(),
-  "createdAt": zod.string()
+  "createdAt": zod.string(),
+  "icon": zod.string().nullable(),
+  "messageCount": zod.number().int()
 }))
 })
 
@@ -193,6 +280,12 @@ export const GetStudentModeParams = zod.object({
 })
 
 export const GetStudentModeResponse = zod.object({
+  "insightsUpdatedAt": zod.string().nullable(),
+  "stats": zod.object({
+  "sessions": zod.number().int(),
+  "messages": zod.number().int(),
+  "lastActive": zod.string().nullable()
+}),
   "student": zod.object({
   "id": zod.number().int(),
   "name": zod.string(),
@@ -203,12 +296,16 @@ export const GetStudentModeResponse = zod.object({
   "insights": zod.array(zod.object({
   "id": zod.number().int(),
   "type": zod.enum(['strength', 'weakness', 'need']),
-  "text": zod.string()
+  "text": zod.string(),
+  "evidence": zod.string().nullable(),
+  "sourceChatId": zod.number().int().nullable()
 })),
   "chats": zod.array(zod.object({
   "id": zod.number().int(),
   "title": zod.string(),
-  "createdAt": zod.string()
+  "createdAt": zod.string(),
+  "icon": zod.string().nullable(),
+  "messageCount": zod.number().int()
 }))
 })
 

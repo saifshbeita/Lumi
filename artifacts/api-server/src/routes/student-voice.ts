@@ -1,4 +1,4 @@
-import { Router, type IRouter, type RequestHandler } from "express";
+import { Router, type IRouter, type RequestHandler, type Request, type Response } from "express";
 import multer from "multer";
 import { rateLimit } from "express-rate-limit";
 import { toFile } from "openai";
@@ -48,9 +48,15 @@ router.post("/voice/transcribe", authorize, limit, (req, res) => {
   });
 });
 router.get("/messages/:id/audio", authorize, limit, async (req, res): Promise<void> => {
-  const id = Number(req.params.id);
+  await serveMessageAudio(req, res, Number(req.params.id), res.locals.voiceStudentId as number, async () => {
+    const fresh = await currentStudent(req.session.studentId);
+    return fresh?.conditions[0] === "dyslexia";
+  });
+});
+
+// Both audiences use exactly the same generation lock, private object and cache.
+export async function serveMessageAudio(req: Request, res: Response, id: number, studentId: number, verifyAccess: () => Promise<boolean>): Promise<void> {
   if (!Number.isSafeInteger(id) || id <= 0) { res.status(403).json({ error: "هذا الصوت ليس في حسابك." }); return; }
-  const studentId = res.locals.voiceStudentId as number;
   const owned = async () => {
     const [row] = await db.select({ message: messages }).from(messages)
       .innerJoin(chats, eq(chats.id, messages.chatId)).innerJoin(students, eq(students.id, chats.studentId))
@@ -88,8 +94,7 @@ router.get("/messages/:id/audio", authorize, limit, async (req, res): Promise<vo
       await file.save(Buffer.from(await speech.arrayBuffer()), { resumable: false, contentType: "audio/mpeg", metadata: { cacheControl: "private, no-store" } });
     }
     if (!message.audioUrl) await db.update(messages).set({ audioUrl: expectedPath }).where(and(eq(messages.id, id), eq(messages.chatId, message.chatId)));
-    const fresh = await currentStudent(req.session.studentId);
-    if (fresh?.conditions[0] !== "dyslexia") { res.status(403).json({ error: "الصوت غير متاح لهذا الحساب." }); return; }
+    if (!await verifyAccess()) { res.status(403).json({ error: "الصوت غير متاح لهذا الحساب." }); return; }
     const [audio] = await file.download();
     res.set({ "Content-Type": "audio/mpeg", "Content-Length": String(audio.length), "Cache-Control": "private, no-store", "X-Lumi-Audio-Cache": cache });
     res.send(audio);
@@ -100,5 +105,5 @@ router.get("/messages/:id/audio", authorize, limit, async (req, res): Promise<vo
     if (locked) await client.query("SELECT pg_advisory_unlock(71935, $1)", [id]).catch(() => { brokenConnection = true; });
     client.release(brokenConnection);
   }
-});
+}
 export default router;

@@ -10,4 +10,8 @@ export interface Insight {
   id: number;
   type: InsightType;
   text: string;
+  /** @nullable */
+  evidence: string | null;
+  /** @nullable */
+  sourceChatId: number | null;
 }

@@ -7,8 +7,12 @@
 import type { Chat } from './chat';
 import type { Insight } from './insight';
 import type { Student } from './student';
+import type { StudentProfileStats } from './studentProfileStats';
 
 export interface StudentProfile {
+  /** @nullable */
+  insightsUpdatedAt: string | null;
+  stats: StudentProfileStats;
   student: Student;
   insights: Insight[];
   chats: Chat[];

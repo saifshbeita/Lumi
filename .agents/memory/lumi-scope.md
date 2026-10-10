@@ -14,3 +14,11 @@ The user expanded the original placeholder scope to real student chat with three
 **Why:** These are explicit scope and accessibility rules from the user.
 
 **How to apply:** Keep voice restricted to dyslexia students on both client and server. Preserve the supplied mascot and motion-free accessibility constraints; do not display condition labels to children.
+
+The adult-profile expansion is limited to session-based learning observations and owned read-only transcripts, including authorized replay of dyslexia audio. It must preserve student modes, existing voice behavior, authentication flows, and the design system.
+
+Adult insights must stay observational: no diagnoses, condition labels, or guesses about health or family. Sparse evidence should produce fewer insights, not invented weaknesses or needs.
+
+**Why:** The user explicitly set these boundaries for making adult profiles reflect children's sessions.
+
+**How to apply:** Treat a student's assigned mode and Lumi's answers as context, not proof of the child's abilities. Keep evidence traceable to the child's actual messages.

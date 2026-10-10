@@ -1,0 +1,37 @@
+Next step: make the adult profile page come alive from the child's sessions. Do NOT change the student modes, voice, auth, or design system.
+
+SCHEMA (shared/schema.ts, push with Drizzle):
+- profile_insights: add evidence (text, nullable) and source_chat_id (nullable, references chats).
+- students: add insights_updated_at (timestamp, nullable).
+
+INSIGHT GENERATION (server/services/insights.ts):
+- Trigger in the background after every 3rd student message in a chat. Never block or slow down the chat reply.
+- Also expose POST /api/adult/students/:id/insights/refresh for an on-demand refresh (adult session, own students only).
+- Input to the LLM: the student's mode, the last 3 chats (max 60 messages), and the current insights.
+- Output JSON only: {"strengths":[{"text","evidence","chat_id"}], "weaknesses":[...], "needs":[...]}, max 3 items per type.
+- Rules for the insight prompt:
+  - Write in English, short, plain, for a teacher or parent.
+  - Observational and learning-focused only, based on what actually happened in the chats. Example: "Confuses ب and ت at the start of words" with evidence "Wrote تاب for باب twice".
+  - Never diagnose, never mention any condition, disorder, or label, never guess about health or family.
+  - If there is not enough data, return fewer items. Never invent.
+- Replace the student's insights in one transaction (delete old, insert new), set students.insights_updated_at.
+- If parsing fails, keep the old insights and log the error.
+
+ADULT PROFILE PAGE:
+- Top stats card: number of sessions, number of messages, last active (relative time).
+- Strengths / Weaknesses / Needs sections, each item shows the text and a small evidence line, with a link that opens the source chat.
+- "Updated X minutes ago" + a "Refresh insights" secondary button with a loading state.
+- Keep the existing empty states when there are no insights yet, with the text "Insights appear after a few sessions."
+- Use success #8DBF9B accents for strengths, #E8A598 for weaknesses, #E5EEF5 for needs. No red.
+
+CHAT TRANSCRIPTS:
+- On the profile, list the child's chats (emoji icon, title, date, message count).
+- Clicking opens a read-only transcript at /students/:id/chats/:chatId. Arabic messages render RTL. Learning-mode AI messages render their steps as a numbered list. Dyslexia AI messages get a play button using the existing cached audio endpoint (add an adult-scoped version of the audio endpoint if needed).
+- Adults can only see their own students' chats. Return 403 otherwise.
+
+DONE WHEN:
+- As each seeded student, send 3 messages. Within ~15 seconds the owning adult's profile shows real insights with evidence tied to those chats.
+- Refresh insights works on demand.
+- Transcripts open correctly for all three modes.
+- The parent account gets 403 on the teacher's students' profiles, chats, and audio, and vice versa.
+- Show me a screenshot of a filled profile page at 1280px width.

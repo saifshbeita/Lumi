@@ -19,6 +19,7 @@ export const students = pgTable("students", {
   pinHash: text("pin_hash").notNull(),
   conditions: text("conditions").array().notNull(),
   assessmentConfirmed: boolean("assessment_confirmed").notNull().default(false),
+  insightsUpdatedAt: timestamp("insights_updated_at", { withTimezone: true }),
   createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
 }, () => [check("single_valid_mode", sql`cardinality(conditions) = 1 AND conditions <@ ARRAY['dyslexia','learning','autism']::text[]`)]);
 export const chats = pgTable("chats", {
@@ -41,6 +42,8 @@ export const profileInsights = pgTable("profile_insights", {
   studentId: integer("student_id").references(() => students.id).notNull(),
   type: text("type", { enum: ["strength", "weakness", "need"] }).notNull(),
   text: text("text").notNull(),
+  evidence: text("evidence"),
+  sourceChatId: integer("source_chat_id").references(() => chats.id),
   updatedAt: timestamp("updated_at", { withTimezone: true }).defaultNow().notNull(),
 }, () => [check("insight_type", sql`type IN ('strength','weakness','need')`)]);
 export const sessions = pgTable("sessions", {

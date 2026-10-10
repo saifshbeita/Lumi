@@ -27,6 +27,7 @@ export * from './studentChat';
 export * from './studentInput';
 export * from './studentLogin';
 export * from './studentProfile';
+export * from './studentProfileStats';
 export * from './studentSession';
 export * from './studentUpdate';
 export * from './success';

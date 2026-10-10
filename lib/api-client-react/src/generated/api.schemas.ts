@@ -150,12 +150,19 @@ export interface Insight {
   id: number;
   type: InsightType;
   text: string;
+  /** @nullable */
+  evidence: string | null;
+  /** @nullable */
+  sourceChatId: number | null;
 }
 
 export interface Chat {
   id: number;
   title: string;
   createdAt: string;
+  /** @nullable */
+  icon: string | null;
+  messageCount: number;
 }
 
 export interface StudentChat {
@@ -205,7 +212,17 @@ export interface ChatExchange {
   reply: ChatMessage;
 }
 
+export type StudentProfileStats = {
+  sessions: number;
+  messages: number;
+  /** @nullable */
+  lastActive: string | null;
+};
+
 export interface StudentProfile {
+  /** @nullable */
+  insightsUpdatedAt: string | null;
+  stats: StudentProfileStats;
   student: Student;
   insights: Insight[];
   chats: Chat[];

@@ -9,4 +9,7 @@ export interface Chat {
   id: number;
   title: string;
   createdAt: string;
+  /** @nullable */
+  icon: string | null;
+  messageCount: number;
 }

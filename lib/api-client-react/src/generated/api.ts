@@ -67,6 +67,226 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
+export const getRefreshStudentInsightsUrl = (id: number,) => {
+
+
+
+
+  return `/api/adult/students/${id}/insights/refresh`
+}
+
+export const refreshStudentInsights = async (id: number, options?: Parameters<typeof customFetch>[1]): Promise<StudentProfile> => {
+
+  return customFetch<StudentProfile>(getRefreshStudentInsightsUrl(id),
+  {
+    ...options,
+    method: 'POST'
+
+
+  }
+);}
+
+
+
+
+
+export const getRefreshStudentInsightsMutationKey = () => ['refreshStudentInsights'] as const;
+
+export const getRefreshStudentInsightsMutationOptions = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshStudentInsights>>, TError,RefreshStudentInsightsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+): UseMutationOptions<Awaited<ReturnType<typeof refreshStudentInsights>>, TError,RefreshStudentInsightsMutationVariables, TContext> => {
+
+const mutationKey = getRefreshStudentInsightsMutationKey();
+const {mutation: mutationOptions, request: requestOptions} = options ?
+      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
+      options
+      : {...options, mutation: {...options.mutation, mutationKey}}
+      : {mutation: { mutationKey, }, request: undefined};
+
+
+
+
+      const mutationFn: MutationFunction<Awaited<ReturnType<typeof refreshStudentInsights>>, RefreshStudentInsightsMutationVariables> = (props) => {
+          const {id} = props ?? {};
+
+          return  refreshStudentInsights(id,requestOptions)
+        }
+
+
+
+
+
+
+  return  { mutationFn, ...mutationOptions }}
+
+    export type RefreshStudentInsightsMutationResult = NonNullable<Awaited<ReturnType<typeof refreshStudentInsights>>>
+
+    export type RefreshStudentInsightsMutationError = ErrorType<void>
+    export type RefreshStudentInsightsMutationVariables = {id: number}
+
+    export const useRefreshStudentInsights = <TError = ErrorType<void>,
+    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof refreshStudentInsights>>, TError,RefreshStudentInsightsMutationVariables, TContext>, request?: SecondParameter<typeof customFetch>}
+ ): UseMutationResult<
+        Awaited<ReturnType<typeof refreshStudentInsights>>,
+        TError,
+        RefreshStudentInsightsMutationVariables,
+        TContext
+      > => {
+      return useMutation(getRefreshStudentInsightsMutationOptions(options));
+    }
+
+export const getGetAdultChatUrl = (id: number,
+    chatId: number,) => {
+
+
+
+
+  return `/api/students/${id}/chats/${chatId}`
+}
+
+export const getAdultChat = async (id: number,
+    chatId: number, options?: Parameters<typeof customFetch>[1]): Promise<ChatHistory> => {
+
+  return customFetch<ChatHistory>(getGetAdultChatUrl(id,chatId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdultChatQueryKey = (id: number,
+    chatId: number,) => {
+    return [
+    `/api/students/${id}/chats/${chatId}`
+    ] as const;
+    }
+
+
+export const getGetAdultChatQueryOptions = <TData = Awaited<ReturnType<typeof getAdultChat>>, TError = ErrorType<void>>(id: number,
+    chatId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdultChat>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdultChatQueryKey(id,chatId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdultChat>>> = ({ signal }) => getAdultChat(id,chatId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && chatId !== null && chatId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdultChat>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdultChatQueryResult = NonNullable<Awaited<ReturnType<typeof getAdultChat>>>
+export type GetAdultChatQueryError = ErrorType<void>
+
+
+
+export function useGetAdultChat<TData = Awaited<ReturnType<typeof getAdultChat>>, TError = ErrorType<void>>(
+ id: number,
+    chatId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdultChat>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdultChatQueryOptions(id,chatId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
+export const getGetAdultMessageAudioUrl = (id: number,
+    messageId: number,) => {
+
+
+
+
+  return `/api/adult/students/${id}/messages/${messageId}/audio`
+}
+
+export const getAdultMessageAudio = async (id: number,
+    messageId: number, options?: Parameters<typeof customFetch>[1]): Promise<Blob> => {
+
+  return customFetch<Blob>(getGetAdultMessageAudioUrl(id,messageId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getGetAdultMessageAudioQueryKey = (id: number,
+    messageId: number,) => {
+    return [
+    `/api/adult/students/${id}/messages/${messageId}/audio`
+    ] as const;
+    }
+
+
+export const getGetAdultMessageAudioQueryOptions = <TData = Awaited<ReturnType<typeof getAdultMessageAudio>>, TError = ErrorType<void>>(id: number,
+    messageId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdultMessageAudio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getGetAdultMessageAudioQueryKey(id,messageId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof getAdultMessageAudio>>> = ({ signal }) => getAdultMessageAudio(id,messageId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: id !== null && id !== undefined && messageId !== null && messageId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof getAdultMessageAudio>>, TError, TData> & { queryKey: QueryKey }
+}
+
+export type GetAdultMessageAudioQueryResult = NonNullable<Awaited<ReturnType<typeof getAdultMessageAudio>>>
+export type GetAdultMessageAudioQueryError = ErrorType<void>
+
+
+
+export function useGetAdultMessageAudio<TData = Awaited<ReturnType<typeof getAdultMessageAudio>>, TError = ErrorType<void>>(
+ id: number,
+    messageId: number, options?: { query?:UseQueryOptions<Awaited<ReturnType<typeof getAdultMessageAudio>>, TError, TData>, request?: SecondParameter<typeof customFetch>}
+
+ ):  UseQueryResult<TData, TError> & { queryKey: QueryKey } {
+
+  const queryOptions = getGetAdultMessageAudioQueryOptions(id,messageId,options)
+
+  const query = useQuery(queryOptions) as  UseQueryResult<TData, TError> & { queryKey: QueryKey };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+
 export const getHealthCheckUrl = () => {
 
 

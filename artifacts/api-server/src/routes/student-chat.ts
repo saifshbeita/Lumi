@@ -9,6 +9,7 @@ import {
 } from "@workspace/api-zod";
 import { currentStudent } from "../lib/profiles";
 import { generateStudentReply, generateChatLabel, type StudentMode } from "../lib/student-ai";
+import { scheduleInsights } from "../services/insights";
 
 const router: IRouter = Router();
 const limiter = rateLimit({ windowMs: 60_000, limit: 20, standardHeaders: "draft-8", legacyHeaders: false, message: { error: "لنأخذ استراحة قصيرة. حاول مرة أخرى بعد قليل." } });
@@ -101,6 +102,7 @@ router.post("/:id/messages", limiter, async (req, res): Promise<void> => {
       [labeledChat] = await lockedDb.update(chats).set(label).where(and(eq(chats.id, chatId), eq(chats.studentId, student.id))).returning() as [typeof chats.$inferSelect];
     }
     res.json(SendStudentMessageResponse.parse({ chat: publicChat(labeledChat), studentMessage: publicMessage(studentMessage), reply: publicMessage(reply!) }));
+    scheduleInsights(student.id, chatId);
   } catch {
     req.log.warn({ chatId, studentMessageId: savedId }, "Student AI exchange unavailable");
     res.status(503).json({ error: "تعذر على لومي الرد الآن. سؤالك محفوظ. حاول مرة أخرى.", studentMessageId: savedId });

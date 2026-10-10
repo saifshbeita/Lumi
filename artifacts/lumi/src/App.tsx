@@ -6,6 +6,7 @@ import Home from '@/pages/home';
 import Auth from '@/pages/auth';
 import Dashboard from '@/pages/adult/dashboard';
 import StudentProfilePage from '@/pages/adult/student-profile';
+import ChatTranscriptPage from '@/pages/adult/chat-transcript';
 import StudentLogin from '@/pages/student/login';
 import DyslexiaHome from '@/pages/student/dyslexia';
 import LearningHome from '@/pages/student/learning';
@@ -25,6 +26,7 @@ function Router() {
         <Route path="/auth" component={Auth} />
         <Route path="/adult" component={Dashboard} />
         <Route path="/adult/students/:id" component={StudentProfilePage} />
+        <Route path="/students/:id/chats/:chatId" component={ChatTranscriptPage} />
         <Route path="/student/login" component={StudentLogin} />
         <Route path="/student/dyslexia/chat/:id" component={DyslexiaChat} />
         <Route path="/student/learning/chat/:id" component={LearningChat} />
