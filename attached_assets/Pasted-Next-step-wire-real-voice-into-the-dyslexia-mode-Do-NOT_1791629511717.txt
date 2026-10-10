@@ -1,0 +1,27 @@
+Next step: wire real voice into the dyslexia mode. Do NOT change other modes, the adult side, or the design system.
+
+PROVIDER
+Use OpenAI through Replit's built-in AI integration if it supports audio. Otherwise stop and ask me for an OpenAI API key (store it as a secret).
+- Speech to text: OpenAI transcription model, language "ar".
+- Text to speech: OpenAI TTS, one warm, calm voice, normal-to-slow speed.
+
+SPEECH TO TEXT
+- POST /api/student/voice/transcribe (student session required, dyslexia students only). Accepts an audio file, returns { text }.
+- Accept both audio/webm (Chrome) and audio/mp4 (iPad Safari). Max 30 seconds, max 5MB.
+- Frontend: the big mic button is TAP to start, TAP to stop (not hold). Auto-stop at 30 seconds.
+- States with clear Arabic labels and a color change only (no animation): idle, "لومي يسمع...", "لومي يفكر...".
+- After transcription, show the text as the child's message bubble and send it automatically through the existing message endpoint.
+- If mic permission is denied or unsupported: friendly Arabic message in #E8A598 and focus the text input fallback.
+
+TEXT TO SPEECH
+- GET /api/student/messages/:id/audio (scoped to the logged-in student, 403 otherwise). Generates the audio on first request, saves it (Replit Object Storage), stores the path in messages.audio_url, and serves the cached file after that. Never regenerate an existing message's audio.
+- Every new AI reply in dyslexia mode plays automatically once it arrives. The child already tapped the mic, so unlock the audio element on that first tap to avoid browser autoplay blocks.
+- The speaker button on every AI message replays it. While playing, the button shows a stop icon and stops playback when tapped.
+- If audio fails, the text still shows and the speaker button shows a retry state. Never block the chat on audio.
+
+DONE WHEN
+- As the seeded dyslexia student: speak a question in Arabic, it is transcribed correctly, sent, and the reply plays aloud automatically.
+- Replay works, and a second replay does not call TTS again (verify the cache).
+- Works in Chrome desktop and iPad Safari (or Safari responsive mode if no device).
+- A non-dyslexia student gets 403 on both voice endpoints.
+- Tell me the average time from tap-stop to hearing the reply.
