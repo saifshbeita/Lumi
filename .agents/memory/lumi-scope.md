@@ -28,3 +28,9 @@ The pitch demo is an adult-only, temporary comparison of the real student modes,
 **Why:** The user requested a projector demonstration without contaminating children's histories, and explicitly protected existing authentication, voice internals, insights logic, and design tokens.
 
 **How to apply:** Reuse the student presentation components and generation prompts. Scope demo-only recording access to the adult session; keep existing student voice authorization unchanged. Verify projector fit inside each column, not just absence of page scrolling.
+
+Adult entry-screen role is navigation intent, not a credential. Authenticate the email and password; use the account's stored role for authorization.
+
+**Why:** A correct teacher password was rejected when the parent entry screen supplied its role. Removing that mismatch must never change the account's actual permissions.
+
+**How to apply:** Keep role selection separate from credential verification; do not apply this adult-login rule to student login.
