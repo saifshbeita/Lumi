@@ -1,0 +1,288 @@
+format: replit.sdm
+version: 1
+size:
+  width: 1920
+  height: 1080
+background:
+  kind: solid
+  color:
+    kind: token
+    token: background
+theme:
+  colors:
+    background: "#FAF9F4"
+    foreground: "#2D4059"
+    accent: "#F3D982"
+    surface: "#E5EEF5"
+    white: "#FFFFFF"
+  fonts:
+    display: Fraunces
+    body: Readex Pro
+assets:
+  full:
+    src: images/lumi-full.png
+  head:
+    src: images/lumi-head.png
+elements:
+  - id: footer-rule
+    type: shape
+    frame:
+      x: 120
+      y: 994
+      width: 1680
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: folio
+    type: text
+    frame:
+      x: 1670
+      y: 1010
+      width: 140
+      height: 42
+    body:
+      paragraphs:
+        - runs:
+            - text: 06 / 09
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: brand-head
+    type: image
+    assetId: head
+    fit: contain
+    frame:
+      x: 1740
+      y: 60
+      width: 80
+      height: 80
+  - id: headline
+    type: text
+    frame:
+      x: 120
+      y: 135
+      width: 1640
+      height: 190
+    body:
+      paragraphs:
+        - runs:
+            - text: A focused position in an active market.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: display
+            sizePt: 38
+            weight: 600
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.1
+          spaceAfterPt: 0
+  - id: competitor-0
+    type: text
+    frame:
+      x: 120
+      y: 345
+      width: 1060
+      height: 140
+    body:
+      paragraphs:
+        - runs:
+            - text: "Lexsee: guided reading, fluency support and teacher insights."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 23
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: competitor-rule-0
+    type: shape
+    frame:
+      x: 120
+      y: 464
+      width: 1040
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: competitor-1
+    type: text
+    frame:
+      x: 120
+      y: 490
+      width: 1060
+      height: 140
+    body:
+      paragraphs:
+        - runs:
+            - text: "Faheem: live one-to-one tutoring and parent reports."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 23
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: competitor-rule-1
+    type: shape
+    frame:
+      x: 120
+      y: 609
+      width: 1040
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: competitor-2
+    type: text
+    frame:
+      x: 120
+      y: 635
+      width: 1060
+      height: 140
+    body:
+      paragraphs:
+        - runs:
+            - text: "Khanmigo: broad AI tutoring with family oversight."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 23
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: competitor-rule-2
+    type: shape
+    frame:
+      x: 120
+      y: 754
+      width: 1040
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: lumi-position
+    type: shape
+    frame:
+      x: 1240
+      y: 340
+      width: 560
+      height: 440
+    geometry:
+      kind: preset
+      preset: roundRect
+      cornerRadius: 24
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: accent
+  - id: lumi-copy
+    type: text
+    frame:
+      x: 1280
+      y: 380
+      width: 480
+      height: 365
+    body:
+      paragraphs:
+        - runs:
+            - text: "Lumi: Arabic/English support, three adult-selected learning modes, one
+                shared learning record."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: validation
+    type: text
+    frame:
+      x: 120
+      y: 835
+      width: 1650
+      height: 95
+    body:
+      paragraphs:
+        - runs:
+            - text: Compete on fit and usability; learning outcomes still need validation.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: source
+    type: text
+    frame:
+      x: 120
+      y: 943
+      width: 1650
+      height: 50
+    body:
+      paragraphs:
+        - runs:
+            - text: "Sources: official competitor websites, accessed October 2026."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0

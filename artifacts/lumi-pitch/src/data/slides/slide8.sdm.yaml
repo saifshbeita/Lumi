@@ -1,0 +1,259 @@
+format: replit.sdm
+version: 1
+size:
+  width: 1920
+  height: 1080
+background:
+  kind: solid
+  color:
+    kind: token
+    token: background
+theme:
+  colors:
+    background: "#FAF9F4"
+    foreground: "#2D4059"
+    accent: "#F3D982"
+    surface: "#E5EEF5"
+    white: "#FFFFFF"
+  fonts:
+    display: Fraunces
+    body: Readex Pro
+assets:
+  full:
+    src: images/lumi-full.png
+  head:
+    src: images/lumi-head.png
+elements:
+  - id: footer-rule
+    type: shape
+    frame:
+      x: 120
+      y: 994
+      width: 1680
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: folio
+    type: text
+    frame:
+      x: 1670
+      y: 1010
+      width: 140
+      height: 42
+    body:
+      paragraphs:
+        - runs:
+            - text: 08 / 09
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: brand-head
+    type: image
+    assetId: head
+    fit: contain
+    frame:
+      x: 1740
+      y: 60
+      width: 80
+      height: 80
+  - id: headline
+    type: text
+    frame:
+      x: 120
+      y: 135
+      width: 1640
+      height: 190
+    body:
+      paragraphs:
+        - runs:
+            - text: Early interest. A measurable route to adoption.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: display
+            sizePt: 38
+            weight: 600
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.1
+          spaceAfterPt: 0
+  - id: waitlist-field
+    type: shape
+    frame:
+      x: 120
+      y: 350
+      width: 690
+      height: 260
+    geometry:
+      kind: preset
+      preset: roundRect
+      cornerRadius: 24
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: accent
+  - id: views-field
+    type: shape
+    frame:
+      x: 860
+      y: 350
+      width: 940
+      height: 260
+    geometry:
+      kind: preset
+      preset: roundRect
+      cornerRadius: 24
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: waitlist
+    type: text
+    frame:
+      x: 160
+      y: 385
+      width: 610
+      height: 220
+    body:
+      paragraphs:
+        - runs:
+            - text: 37 waitlist signups in the first three hackathon hours.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 26
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: views
+    type: text
+    frame:
+      x: 900
+      y: 400
+      width: 830
+      height: 185
+    body:
+      paragraphs:
+        - runs:
+            - text: 10,000 Instagram views in 24 hours.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 30
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: feedback
+    type: text
+    frame:
+      x: 120
+      y: 640
+      width: 1650
+      height: 140
+    body:
+      paragraphs:
+        - runs:
+            - text: Feedback from 2 specialists and 3 teachers; 1 Amman school willing to
+                trial.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 23
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: gtm
+    type: text
+    frame:
+      x: 120
+      y: 790
+      width: 1650
+      height: 120
+    body:
+      paragraphs:
+        - runs:
+            - text: "@lumi.mena → parent/teacher demos → supervised pilots → paid conversion."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: metrics
+    type: text
+    frame:
+      x: 120
+      y: 920
+      width: 1650
+      height: 60
+    body:
+      paragraphs:
+        - runs:
+            - text: Track activation, weekly use, teacher-rated usefulness and renewal.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 19
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: caveat
+    type: text
+    frame:
+      x: 120
+      y: 1030
+      width: 1500
+      height: 40
+    body:
+      paragraphs:
+        - runs:
+            - text: Founder-reported signals — not paid traction or proven learning impact.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0

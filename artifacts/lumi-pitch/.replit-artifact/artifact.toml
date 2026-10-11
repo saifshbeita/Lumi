@@ -1,0 +1,28 @@
+kind = "slides"
+previewPath = "/lumi-pitch/"
+title = "Lumi — Every mind learns its own way"
+description = "Nine-slide English pitch with verified research, proposed business model, and a one-minute demo slot."
+version = "1.0.0"
+id = "artifacts/lumi-pitch"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/lumi-pitch/" ]
+localPort = 24758
+
+[services.development]
+run = "pnpm --filter @workspace/lumi-pitch run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/lumi-pitch", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/lumi-pitch/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24758"
+BASE_PATH = "/lumi-pitch/"

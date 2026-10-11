@@ -56,3 +56,31 @@ mtime_ms = 1791643633755
 storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/2677e303-ddad-4b85-9d7e-45cffc8e0753/d326b0d7-c2d5-4ae5-abc5-1776fda4a2d1"
 storage_version_token = "1791643660949223"
 content_type = "text/markdown"
+
+[[outputs]]
+id = "d4HvXEQ36esQ0plAoSCVV"
+uri = "file://artifacts/lumi-pitch/research/research-notes.html"
+type = "html"
+title = "Lumi — Research & Market Evidence"
+description = "Source register, market calculations, competitor research, claim limitations and pilot strategy."
+logical_id = "8ee5d6f7-26cd-496a-b15f-896bd345e455"
+content_hash = "sha256:27a927e3bb4a7f5b55a838c196fbd459377f775b7e761f0cd20129c8b7e25ef6"
+size = 17766
+mtime_ms = 1791712141299
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/8ee5d6f7-26cd-496a-b15f-896bd345e455/57a4832f-8341-4451-bde2-c47ba8db0044"
+storage_version_token = "1791712203424597"
+content_type = "text/html"
+
+[[outputs]]
+id = "zlbsfhvC8mzDuGYXJtkrX"
+uri = "file://artifacts/lumi-pitch/research/speaker-script.html"
+type = "html"
+title = "Lumi — Two-Minute Speaker Script"
+description = "230-word English script, slide-by-slide timing and 60-second demo handoff."
+logical_id = "5e98b4f2-1288-46d7-b5af-c84420b6e928"
+content_hash = "sha256:bdaa6cbfe403550b27e87f69da69b72cc45209ef746059429ecdb54e0c63d096"
+size = 4354
+mtime_ms = 1791712169671
+storage_uri = "gcs://replit-rams-assets-sisko/rams/assets/repl:ce1bdcca-8101-4745-9481-b94705c81f9a/5e98b4f2-1288-46d7-b5af-c84420b6e928/2d6b87a1-6fe4-4eb7-91e4-515859ff2d14"
+storage_version_token = "1791712204759047"
+content_type = "text/html"

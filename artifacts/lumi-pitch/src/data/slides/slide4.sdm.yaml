@@ -1,0 +1,176 @@
+format: replit.sdm
+version: 1
+size:
+  width: 1920
+  height: 1080
+background:
+  kind: solid
+  color:
+    kind: token
+    token: foreground
+theme:
+  colors:
+    background: "#FAF9F4"
+    foreground: "#2D4059"
+    accent: "#F3D982"
+    surface: "#E5EEF5"
+    white: "#FFFFFF"
+  fonts:
+    display: Fraunces
+    body: Readex Pro
+assets:
+  full:
+    src: images/lumi-full.png
+  head:
+    src: images/lumi-head.png
+elements:
+  - id: footer-rule
+    type: shape
+    frame:
+      x: 120
+      y: 994
+      width: 1680
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: accent
+  - id: folio
+    type: text
+    frame:
+      x: 1670
+      y: 1010
+      width: 140
+      height: 42
+    body:
+      paragraphs:
+        - runs:
+            - text: 04 / 09
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: background
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: brand-head
+    type: image
+    assetId: head
+    fit: contain
+    frame:
+      x: 1740
+      y: 60
+      width: 80
+      height: 80
+  - id: headline
+    type: text
+    frame:
+      x: 120
+      y: 135
+      width: 1640
+      height: 190
+    body:
+      paragraphs:
+        - runs:
+            - text: See Lumi in action.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: display
+            sizePt: 38
+            weight: 600
+            color:
+              kind: token
+              token: background
+          lineHeight: 1.1
+          spaceAfterPt: 0
+  - id: video-slot
+    type: shape
+    frame:
+      x: 300
+      y: 340
+      width: 1320
+      height: 455
+    geometry:
+      kind: preset
+      preset: roundRect
+      cornerRadius: 24
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: duration
+    type: text
+    frame:
+      x: 380
+      y: 445
+      width: 1200
+      height: 230
+    body:
+      paragraphs:
+        - runs:
+            - text: 60-second product demo.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: display
+            sizePt: 42
+            weight: 600
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.1
+          spaceAfterPt: 0
+  - id: pending
+    type: text
+    frame:
+      x: 430
+      y: 650
+      width: 1100
+      height: 80
+    body:
+      paragraphs:
+        - runs:
+            - text: Video to be supplied by the Lumi team.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: demo-flow
+    type: text
+    frame:
+      x: 300
+      y: 865
+      width: 1350
+      height: 100
+    body:
+      paragraphs:
+        - runs:
+            - text: Child experience → adapted support → adult insights.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 24
+            weight: 400
+            color:
+              kind: token
+              token: background
+          lineHeight: 1.25
+          spaceAfterPt: 0

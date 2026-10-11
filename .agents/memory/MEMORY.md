@@ -5,3 +5,4 @@
 - [Demo release](demo-release.md) — additive fictional production seeds, bilingual voice goals, actual-playback measurements, and strict insight evidence.
 - [Bilingual ownership](bilingual-ownership.md) — adults control child language; demo language is independent; preserve original transcripts and quotations.
 - [Placement boundaries](placement-boundaries.md) — Arabic warm-ups ages 6–12; adult-only results, mode-specific presentation limits, and scoped audio.
+- [Pitch evidence](lumi-pitch-evidence.md) — founder-reported interest, proposed pricing, and prevalence-based market scenarios must stay clearly qualified.

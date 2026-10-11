@@ -1,0 +1,259 @@
+format: replit.sdm
+version: 1
+size:
+  width: 1920
+  height: 1080
+background:
+  kind: solid
+  color:
+    kind: token
+    token: background
+theme:
+  colors:
+    background: "#FAF9F4"
+    foreground: "#2D4059"
+    accent: "#F3D982"
+    surface: "#E5EEF5"
+    white: "#FFFFFF"
+  fonts:
+    display: Fraunces
+    body: Readex Pro
+assets:
+  full:
+    src: images/lumi-full.png
+  head:
+    src: images/lumi-head.png
+elements:
+  - id: footer-rule
+    type: shape
+    frame:
+      x: 120
+      y: 994
+      width: 1680
+      height: 2
+    geometry:
+      kind: preset
+      preset: rect
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: surface
+  - id: folio
+    type: text
+    frame:
+      x: 1670
+      y: 1010
+      width: 140
+      height: 42
+    body:
+      paragraphs:
+        - runs:
+            - text: 05 / 09
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: brand-head
+    type: image
+    assetId: head
+    fit: contain
+    frame:
+      x: 1740
+      y: 60
+      width: 80
+      height: 80
+  - id: headline
+    type: text
+    frame:
+      x: 120
+      y: 135
+      width: 1640
+      height: 190
+    body:
+      paragraphs:
+        - runs:
+            - text: Start in Jordan. Expand with evidence.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: display
+            sizePt: 38
+            weight: 600
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.1
+          spaceAfterPt: 0
+  - id: opportunity-field
+    type: shape
+    frame:
+      x: 120
+      y: 390
+      width: 760
+      height: 425
+    geometry:
+      kind: preset
+      preset: roundRect
+      cornerRadius: 24
+    fill:
+      kind: solid
+      color:
+        kind: token
+        token: accent
+  - id: enrollment
+    type: text
+    frame:
+      x: 120
+      y: 305
+      width: 1650
+      height: 90
+    body:
+      paragraphs:
+        - runs:
+            - text: 4.56M primary pupils across Jordan and Saudi Arabia in 2024.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 23
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: market-number
+    type: text
+    frame:
+      x: 160
+      y: 435
+      width: 680
+      height: 190
+    body:
+      paragraphs:
+        - runs:
+            - text: $30.1M
+          defaultRunStyle:
+            font:
+              kind: token
+              token: display
+            sizePt: 80
+            weight: 600
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.1
+          spaceAfterPt: 0
+  - id: market-context
+    type: text
+    frame:
+      x: 160
+      y: 625
+      width: 670
+      height: 180
+    body:
+      paragraphs:
+        - runs:
+            - text: "illustrative annual opportunity: 4.56M × 11% × $60/year."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: market-entry
+    type: text
+    frame:
+      x: 970
+      y: 410
+      width: 820
+      height: 415
+    body:
+      paragraphs:
+        - runs:
+            - text: "Jordan-only scenario: $7.4M/year, before access and purchasing
+                constraints."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 10
+        - runs:
+            - text: "Initial target: 10 partners × 30 paid learners = $18K annual recurring
+                revenue."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 22
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 10
+  - id: assumptions
+    type: text
+    frame:
+      x: 120
+      y: 840
+      width: 1660
+      height: 85
+    body:
+      paragraphs:
+        - runs:
+            - text: Scenarios, not forecasts. Primary enrollment is an age proxy; regional
+                prevalence is not a country-specific estimate.
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 16
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
+  - id: market-source
+    type: text
+    frame:
+      x: 120
+      y: 930
+      width: 1650
+      height: 78
+    body:
+      paragraphs:
+        - runs:
+            - text: "Sources: World Bank / UNESCO UIS, 2024 enrollment; Aldakhil et al., 2024.
+                Price and adoption are assumptions."
+          defaultRunStyle:
+            font:
+              kind: token
+              token: body
+            sizePt: 14.4
+            weight: 400
+            color:
+              kind: token
+              token: foreground
+          lineHeight: 1.25
+          spaceAfterPt: 0
